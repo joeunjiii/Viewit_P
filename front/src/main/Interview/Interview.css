@@ -80,6 +80,7 @@
   gap: 100px;
   margin: 0; /* 일단 margin 제거 */
   flex: 1; /* 인터뷰 전체 폭 중 일부 자동 확보 */
+  margin-left : 100px;
   margin-right: 100px; /* or 적절한 제한폭 지정 */
 }
 
@@ -204,21 +205,24 @@
     padding: 12px 16px;
   }
   .interview-body {
-    flex-direction: row; /* 가로 배치 유지 */
-    gap: 40px; /* 데스크탑보다 좁게 */
+    display: flex;
+    flex-direction: row; 
+    gap: 40px; 
     align-items: flex-start;
   }
  
-  
   .header-spacer {
-    flex-grow: 1;
-    max-width: 1000px; /* 땡기고 싶은 거리 */
+    flex-grow: 0;       /* ✅ 오른쪽 밀지 않도록 */
+    max-width: none;    /* ✅ 너비 제한 제거 */
+  }
+  .header-left {
+    margin-right: 500px;
   }
   .end-button {
-    margin-left: auto; /* 오른쪽 끝으로 붙임 */
-    transform: translateX(-24px);
+    transform: none;    /* ✅ 위치 조정 제거 */
     font-size: 13px;
     padding: 5px 12px;
+    margin-left: 0;     /* 혹시 auto 같은 속성 있었으면 제거 */
   }
   .voice-area {
     margin: 0;
@@ -233,6 +237,7 @@
   }
   .timer-area {
     align-self: center;
+    margin-left:100px;
   }
 
   .waveform {

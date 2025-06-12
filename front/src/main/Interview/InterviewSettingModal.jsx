@@ -91,9 +91,9 @@ function InterviewSettingsModal({ onClose, onStart }) {
         </div>
 
         <div className="modal-actions">
-          <Link to="/main">
-            <button className="cancel">취소</button>
-          </Link>
+          <button className="cancel" onClick={() => onClose()}>
+            취소
+          </button>
           <button
             className="start"
             onClick={() =>

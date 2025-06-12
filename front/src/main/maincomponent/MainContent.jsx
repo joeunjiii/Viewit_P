@@ -1,10 +1,18 @@
+import React,{useState} from "react";
 import SectionHeader from "./SectionHeader";
 import RecentSection from "./RecentSection";
+import SpeechAlertModal from "../ex/SpeechAlertModal";
 import { FaUsers, FaMicrophone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./css/Maincontent.css";
 
 function MainContent() {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleSpeechClick = () => {
+    setShowModal(true);
+  };
+
   return (
     <div className="main-content">
       <header className="main-header">
@@ -30,7 +38,7 @@ function MainContent() {
             <div className="card-title">모의면접</div>
           </Link>
 
-          <div className="card">
+          <div className="card" onClick={handleSpeechClick}>
             <div className="card-icon">
               <FaMicrophone />
             </div>
@@ -68,8 +76,11 @@ function MainContent() {
           </div>
         </div>
       </div>
+      {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}
     </div>
+    
   );
+  
 }
 
 export default MainContent;
