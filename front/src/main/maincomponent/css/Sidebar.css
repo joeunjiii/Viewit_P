@@ -1,0 +1,216 @@
+/* Sidebar 컴포넌트 전용 스타일 */
+
+/* 사이드바 기본 */
+.sidebar {
+  width: 240px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px 0;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+/* 반응형: 태블릿 */
+.sidebar.tablet {
+  width: 80px;
+  min-width: 80px;
+}
+
+.sidebar.tablet .main-nav li span,
+.sidebar.tablet .settings-button span {
+  display: flex;
+}
+
+/* 로고 섹션 */
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.sidebar-logo {
+  width: 100%;
+  max-width: 120px;
+  /* PC 기준 최대 너비 */
+  height: auto;
+  /* 비율 유지 */
+  object-fit: contain;
+  /* 이미지 잘림 방지 */
+  display: block;
+  margin: 0 auto;
+}
+
+/* 프로필 섹션 */
+.profile-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #6baa7f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  margin-right: 12px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🔹 공통 메뉴 스타일 */
+.menu-link {
+  text-decoration: none;
+  color: #555;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.menu-link:hover {
+  background-color: #f5f5f5;
+}
+
+/* 🔹 선택된 메뉴 (아이콘 + 텍스트 색상 강조) */
+.menu-link.active {
+  color: #6baa7f;
+  font-weight: 600;
+  background-color: #f0f0f0;
+}
+
+.menu-link .menu-icon {
+  color: inherit; /* 텍스트 색상 따라가게 */
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.menu-link.active .menu-icon {
+  color: #6baa7f;
+}
+
+
+@media (max-width: 1024px) {
+  .profile-info {
+    display: none;
+  }
+
+  .profile-section {
+    justify-content: center;
+    /* 가운데 정렬 */
+  }
+
+  .profile-icon {
+    margin-right: 0;
+    /* 오른쪽 여백 제거 */
+  }
+
+  .main-nav li {
+    justify-content: center;
+  }
+
+  .menu-icon {
+    margin-right: 0;
+    /* 아이콘 오른쪽 여백 제거 */
+  }
+
+  .settings-button {
+    justify-content: center;
+    /* 가운데 정렬 */
+  }
+
+  .settings-icon {
+    margin-right: 0;
+    /* 오른쪽 여백 제거 */
+  }
+  .menu-link {
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .menu-link .menu-icon {
+    margin-right: 0;
+  }
+
+  .menu-text {
+    display: none;
+  }
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.email {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* 메뉴 섹션 */
+.main-nav {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.main-nav ul {
+  list-style: none;
+}
+
+.main-nav li {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  color: #555;
+  transition: background-color 0.2s;
+}
+
+.main-nav li:hover {
+  background-color: #f5f5f5;
+}
+
+.main-nav li.active {
+  color: #6baa7f;
+  font-weight: 500;
+}
+
+.menu-icon {
+  font-size: 18px;
+}
+
+.main-nav li span {
+  padding-left: 8px;
+}
+
+/* 설정 버튼 */
+.settings-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #555;
+  cursor: pointer;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+}
+
+.settings-icon {
+  font-size: 18px;
+}
+
+.settings-button span {
+  padding-left: 8px;
+}

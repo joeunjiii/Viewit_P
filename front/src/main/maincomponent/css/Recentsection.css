@@ -1,0 +1,73 @@
+.Recent-section {
+  margin-top: 24px;
+}
+
+.Recent-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.Recent-icon {
+  font-size: 18px;
+  color: #666;
+}
+
+.Recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.Recent-card {
+  display: flex;                  /* Flexbox 적용 */
+  flex-direction: column;        /* 세로 방향 정렬 */
+  justify-content: center;       /* 세로 중앙 정렬 */
+  align-items: center;           /* 가로 중앙 정렬 */
+  text-align: center;            /* 텍스트도 중앙 정렬 */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 220px;
+  min-height: 100px;
+  padding: 16px 20px; 
+  font-size: 13px;
+  text-align: center;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s;
+}
+
+.Recent-card:hover {
+  background-color: #f0f3f0;
+}
+
+.Recent-day {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.Recent-label {
+  font-size: 13px;
+  color: #555;
+}
+
+.recent-toggle-btn {
+  margin-top: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #6baa7f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recent-toggle-btn:hover {
+  background-color: #58946d;
+}

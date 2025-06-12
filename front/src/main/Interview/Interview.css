@@ -1,0 +1,256 @@
+/* 전체 인터뷰 콘텐츠 영역 */
+.interview-content {
+  padding: 24px;
+  margin-left: 8vw;
+  margin-right: 8vw;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: rgb(217, 233, 217);
+}
+
+/* 헤더 영역 (상단) */
+.interview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: rgb(255, 255, 255);
+  border-bottom: 1px solid #a3c2a3;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 35px;
+}
+
+/* 상단: 남은 시간 + 종료 버튼 */
+.interview-section-header {
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 본문 전체 */
+.interview-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 30px;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+/* 질문 탭 */
+.question-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 50px;
+}
+.tab {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 999px;
+  border: none;
+  background-color: #eee;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  min-width: 80px;
+}
+.tab.selected {
+  background-color: #5e9c76;
+  color: white;
+}
+
+/* 질문 파형 + 타이머를 나란히 배치 */
+.interview-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px 5vw;
+  gap: 80px;
+  box-sizing: border-box;
+}
+
+/* 왼쪽: 음성 영역 */
+.voice-area {
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+  margin: 0; /* 일단 margin 제거 */
+  flex: 1; /* 인터뷰 전체 폭 중 일부 자동 확보 */
+  margin-right: 100px; /* or 적절한 제한폭 지정 */
+}
+
+.voice-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 80px;
+}
+.voice-label {
+  margin-right: 12px;
+  min-width: 60px; /* 최소 너비 확보 */
+  white-space: nowrap; /* 줄바꿈 방지 */
+  font-weight: 600;
+}
+.waveform {
+  width: 300px;
+  height: 40px;
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+/* 아이콘 공통 스타일 */
+.icon {
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon.robot::before {
+  content: "🤖";
+}
+.icon.mic::before {
+  content: "🎤";
+}
+.icon.robot::before,
+.icon.mic::before {
+  font-size: 28px;
+
+  width: 40px;
+  height: 40px;
+}
+
+/* 오른쪽: 타이머 영역 */
+.timer-area {
+  width: 50vw;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-right: 150px;
+}
+
+/* 타이머 원형 */
+.timer-circle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: white;
+  border: 14px solid #5e9b87;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  color: #000;
+}
+
+.timer-label {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.timer-value {
+  font-size: 58px;
+  font-weight: 700;
+}
+
+/* 다시 답변하기 버튼 */
+.replay-button {
+  margin-top: 50px;
+  background-color: #ffffff;
+  border: 2px solid #6baa7f;
+  color: #000000;
+  padding: 8px 16px;
+  font-size: 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.replay-button:hover {
+  background-color: #f0f9f4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 종료 버튼 */
+.end-button {
+  background-color: white;
+  border: 1px solid red;
+  color: red;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.end-button:hover {
+  background-color: #ffe5e5;
+}
+
+@media (max-width: 1024px) {
+  .interview-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    padding: 12px 16px;
+  }
+  .interview-body {
+    flex-direction: row; /* 가로 배치 유지 */
+    gap: 40px; /* 데스크탑보다 좁게 */
+    align-items: flex-start;
+  }
+ 
+  
+  .header-spacer {
+    flex-grow: 1;
+    max-width: 1000px; /* 땡기고 싶은 거리 */
+  }
+  .end-button {
+    margin-left: auto; /* 오른쪽 끝으로 붙임 */
+    transform: translateX(-24px);
+    font-size: 13px;
+    padding: 5px 12px;
+  }
+  .voice-area {
+    margin: 0;
+    gap: 40px;
+    flex: 1;
+    margin-right: 80px;
+  }
+  .voice-item {
+    flex-direction: column;
+    align-items: flex-start; /* 세로 배치 시 왼쪽 정렬 */
+    gap: 8px;
+  }
+  .timer-area {
+    align-self: center;
+  }
+
+  .waveform {
+    max-width: 250px;
+  }
+
+  .timer-circle {
+    width: 160px;
+    height: 160px;
+    border-width: 12px;
+  }
+
+  .timer-value {
+    font-size: 40px;
+  }
+
+  .replay-button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}

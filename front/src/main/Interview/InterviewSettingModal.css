@@ -1,0 +1,250 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #d5e8d4;
+  padding: 24px;
+  border-radius: 12px;
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section p,
+.section label {
+  margin: 0;
+}
+
+.section input[type="radio"] {
+  margin-right: 6px;
+}
+
+.section label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.answer-time-options {
+  display: flex;
+  gap: 50px;
+}
+
+.answer-time-options label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* 기본 라벨 버튼 스타일 */
+.time-radio {
+  padding: 4px 12px;
+  font-size: 14px;
+  border: 1.5px solid #999;
+  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hover 효과 */
+.time-radio:hover {
+  background-color: #f8f8f8;
+  border-color: #777;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+/* 선택된 상태 */
+.time-radio.selected {
+  background-color: rgb(107, 170, 127);
+  color: white;
+  border-color: #4caf50;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 클릭 효과 */
+.time-radio:active {
+  transform: scale(0.96);
+}
+
+/* 라디오 input 숨김 */
+.time-radio input[type="radio"] {
+  display: none;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.section select {
+  padding: 8px 12px;
+  border: 1.5px solid #999;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  color: #333;
+  appearance: none; 
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+.section select:focus {
+  border-color: rgb(107, 170, 127);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 24px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.4s;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: rgb(107, 170, 127);
+}
+
+input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+button.cancel {
+  background-color: white;
+  color: #333;
+  padding: 8px 16px;
+  border: 1px solid #999;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+button.cancel:hover {
+  background-color: #f8f8f8;
+  border-color: #777;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+button.cancel:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button.start {
+  background-color: rgb(107, 170, 127);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+button.start:hover {
+  background-color: #43a047;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+button.start:active {
+  transform: scale(0.96);
+  background-color: #388e3c;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 1024px */
+@media (max-width: 1024px) {
+  .answer-time-options {
+    display: flex;
+    flex-wrap: wrap;           
+    justify-content: left;   
+    gap: 50px;                
+    margin-top: 8px;
+  }
+  .modal-content {
+    max-width: 420px;
+    padding: 24px;
+  }
+  .modal-content h3,
+  .modal-content p {
+    font-size: 16px;
+  }
+
+  .time-radio {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    white-space: nowrap;    
+  }
+
+  .modal-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .start, .cancel {
+    flex: 1;
+    font-size: 14px;
+    padding: 10px;
+  }
+}

@@ -1,0 +1,65 @@
+
+body {
+  background-color: rgb(217, 233, 217);
+}
+
+
+/* src/App.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-box {
+  background-color: white;
+  width: 400px;
+  height: 300px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.naver-button {
+  background-color: #639F86;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  transition: background-color 0.3s;
+
+  display: flex;                /* 요소 정렬용 flex */
+  align-items: center;          /* 세로 중앙 정렬 */
+  gap: 10px;                    /* 아이콘과 텍스트 간격 */
+}
+
+.naver-icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  object-fit: cover;
+  background-color: white;
+}
+
+.login-logo {
+  width: 300px;
+  margin-top : 30px;
+  margin-bottom: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.horizontal-line {
+  width: 70%;
+  height: 1px;
+  background-color: #aaa;
+  margin: 20px 0;
+}
