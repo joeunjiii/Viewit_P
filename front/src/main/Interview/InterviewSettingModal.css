@@ -18,14 +18,18 @@
   width: 600px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start; /* 🔧 중앙 → 좌측 정렬 */
+  text-align: left; /* 🔧 텍스트도 좌측 정렬 */
   gap: 20px;
   font-size: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 .modal-actions {
   display: flex;
+  width: 100%;
   justify-content: space-between;
-  margin-top: 20px;
+  align-items: center;
+
 }
 
 .section {
@@ -36,6 +40,7 @@
 
 .section p,
 .section label {
+  text-align: left;
   margin: 0;
 }
 
@@ -119,7 +124,7 @@
   font-size: 14px;
   background-color: white;
   color: #333;
-  appearance: none; 
+  appearance: none;
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
@@ -163,6 +168,7 @@ input:checked + .slider::before {
 }
 
 button.cancel {
+  margin-right: 12px;
   background-color: white;
   color: #333;
   padding: 8px 16px;
@@ -172,6 +178,7 @@ button.cancel {
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-right: 12px;
 }
 
 button.cancel:hover {
@@ -214,9 +221,9 @@ button.start:active {
 @media (max-width: 1024px) {
   .answer-time-options {
     display: flex;
-    flex-wrap: wrap;           
-    justify-content: left;   
-    gap: 50px;                
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 50px;
     margin-top: 8px;
   }
   .modal-content {
@@ -231,20 +238,21 @@ button.start:active {
   .time-radio {
     padding: 8px 12px;
     font-size: 14px;
-    background-color: #f0f0f0;
+    background-color: rgb(255, 255, 255);
     border-radius: 6px;
-    white-space: nowrap;    
+    white-space: nowrap;
   }
 
   .modal-actions {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 20px;
+    display: flex;
+    justify-content: space-between; /* 양끝 정렬 */
+    width: 100%;
+    margin-top: 20px;
   }
 
-  .start, .cancel {
-    flex: 1;
-    font-size: 14px;
+  .start,
+  .cancel {
+    font-size: 12px;
     padding: 10px;
   }
 }

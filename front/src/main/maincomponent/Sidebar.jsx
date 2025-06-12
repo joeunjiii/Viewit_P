@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaFileAlt, FaCog, FaUsers } from "react-icons/fa";
 import "./css/Sidebar.css";
 
-function Sidebar() {
+function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -60,15 +60,18 @@ function Sidebar() {
             {!isTablet && <span>모의면접</span>}
           </Link>
 
-          <Link
+          <div
             to="/speech"
-            className={`menu-link ${currentPath === "/speech" ? "active" : ""}`}
+            className={`menu-link ${currentPath === "/speech" ? "active" : ""}`
+            }
+            onClick={onSpeechClick}
+            style={{ cursor: "pointer" }}
           >
             <div className="menu-icon">
               <FaFileAlt />
             </div>
             {!isTablet && <span>스피치연습</span>}
-          </Link>
+          </div>
         </div>
       </nav>
       <div className="settings-button">
