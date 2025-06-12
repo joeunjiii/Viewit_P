@@ -9,7 +9,7 @@ function Main() {
 
   return (
     <div className="app-container">
-      {/* 왼쪽 사이드바 */}
+      {/* 왼쪽 사이드바 */}ㅁㄴㅇ
       <div className="sidebar">
         <div className="profile-section">
           <div className="profile-icon">
