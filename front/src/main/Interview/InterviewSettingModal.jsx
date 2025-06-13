@@ -1,42 +1,44 @@
 // components/InterviewSettingsModal.jsx
 import React, { useState, useEffect } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
 
-function InterviewSettingsModal({ onClose, onStart,onOpenMicCheck }) {
-  const [micEnabled, setMicEnabled] = useState(true);
-  const [answerTime, setAnswerTime] = useState(10);
-  const [job, setJob] = useState("Back-end 개발자(Java)");
-  const [autoQuestion, setAutoQuestion] = useState(false);
-  const [micCheckOpen, setMicCheckOpen] = useState(false);
+function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
+  const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
+  const [answerTime, setAnswerTime] = useState(10); // 답변 시간 상태
+  const [job, setJob] = useState("Back-end 개발자(Java)"); // 직무 유형 상태
+  const [autoQuestion, setAutoQuestion] = useState(false); // 질문
+  const [micCheckOpen, setMicCheckOpen] = useState(false); //마이크모달창 상태
+  const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
 
+  console.log("✅ 선택된 answerTime:", answerTime);
   const handleCancel = () => {
     navigate("/main");
   };
-  // 모달창 켜질때 기본값 입력
-  useEffect(() => {
-    setMicEnabled(true);
-    setAnswerTime(10);
-    setJob("backend");
-    setAutoQuestion(false);
-  }, []);
 
+  const handleStart = () => {
+    onStart({
+      micEnabled,
+      answerTime,
+      job,
+      autoQuestion,
+      allowRetry,
+    });
+  };
+
+  
   return (
     <div className="modal-overlay">
       <div className="modal-content">
         <h3>마이크 설정</h3>
 
         {/* 🎤 마이크 상태 확인 버튼 */}
-        <button
-          className="mic-check-button"
-          onClick={onOpenMicCheck}
-        >
+        <button className="mic-check-button" onClick={onOpenMicCheck}>
           🎤 마이크 상태 확인
         </button>
-        
 
         <div className="section">
           <p>답변 시간 설정</p>
@@ -53,7 +55,7 @@ function InterviewSettingsModal({ onClose, onStart,onOpenMicCheck }) {
                   name="answerTime"
                   value={time}
                   checked={answerTime === time}
-                  onChange={() => setAnswerTime(time)}
+                  onChange={(e) => setAnswerTime(Number(e.target.value))}
                 />
                 {time}초
               </label>
@@ -96,17 +98,23 @@ function InterviewSettingsModal({ onClose, onStart,onOpenMicCheck }) {
             <span className="slider" />
           </label>
         </div>
+        <div className="section">
+          <p>다시 답변하기 허용</p>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={allowRetry}
+              onChange={() => setAllowRetry(!allowRetry)}
+            />
+            <span className="slider" />
+          </label>
+        </div>
 
         <div className="modal-actions">
           <button className="cancel" onClick={handleCancel}>
             취소
           </button>
-          <button
-            className="start"
-            onClick={() =>
-              onStart({ micEnabled, answerTime, job, autoQuestion })
-            }
-          >
+          <button className="start" onClick={handleStart}>
             시작하기
           </button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
@@ -6,25 +6,39 @@ import MicCheckModal from "./asset/Mic/MicCheckModal";
 import "./Interview.css";
 
 function Interview() {
-  const [showModal, setShowModal] = useState(true); // 초기엔 모달 열림
-  const navigate = useNavigate(); // navigate 준비
+  const [showModal, setShowModal] = useState(true);
   const [micCheckOpen, setMicCheckOpen] = useState(false);
+  const [autoQuestion, setAutoQuestion] = useState(false); //자막 상태
+  const [answerTime, setAnswerTime] = useState(10);
+  const [allowRetry, setAllowRetry] = useState(true);
+
+  const navigate = useNavigate();
+
+  //예시데이터 나중에 state로 변경, 추후에 삭제
+  const [captionText, setCaptionText] = useState(
+    "면접관: 자기소개 부탁드립니다.길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인"
+  );
 
   console.log("🎯 Interview 렌더링됨");
+
   const handleStart = (settings) => {
     console.log("시작 설정:", settings);
     setShowModal(false);
-  
+    setAutoQuestion(settings.autoQuestion);
+    setAnswerTime(settings.answerTime);
+    setAllowRetry(settings.allowRetry);
     if (settings.micEnabled) {
       // 마이크 접근 시도
     }
   };
-  
+
   useEffect(() => {
     if (!showModal) {
       const startMic = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
           // 오디오 처리
         } catch (err) {
           console.error("🎤 Interview 페이지에서 마이크 접근 실패:", err);
@@ -33,8 +47,6 @@ function Interview() {
       startMic();
     }
   }, [showModal]);
-  
-  
 
   return (
     <>
@@ -86,15 +98,21 @@ function Interview() {
               <div className="timer-area">
                 <div className="timer-circle">
                   <div className="timer-label">답변시간</div>
-                  <div className="timer-value">15</div>
+                  <div className="timer-value">{answerTime}</div>
                 </div>
-                <button className="replay-button">다시 답변하기</button>
+                {allowRetry && (
+                  <button className="replay-button">다시 답변하기</button>
+                )}
               </div>
             </div>
           </div>
+          {autoQuestion && (
+            <div className="caption-box">
+              <p>{captionText}</p>
+            </div>
+          )}
         </div>
       )}
-      
     </>
   );
 }
