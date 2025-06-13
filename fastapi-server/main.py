@@ -1,29 +1,22 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from routers import stt
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 추후 React 주소로 제한
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Question(BaseModel):
     text: str
 
-@app.post("/ask")
-async def ask(q: Question):
-    return {"answer": f"AI says: {q.text}"}
-
-@app.get("/ask")
-def test_get():
-    return {"message": "연결 확인용 텍스트"}
 
 
-# @app.get("/")
-# async def root():
-#     return {"message": "Hello World"}
-#
-#
-# @app.get("/hello/{name}")
-# async def say_hello(name: str):
-#     return {"message": f"Hello {name}"}
-
-
-
-
+app.include_router(stt.router)
