@@ -1,0 +1,13 @@
+.volume-meter-wrapper {
+    width: 100%;  /* 부모인 .modal-content 기준 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .volume-bar-background {
+    width: 100%;           /* 부모 기준 꽉 채움 */
+    max-width: 240px;      /* 최대폭 제한 (넘치지 않게) */
+    height: 12px;
+  }
+  
