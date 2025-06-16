@@ -1,10 +1,6 @@
-# services/whisper_service.py
+# 모델만 로딩
 import whisper
 
 print("🔊 Whisper 모델 불러오는 중...")
-model = whisper.load_model("small")  # tiny, base, small, medium, large
+model = whisper.load_model("small")
 print("✅ Whisper 모델 로딩 완료")
-
-def transcribe_audio(file_path: str) -> str:
-    result = model.transcribe(file_path)
-    return result["text"]
