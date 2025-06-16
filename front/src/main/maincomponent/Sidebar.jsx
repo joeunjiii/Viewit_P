@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaHome, FaFileAlt, FaCog, FaUsers } from "react-icons/fa";
 import "./css/Sidebar.css";
 
 function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
-
+  const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const isTablet = windowWidth <= 1024;
   const sidebarClass = isTablet ? "sidebar tablet" : "sidebar";
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleLogout = () => {
+    // 🔐 프론트에서 토큰 제거 + 메인 이동
+    localStorage.removeItem("token"); // 예시
+    navigate("/"); // 또는 window.location.href = "/"
+  };
 
   return (
     <div className={sidebarClass}>
@@ -62,8 +69,7 @@ function Sidebar({ onSpeechClick }) {
 
           <div
             to="/speech"
-            className={`menu-link ${currentPath === "/speech" ? "active" : ""}`
-            }
+            className={`menu-link ${currentPath === "/speech" ? "active" : ""}`}
             onClick={onSpeechClick}
             style={{ cursor: "pointer" }}
           >
@@ -74,10 +80,30 @@ function Sidebar({ onSpeechClick }) {
           </div>
         </div>
       </nav>
-      <div className="settings-button">
+
+      <div className="settings-button" onClick={() => setShowLogoutModal(true)}>
         <FaCog className="settings-icon" />
         {!isTablet && <span>설정</span>}
       </div>
+      {/* 로그아웃 모달 */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay">
+          <div className="logout-modal">
+            <h3 className="logout-title">로그아웃 하시겠습니까?</h3>
+            <div className="logout-actions">
+              <button
+                className="logout-cancel"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                취소
+              </button>
+              <button className="logout-confirm" onClick={handleLogout}>
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
