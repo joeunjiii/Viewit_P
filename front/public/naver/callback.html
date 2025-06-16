@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.0.js"
+            charset="utf-8"
+    ></script>
+    <script>
+        // SDK 초기화
+        const naverLogin = new naver.LoginWithNaverId({
+            clientId: "ZKaZpBQ88jGwN0zuYf87",
+            callbackUrl: "/naver/callback.html",
+            isPopup: true,
+        });
+        naverLogin.init();
+
+        window.onload = () => {
+            if (naverLogin.getLoginStatus()) {
+                window.opener.postMessage(
+                    { source: "naver", accessToken: naverLogin.accessToken },
+                    window.opener.location.origin
+                );
+            }
+            window.close();
+        };
+    </script>
+</head>
+<body>
+
+</body>
+</html>
