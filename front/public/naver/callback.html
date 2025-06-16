@@ -1,33 +1,49 @@
+<!-- public/naver/callback.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <title>Naver Login Callback</title>
+    <!-- 1) 네이버 JS-SDK 불러오기 -->
     <script
             src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.0.js"
             charset="utf-8"
     ></script>
+
     <script>
-        // SDK 초기화
+        // 2) 팝업이 열린 origin (http://localhost:3000) 자동으로 가져오기
+        const ORIGIN = window.location.origin;
+
+        // 3) 네이버 SDK 초기화
         const naverLogin = new naver.LoginWithNaverId({
-            clientId: "ZKaZpBQ88jGwN0zuYf87",
-            callbackUrl: "/naver/callback.html",
-            isPopup: true,
+            clientId: "ZKaZpBQ88jGwN0zuYf87",           // 네이버 앱 Client ID
+            callbackUrl: `${ORIGIN}/naver/callback.html`,// → 반드시 네이버 개발자 센터에 등록된 URL과 1:1 일치해야 합니다
+            isPopup: true
         });
         naverLogin.init();
 
-        window.onload = () => {
-            if (naverLogin.getLoginStatus()) {
+        // 4) window.location.hash 에 토큰이 붙어 있는지 확인
+        const hash = window.location.hash; // 예: "#access_token=ABC123&token_type=Bearer&..."
+        if (!hash.includes("access_token")) {
+            // 최초 호출: 네이버 로그인 페이지로 이동
+            naverLogin.authorize();
+        } else {
+            // 인가 완료 후 돌아왔을 때
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get("access_token");
+            if (accessToken) {
+                // 부모 창에 토큰 전송 (origin 보안 체크)
                 window.opener.postMessage(
-                    { source: "naver", accessToken: naverLogin.accessToken },
-                    window.opener.location.origin
+                    { source: "naver", accessToken },
+                    ORIGIN
                 );
+            } else {
+                alert("네이버 로그인에 실패했습니다.");
             }
+            // 팝업 닫기
             window.close();
-        };
+        }
     </script>
 </head>
-<body>
-
-</body>
+<body></body>
 </html>

@@ -20,5 +20,5 @@ spring:
 
 app:
   jwt:
-    secret: verySecretKeyHere       # 토큰 서명에 사용할 비밀키
-    expiration: 3600000             # 만료 시간(ms 단위)
+    secret: ThisIsASecretKeyThatIsAtLeast32BytesLong!!
+    expiration-ms: 3600000            # 만료 시간(ms 단위)

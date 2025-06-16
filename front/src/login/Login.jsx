@@ -4,21 +4,45 @@ import "./login.css";
 
 export default function Login() {
   useEffect(() => {
-    function handleMessage(e) {
-      if (e.origin !== window.location.origin) return;
-      const { source, accessToken } = e.data || {};
+    function handleMessage(event) {
+      // 1) 메시지 수신 확인용 로그
+      console.log("[Login] message event:", event.data, "from", event.origin);
+
+      // 2) 보안: 반드시 origin 체크 (팝업과 같은 출처인지)
+      if (event.origin !== window.location.origin) {
+        console.warn("[Login] origin mismatch, ignoring message");
+        return;
+      }
+
+      const { source, accessToken } = event.data || {};
       if (source === "naver" && accessToken) {
-        // 받은 토큰으로 백엔드 인증
+        console.log("[Login] got Naver accessToken:", accessToken);
+
+        // 3) 백엔드에 토큰 전달 (proxy 활용)
         fetch("/api/auth/naver", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",              // 쿠키 기반 인증 쓰려면 필요
           body: JSON.stringify({ accessToken }),
         })
             .then(res => {
-              if (res.ok) window.location.href = "/main";
-              else alert("로그인 실패");
+              console.log("[Login] /api/auth/naver response status:", res.status);
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json();
             })
-            .catch(() => alert("네트워크 오류"));
+            .then(data => {
+              console.log("[Login] /api/auth/naver response body:", data);
+              if (data.token) {
+                localStorage.setItem("jwt", data.token);
+                window.location.href = "/main";
+              } else {
+                alert("로그인 실패: 토큰이 없습니다.");
+              }
+            })
+            .catch(err => {
+              console.error("[Login] 네트워크 오류 또는 백엔드 에러", err);
+              alert("네트워크 오류 발생");
+            });
       }
     }
 
@@ -28,7 +52,7 @@ export default function Login() {
 
   const handleLogin = () => {
     window.open(
-        "/naver/callback.html",          // ← 콜백 페이지만 팝업
+        "/naver/callback.html",          // public/naver/callback.html 경로
         "naverLoginPopup",
         "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
     );
@@ -41,7 +65,7 @@ export default function Login() {
           <div className="horizontal-line" />
           <button className="naver-button" onClick={handleLogin}>
             <img
-                src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ae/c9/ec/aec9ecca-cdbc-0de4-d0bb-2dc45cb43373/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/230x0w.webp"
+                src="https://static.nid.naver.com/img/default/naverlogin_logo.png"
                 alt="네이버 로그인"
                 className="naver-icon"
             />

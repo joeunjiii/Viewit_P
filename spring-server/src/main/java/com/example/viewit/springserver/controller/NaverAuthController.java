@@ -1,6 +1,8 @@
-package com.example.viewit.springserver.auth;
+// src/main/java/com/example/viewit/springserver/controller/NaverAuthController.java
+package com.example.viewit.springserver.controller;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -30,20 +32,24 @@ public class NaverAuthController {
         headers.setBearerAuth(accessToken);
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> resp = rest.exchange(
+        ResponseEntity<Map<String, Object>> resp = rest.exchange(
                 "https://openapi.naver.com/v1/nid/me",
-                HttpMethod.GET, entity, Map.class
+                HttpMethod.GET, entity,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
         );
-        Map profile = resp.getBody();
-        Map userInfo = (Map) profile.get("response");
+
+        Map<String, Object> profile = resp.getBody();
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Map<String, Object> userInfo = (Map<String, Object>) profile.get("response");
 
         // 2) 사용자 등록/조회 로직
         String email = userInfo.get("email").toString();
-        // 예: User user = userService.findOrCreate(email, userInfo);
+        // e.g., User user = userService.findOrCreate(email);
 
-        // 3) JWT 발급 또는 세션 설정
+        // 3) JWT 발급
         String jwt = jwtProvider.createToken(email);
-
         return ResponseEntity.ok(Map.of("token", jwt));
     }
 }

@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+
 import java.security.Key;
 import java.util.Date;
 
@@ -22,8 +23,8 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        // HS256 용 key 생성 (secretKey 바이트 길이가 충분해야 합니다.
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        System.out.println("JWT key length: " + key.getEncoded().length);
     }
 
     /** JWT 생성 */
