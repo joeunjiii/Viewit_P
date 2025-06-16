@@ -8,9 +8,8 @@ import MicCheckModal from "./asset/Mic/MicCheckModal";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
   const [answerTime, setAnswerTime] = useState(10); // 답변 시간 상태
-  const [job, setJob] = useState("Back-end 개발자(Java)"); // 직무 유형 상태
+  const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
-  const [micCheckOpen, setMicCheckOpen] = useState(false); //마이크모달창 상태
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
 
