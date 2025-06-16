@@ -6,13 +6,14 @@ import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
 import { requestTTS } from "./api/tts";
 
-function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
+function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete }) {
   const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
   const [waitTime, setWaitTime] = useState(5); // 대기시간 기본값 (선택 가능하게도 가능)
   const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
   console.log("✅ 선택된 waitTime:", waitTime);
   const handleCancel = () => {
@@ -33,6 +34,11 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
     if (audioUrl) {
       const audio = new Audio("http://localhost:8000" + audioUrl);
       audio.play();
+
+      audio.onended = () => {
+        console.log("🔊 TTS 재생 완료, 타이머 시작");
+        onTTSComplete();
+      };
     }
   };
 

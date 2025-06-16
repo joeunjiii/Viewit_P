@@ -6,6 +6,11 @@ function Timer({ duration, onComplete, autoStart = true, label = "타이머", mo
   const [isRunning, setIsRunning] = useState(autoStart);
 
   useEffect(() => {
+    setTimeLeft(duration);
+    if (autoStart) setIsRunning(true);
+  }, [duration, autoStart]);
+  
+  useEffect(() => {
     if (!isRunning) return;
     if (timeLeft === 0) {
       onComplete?.(); // 콜백 실행

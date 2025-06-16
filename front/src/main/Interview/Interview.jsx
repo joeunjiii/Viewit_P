@@ -23,15 +23,9 @@ function Interview() {
 
   const navigate = useNavigate();
 
-  //나중에 삭제
-  const handleWaitComplete = () => {
-    console.log("🛑 대기 시간 종료"); // ✅ 이름 일치하게 정의해두었는지 확인!
-  };
-
   //예시데이터 나중에 state로 변경, 추후에 삭제
-  const [captionText, setCaptionText] = useState(
-    "면접관: 자기소개 부탁드립니다.길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인길어짐확인"
-  );
+  const [captionText, setCaptionText] =
+    useState("면접관: 자기소개 부탁드립니다.");
 
   const handleStart = (settings) => {
     console.log("시작 설정:", settings);
@@ -43,17 +37,27 @@ function Interview() {
       // 마이크 접근 시도
     }
   };
-
+  const handleTTSComplete = () => {
+    console.log("🎧 TTS 끝났고 이제 대기 타이머 시작!");
+    setIsWaiting(true); // 대기 타이머 시작
+    setTimerKey((prev) => prev + 1); // Timer 리렌더링 트리거 (key prop 용도)
+  };
   //다음질문 TTS
   const handleNextQuestion = async () => {
     const result = await requestNextTTSQuestion();
     if (!result) return;
-  
+
     const { audioUrl, question } = result;
     setCurrentQuestion(question);
-  
+
     const audio = new Audio("http://localhost:8000" + audioUrl);
     audio.play();
+
+    audio.onended = () => {
+      console.log("🎧 TTS 끝났음 → 대기 시작");
+      setIsWaiting(true); // 대기 시작 트리거
+      setTimerKey((prev) => prev + 1); // Timer 강제 리렌더
+    };
   };
 
   useEffect(() => {
@@ -79,6 +83,7 @@ function Interview() {
           onClose={() => setShowModal(false)}
           onStart={handleStart}
           onOpenMicCheck={() => setMicCheckOpen(true)}
+          onTTSComplete={handleTTSComplete}
         />
       )}
       {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
@@ -107,14 +112,19 @@ function Interview() {
               {/* 타이머 */}
               <div className="timer-area">
                 <Timer
+                  key={timerKey} // ← 강제 리렌더링용 키
                   duration={waitTime}
-                  onComplete={handleWaitComplete}
+                  autoStart={isWaiting}
                   label="대기시간"
                 />
                 {allowRetry && (
                   <button
                     className="replay-button"
-                    onClick={() => window.location.reload()}
+                    onClick={() => {
+                      console.log("🔁 다시 답변하기 버튼 클릭 → 타이머 리셋");
+                      setTimerKey((prev) => prev + 1); // 타이머 다시 시작
+                      setIsWaiting(true); // autoStart 다시 true
+                    }}
                   >
                     다시 답변하기
                   </button>
