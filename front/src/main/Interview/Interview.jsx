@@ -71,6 +71,7 @@ function Interview() {
               종료하기
             </button>
           </div>
+
           {/* 본문 섹션 */}
           <div className="interview-section-body">
             {/* 좌측: 질문 탭 */}
@@ -110,40 +111,6 @@ function Interview() {
               <p>{captionText}</p>
             </div>
           )}
-          {autoQuestion && (
-            <div className="caption-box">
-              <p>{captionText}</p>
-            </div>
-          )}
-          /* 🔽 여기에 업로드 박스 추가 */
-          <div style={{ marginTop: "40px", padding: "0 32px" }}>
-            <h4>🔈 테스트용 음성 업로드</h4>
-            <input
-              type="file"
-              accept=".wav"
-              onChange={async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append("file", file);
-
-                try {
-                  const res = await fetch(
-                    "http://localhost:8000/upload_audio",
-                    {
-                      method: "POST",
-                      body: formData,
-                    }
-                  );
-                  const data = await res.json();
-                  console.log("📝 변환된 텍스트:", data.transcript);
-                } catch (error) {
-                  console.error("업로드 실패:", error);
-                }
-              }}
-            />
-          </div>
         </div>
       )}
     </>
