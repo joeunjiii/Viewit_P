@@ -16,4 +16,23 @@ export const requestTTS = async () => {
       return null;
     }
   };
+
+
+//다음질문 TTS
+export const requestNextTTSQuestion = async () => {
+  try {
+    const res = await fetch("http://localhost:8000/interview/next");
+    const data = await res.json();
+
+    // 예: { audio_url: "/static/audio/q2.mp3", question: "지원 동기는?" }
+    return {
+      audioUrl: data.audio_url,
+      question: data.question,
+    };
+  } catch (err) {
+    console.error("❌ 다음 질문 요청 실패:", err);
+    return null;
+  }
+};
+
   
