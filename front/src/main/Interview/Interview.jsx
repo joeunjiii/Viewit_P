@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
-import Timer from "./Timer";
-import Question from "./Question";
-import CaptionBox from "./CaptionBox";
-import VoiceWaveform from "./VouceWave";
-import QuestionTabs from "./QuestionTabs";
+import Timer from "./asset/Timer";
+import Question from "./asset/Question";
+import CaptionBox from "./asset/CaptionBox";
+import VoiceWaveform from "./asset/VoiceWaveform";
+import QuestionTabs from "./asset/QuestionTabs";
 import "./Interview.css";
+import { requestNextTTSQuestion } from "./api/tts";
 
 function Interview() {
   const [showModal, setShowModal] = useState(true);
@@ -18,14 +19,14 @@ function Interview() {
   const [waitTime, setWaitTime] = useState(5);
   const [questionNumber, setQuestionNumber] = useState(1); // Q1부터
   const [isWaiting, setIsWaiting] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+
   const navigate = useNavigate();
 
   //나중에 삭제
   const handleWaitComplete = () => {
     console.log("🛑 대기 시간 종료"); // ✅ 이름 일치하게 정의해두었는지 확인!
   };
-
- 
 
   //예시데이터 나중에 state로 변경, 추후에 삭제
   const [captionText, setCaptionText] = useState(
@@ -41,6 +42,18 @@ function Interview() {
     if (settings.micEnabled) {
       // 마이크 접근 시도
     }
+  };
+
+  //다음질문 TTS
+  const handleNextQuestion = async () => {
+    const result = await requestNextTTSQuestion();
+    if (!result) return;
+  
+    const { audioUrl, question } = result;
+    setCurrentQuestion(question);
+  
+    const audio = new Audio("http://localhost:8000" + audioUrl);
+    audio.play();
   };
 
   useEffect(() => {
@@ -86,37 +99,11 @@ function Interview() {
           <div className="interview-section-body">
             {/* 좌측: 질문 탭 */}
             <QuestionTabs questionNumber={questionNumber} />
-            {/* 질문 내용 표시 */}
-            {/* 나중에 지울예정 */}
-            <div className="question-wrapper" style={{ padding: "20px 24px" }}>
-              <Question
-                number={questionNumber}
-                text={`질문 내용 예시: Q${questionNumber}의 내용입니다.(임시표시)`}
-              />
-              <button
-                onClick={() => {
-                  setQuestionNumber((prev) => prev + 1);
-                  setWaitTime(5);
-                  setCaptionText(`면접관: Q${questionNumber + 1} 질문입니다.`);
-                }}
-                style={{
-                  fontSize: "12px",
-                  padding: "4px 8px",
-                  borderRadius: "6px",
-                  backgroundColor: "#e0e0e0",
-                  border: "1px solid #bbb",
-                  cursor: "pointer",
-                }}
-              >
-                다음(임시표시)
-              </button>
-            </div>
 
             {/* 본문 2단 영역 */}
             <div className="interview-body">
               {/* 왼쪽: 음성 파형 */}
               <VoiceWaveform />
-
               {/* 타이머 */}
               <div className="timer-area">
                 <Timer
@@ -139,7 +126,7 @@ function Interview() {
         </div>
       )}
 
-      /* 나중에 지우기 */
+      {/* 나중에 지우기  */}
       <div style={{ marginTop: "40px", padding: "0 32px" }}>
         <h4>🔈 테스트용 음성 업로드</h4>
         <input

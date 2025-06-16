@@ -9,9 +9,8 @@ import { requestTTS } from "./api/tts";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
   const [waitTime, setWaitTime] = useState(5); // 대기시간 기본값 (선택 가능하게도 가능)
-  const [job, setJob] = useState("Back-end 개발자(Java)"); // 직무 유형 상태
+  const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
-  const [micCheckOpen, setMicCheckOpen] = useState(false); //마이크모달창 상태
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
 
