@@ -4,31 +4,44 @@ import { Link, useNavigate } from "react-router-dom";
 import "./InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
+import { requestTTS } from "./api/tts";
 
-function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
+function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete }) {
   const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
   const [answerTime, setAnswerTime] = useState(10); // 답변 시간 상태
   const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
-  console.log("✅ 선택된 answerTime:", answerTime);
+  console.log("✅ 선택된 waitTime:", waitTime);
   const handleCancel = () => {
     navigate("/main");
   };
 
-  const handleStart = () => {
+  const handleStart = async (settings) => {
+    console.log("시작 설정:", settings);
     onStart({
       micEnabled,
-      answerTime,
+      waitTime,
       job,
       autoQuestion,
       allowRetry,
     });
+
+    const audioUrl = await requestTTS();
+    if (audioUrl) {
+      const audio = new Audio("http://localhost:8000" + audioUrl);
+      audio.play();
+
+      audio.onended = () => {
+        console.log("🔊 TTS 재생 완료, 타이머 시작");
+        onTTSComplete();
+      };
+    }
   };
 
-  
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -40,23 +53,21 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
         </button>
 
         <div className="section">
-          <p>답변 시간 설정</p>
+          <p>대기 시간 설정</p>
           <div className="answer-time-options">
-            {[10, 20, 30].map((time) => (
+            {[3, 5, 10].map((sec) => (
               <label
-                key={time}
-                className={`time-radio ${
-                  answerTime === time ? "selected" : ""
-                }`}
+                key={sec}
+                className={`time-radio ${waitTime === sec ? "selected" : ""}`}
               >
                 <input
                   type="radio"
-                  name="answerTime"
-                  value={time}
-                  checked={answerTime === time}
-                  onChange={(e) => setAnswerTime(Number(e.target.value))}
+                  name="waitTime"
+                  value={sec}
+                  checked={waitTime === sec}
+                  onChange={(e) => setWaitTime(Number(e.target.value))}
                 />
-                {time}초
+                {sec}초
               </label>
             ))}
           </div>
