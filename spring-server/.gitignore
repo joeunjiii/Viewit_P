@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# Python virtual environment (optional, if used)
+.venv/
+env/
+venv/
+ENV/
