@@ -1,32 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  FaHome,
-  FaCog,
-  FaUsers,
-  FaMicrophone,
-} from "react-icons/fa";
+import { FaHome, FaCog, FaUsers, FaMicrophone } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 import "./css/Sidebar.css";
 
 function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
-  const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const isTablet = windowWidth <= 1024;
   const sidebarClass = isTablet ? "sidebar tablet" : "sidebar";
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // 1. 토큰이 있는지 확인해서 상태관리
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+
+  const navigate = useNavigate();
+
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+
+    if (!storedToken) {
+      navigate("/login"); // 또는 navigate("/") 원하는 경로
+      return; // 아래 코드 실행 안 함
+    }
+    // 콘솔에 토큰 출력!
+    console.log("[Sidebar] 현재 JWT 토큰:", storedToken);
+    setToken(localStorage.getItem("token"));
+
+    if (token) {
+      try {
+        const payload = jwtDecode(storedToken);
+        console.log("[Sidebar] payload:", payload);
+        setUsername(payload.name || "사용자");
+        setEmail(payload.sub || payload.email || "");
+      } catch (e) {
+        setUsername("");
+        setEmail("");
+      }
+    } else {
+      setUsername("");
+      setEmail("");
+    }
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
     // 🔐 프론트에서 토큰 제거 + 메인 이동
     localStorage.removeItem("token"); // 예시
-    navigate("/"); // 또는 window.location.href = "/"
+    window.location.href = "/"
   };
 
   return (
@@ -43,8 +70,8 @@ function Sidebar({ onSpeechClick }) {
           <span>프로필</span>
         </div>
         <div className="profile-info">
-          <div className="username">사용자네네임</div>
-          <div className="email">아이디@naver.com</div>
+          <div className="username">{username || "로그인 필요"}</div>
+          <div className="email">{email}</div>
         </div>
       </div>
 
