@@ -12,7 +12,7 @@ function QuestionStatusBar({ status, remainingTime }) {
       break;
     case "wait":
       icon = "⏱";
-      message = `대기중입니다 `;
+      message = `대기중입니다 `; 
       break;
     case "recording":
       icon = "🎤";

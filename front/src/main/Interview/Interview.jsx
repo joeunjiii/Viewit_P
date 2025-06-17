@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import "./Interview.css";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
@@ -7,6 +7,7 @@ import QuestionTabs from "./asset/QuestionTabs";
 import InterviewHeader from "./asset/InterviewHeader";
 import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
+import Timer from "./asset/Timer";
 
 function Interview() {
   const [showModal, setShowModal] = useState(true);
@@ -18,7 +19,6 @@ function Interview() {
   const [captionText, setCaptionText] = useState("면접관: 자기소개 부탁드립니다.");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
-  //예시데이터 나중에 state로 변경, 추후에 삭제
 
   const handleStart = (settings) => {
     setShowModal(false);
@@ -34,7 +34,6 @@ function Interview() {
           onClose={() => setShowModal(false)}
           onStart={handleStart}
           onOpenMicCheck={() => setMicCheckOpen(true)}
-          onTTSComplete={() => console.log("TTS 끝남")}
         />
       )}
 
@@ -47,11 +46,9 @@ function Interview() {
             <QuestionTabs questionNumber={questionNumber} />
             <div className="interview-body">
               <div className="status-display-box">
-                <QuestionStatusBar
-                  status={status}
-                  remainingTime={remainingTime}
-                />
+                <QuestionStatusBar status={status} remainingTime={remainingTime} />
               </div>
+
               <InterviewSessionManager
                 waitTime={waitTime}
                 allowRetry={allowRetry}
@@ -64,6 +61,8 @@ function Interview() {
                 }}
               />
             </div>
+
+           
           </div>
 
           {autoQuestion && <CaptionBox text={captionText} />}
