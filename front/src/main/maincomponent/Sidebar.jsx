@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaHome, FaFileAlt, FaCog, FaUsers } from "react-icons/fa";
+import {
+  FaHome,
+  FaFileAlt,
+  FaCog,
+  FaUsers,
+  FaMicrophone,
+} from "react-icons/fa";
 import "./css/Sidebar.css";
 
 function Sidebar({ onSpeechClick }) {
@@ -74,7 +80,7 @@ function Sidebar({ onSpeechClick }) {
             style={{ cursor: "pointer" }}
           >
             <div className="menu-icon">
-              <FaFileAlt />
+              <FaMicrophone />
             </div>
             {!isTablet && <span>스피치연습</span>}
           </div>

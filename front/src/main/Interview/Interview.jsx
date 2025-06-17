@@ -9,7 +9,8 @@ import VoiceWaveform from "./asset/VoiceWaveform";
 import QuestionTabs from "./asset/QuestionTabs";
 import "./Interview.css";
 import { requestNextTTSQuestion } from "./api/tts";
-
+import InterviewFlowManager from "./asset/InterviewFLow/InterviewFlowManager";
+import InterviewHeader from "./asset/InterviewHeader";
 function Interview() {
   const [showModal, setShowModal] = useState(true);
   const [micCheckOpen, setMicCheckOpen] = useState(false);
@@ -42,6 +43,11 @@ function Interview() {
     setIsWaiting(true); // 대기 타이머 시작
     setTimerKey((prev) => prev + 1); // Timer 리렌더링 트리거 (key prop 용도)
   };
+  const handleAnswerComplete = (text) => {
+    console.log("📝 사용자가 말한 내용:", text);
+    // 다음 질문 불러오기, DB 저장 등 추가 처리 가능
+  };
+
   //다음질문 TTS
   const handleNextQuestion = async () => {
     const result = await requestNextTTSQuestion();
@@ -86,19 +92,17 @@ function Interview() {
           onTTSComplete={handleTTSComplete}
         />
       )}
+      <InterviewFlowManager
+        questionAudioUrl={currentQuestion.audioUrl}
+        waitDuration={3}
+        answerDuration={10}
+        onComplete={handleAnswerComplete}
+      />
       {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
       {!showModal && (
         <div className="interview-wrapper">
           {/* 상단 섹션 */}
-          <div className="interview-header">
-            <div className="header-left">
-              <Timer duration={600} label="답변시간" mode="text" />
-            </div>
-            <div className="header-spacer" />
-            <button className="end-button" onClick={() => navigate("/main")}>
-              종료하기
-            </button>
-          </div>
+          <InterviewHeader totalDuration={600} />
 
           {/* 본문 섹션 */}
           <div className="interview-section-body">
