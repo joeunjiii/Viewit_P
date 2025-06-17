@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./MicCheckModal.css";
 
 function MicCheckModal({ onClose }) {
@@ -7,18 +7,20 @@ function MicCheckModal({ onClose }) {
   const [deviceList, setDeviceList] = useState([]);
   const [isInitializing, setIsInitializing] = useState(true);
   const [stream, setStream] = useState(null);
-  const [recorder, setRecorder] = useState(null);
   const [recording, setRecording] = useState(false);
 
+
+  const stopStream = useCallback(() => {
+    stream?.getTracks().forEach((track) => track.stop());
+    setStream(null);
+  }, [stream]);
+  
   useEffect(() => {
     checkInitialDeviceStatus();
     return () => stopStream();
-  }, []);
+  }, [stopStream]);
 
-  const stopStream = () => {
-    stream?.getTracks().forEach((track) => track.stop());
-    setStream(null);
-  };
+ 
 
   const checkInitialDeviceStatus = async () => {
     setIsInitializing(true);
@@ -52,7 +54,6 @@ function MicCheckModal({ onClose }) {
       setStream(s);
 
       const mediaRecorder = new MediaRecorder(s);
-      setRecorder(mediaRecorder);
 
       const chunks = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
@@ -99,10 +100,15 @@ function MicCheckModal({ onClose }) {
             ) : (
               <p>❌ 마이크를 사용할 수 없습니다</p>
             )}
-            <p style={{ color: status.includes("❌") ? "red" : "green" }}>{status}</p>
+            <p style={{ color: status.includes("❌") ? "red" : "green" }}>
+              {status}
+            </p>
             <div className="modal-actions">
               <button onClick={onClose}>닫기</button>
-              <button onClick={handleCheck} disabled={!micAvailable || recording}>
+              <button
+                onClick={handleCheck}
+                disabled={!micAvailable || recording}
+              >
                 {recording ? "테스트 중..." : "마이크 테스트"}
               </button>
               <button onClick={checkInitialDeviceStatus} disabled={recording}>

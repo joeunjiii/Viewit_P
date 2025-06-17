@@ -66,43 +66,27 @@
 /* 질문 파형 + 타이머를 나란히 배치 */
 .interview-body {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: center;
   align-items: flex-start;
   padding: 40px 5vw;
   gap: 80px;
   box-sizing: border-box;
 }
 
-/* 왼쪽: 음성 영역 */
-.voice-area {
+.status-display-box {
+  min-width: 220px;
   display: flex;
-  flex-direction: column;
-  gap: 100px;
-  margin: 0; /* 일단 margin 제거 */
-  flex: 1; /* 인터뷰 전체 폭 중 일부 자동 확보 */
-  margin-left : 100px;
-  margin-right: 100px; 
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background-color: #f9fbff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.voice-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 80px;
-}
-.voice-label {
-  margin-right: 12px;
-  min-width: 60px; /* 최소 너비 확보 */
-  white-space: nowrap; /* 줄바꿈 방지 */
-  font-weight: 600;
-}
-.waveform {
-  width: 300px;
-  height: 40px;
-  background-color: #ddd;
-  border-radius: 4px;
-}
+
+
 
 /* 아이콘 공통 스타일 */
 .icon {
@@ -129,14 +113,14 @@
 
 /* 오른쪽: 타이머 영역 */
 .timer-area {
-  width: 50vw;
+  width: 30vw;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   margin-right: 150px;
-  margin-left: 150px;
+  
 }
 
 /* 타이머 원형 */

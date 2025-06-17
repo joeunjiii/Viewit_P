@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
-  FaFileAlt,
   FaCog,
   FaUsers,
   FaMicrophone,
@@ -111,17 +110,6 @@ function Sidebar({ onSpeechClick }) {
         </div>
       )}
     </div>
-  );
-}
-
-function MenuItem({ label, icon, to, active, collapsed }) {
-  return (
-    <li className={active ? "active" : ""}>
-      <Link to={to} className="menu-link">
-        <div className="menu-icon">{icon}</div>
-        {!collapsed && <span>{label}</span>}
-      </Link>
-    </li>
   );
 }
 

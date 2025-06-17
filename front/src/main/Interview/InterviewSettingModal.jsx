@@ -1,21 +1,19 @@
 // components/InterviewSettingsModal.jsx
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import {  useNavigate } from "react-router-dom";
 import "./InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import MicCheckModal from "./asset/Mic/MicCheckModal";
 import { requestTTS } from "./api/tts";
 
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete }) {
-  const [micEnabled, setMicEnabled] = useState(true); // 마이크상태
-  const [answerTime, setAnswerTime] = useState(10); // 답변 시간 상태
+  const [micEnabled] = useState(true);// 마이크상태
   const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
-  const navigate = useNavigate();
-  const [isTimerActive, setIsTimerActive] = useState(false);
   const [waitTime, setWaitTime] = useState(5);
 
+  const navigate = useNavigate();
+  
   console.log("✅ 선택된 waitTime:", waitTime);
   const handleCancel = () => {
     navigate("/main");

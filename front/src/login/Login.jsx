@@ -65,7 +65,7 @@ export default function Login() {
           <div className="horizontal-line" />
           <button className="naver-button" onClick={handleLogin}>
             <img
-                src="https://static.nid.naver.com/img/default/naverlogin_logo.png"
+                src="/assets/naver.png"
                 alt="네이버 로그인"
                 className="naver-icon"
             />
