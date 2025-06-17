@@ -8,7 +8,7 @@ import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "
   const analyserRef = useRef(null);
   const animationIdRef = useRef(null);
   const SILENCE_THRESHOLD = 0.01; // 무음 기준 (볼륨 크기)
-  const SILENCE_DURATION = 3000; // 무음이 3초 지속되면 종료ㄴ
+  const SILENCE_DURATION = 3000; // 무음이 3초 지속되면 종료
 
   useImperativeHandle(ref, () => ({
     stop: () => {
@@ -62,11 +62,14 @@ import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "
   };
 
   const start = useCallback(async () => {
+    console.log("녹음 시작!");
+
     streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
     const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: "audio/webm" });
     audioChunksRef.current = [];
   
     mediaRecorder.ondataavailable = (e) => {
+      console.log("ondataavailable 호출!", e.data, e.data.size);
       if (e.data.size > 0) {
         audioChunksRef.current.push(e.data);
       }
@@ -75,6 +78,7 @@ import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "
     mediaRecorder.onstop = () => {
       stopSilenceDetection();
       const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      console.log("onstop 호출! Blob:", blob, "크기:", blob.size, "타입:", blob.type);
       streamRef.current.getTracks().forEach((t) => t.stop());
       onStop(blob);
     };
@@ -86,13 +90,14 @@ import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "
   
 
   useEffect(() => {
-    if (isRecording) start(); //  녹음 시작
-  
-    return () => {
-      stopSilenceDetection(); //  무음 감지 해제
-      streamRef.current?.getTracks().forEach((t) => t.stop()); // 마이크 정리
-    };
-  }, [isRecording, start]); //  start 누락 시 경고 발생
+    if (isRecording) {
+      start();
+    } else {
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+    }
+  }, [isRecording]);
 
   return null;
 });

@@ -5,7 +5,7 @@ import "./InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { requestTTS } from "./api/tts";
 
-function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete }) {
+function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [micEnabled] = useState(true);// 마이크상태
   const [job, setJob] = useState("backend"); // 직무 유형 상태
   const [autoQuestion, setAutoQuestion] = useState(false); // 질문
@@ -39,7 +39,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete
 
       audio.onended = () => {
         console.log("🔊 TTS 재생 완료, 타이머 시작");
-        onTTSComplete();
+       
       };
     }
   };
