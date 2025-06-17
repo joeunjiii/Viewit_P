@@ -1,5 +1,5 @@
 // components/Timer.jsx
-import React, { useState, useEffect } from "react";
+import {React, useState, useEffect } from "react";
 
 function Timer({ duration, onComplete, autoStart = true, label = "타이머", mode = "circle" }) {
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -16,20 +16,14 @@ function Timer({ duration, onComplete, autoStart = true, label = "타이머", mo
       onComplete?.(); // 콜백 실행
       return;
     }
-
+  
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
-
+  
     return () => clearInterval(timer);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, onComplete]);
 
-  const start = () => {
-    setTimeLeft(duration);
-    setIsRunning(true);
-  };
-
-  const stop = () => setIsRunning(false);
 
   const formatTime = (sec) => {
     const m = String(Math.floor(sec / 60)).padStart(1, "0");
