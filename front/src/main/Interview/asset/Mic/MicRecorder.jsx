@@ -1,55 +1,43 @@
-// components/asset/Mic/MicRecorder.jsx
-import React, { useState } from "react";
-import { ReactMic } from "react-mic";
-import axios from "axios";
+import React, { useImperativeHandle, forwardRef, useRef } from "react";
 
-function MicRecorder() {
-  const [record, setRecord] = useState(false);
-  const [sttText, setSttText] = useState("");
-  const [loading, setLoading] = useState(false);
+const MicRecorder = forwardRef(({ isRecording, onStop }, ref) => {
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
 
-  const startRecording = () => setRecord(true);
-  const stopRecording = () => setRecord(false);
+  useImperativeHandle(ref, () => ({
+    stop: () => {
+      mediaRecorderRef.current?.stop();
+    },
+  }));
 
-  const onStop = async (recordedBlob) => {
-    console.log("녹음 끝:", recordedBlob);
-    setLoading(true);
+  const start = async () => {
+    streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: "audio/webm" });
 
-    try {
-      const formData = new FormData();
-      formData.append("audio", recordedBlob.blob, "speech.wav");
+    audioChunksRef.current = [];
 
-      const res = await axios.post("http://localhost:8000/stt", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        audioChunksRef.current.push(e.data);
+      }
+    };
 
-      setSttText(res.data.text);
-    } catch (err) {
-      console.error("STT 요청 실패:", err);
-      setSttText("STT 요청 실패");
-    }
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      onStop(blob);
+    };
 
-    setLoading(false);
+    mediaRecorder.start();
+    mediaRecorderRef.current = mediaRecorder;
   };
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <ReactMic
-        record={record}
-        onStop={onStop}
-        strokeColor="#4caf50"
-        backgroundColor="#e8f5e9"
-        mimeType="audio/wav"
-        className="sound-wave"
-      />
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={startRecording} disabled={record}>🎙 녹음 시작</button>
-        <button onClick={stopRecording} disabled={!record}>🛑 녹음 종료</button>
-      </div>
-      {loading && <p>⏳ 음성 인식 중...</p>}
-      {sttText && <p>📝 인식 결과: {sttText}</p>}
-    </div>
-  );
-}
+  React.useEffect(() => {
+    if (isRecording) start();
+  }, [isRecording]);
+
+  return null; // 시각화 필요 시 캔버스 추가 가능
+});
 
 export default MicRecorder;
