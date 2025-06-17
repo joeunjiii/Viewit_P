@@ -64,7 +64,7 @@ public class NaverAuthController {
         log.info("[NaverAuth] 3) 파싱된 이메일 = {}", email);
         log.info("[NaverAuth] 3) 파싱된 이름 = {}", name);
         // 4) JWT 발급 및 로깅
-        String jwt = jwtProvider.createToken(email);
+        String jwt = jwtProvider.createToken(email,name);
         log.info("[NaverAuth] 4) 발급된 JWT = {}", jwt);
         String naverId = userInfo.get("id").toString();
         //DB저장

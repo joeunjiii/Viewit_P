@@ -33,7 +33,7 @@ export default function Login() {
             .then(data => {
               console.log("[Login] /api/auth/naver response body:", data);
               if (data.token) {
-                localStorage.setItem("jwt", data.token);
+                localStorage.setItem("token", data.token);
                 window.location.href = "/main";
               } else {
                 alert("로그인 실패: 토큰이 없습니다.");
