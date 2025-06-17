@@ -1,55 +1,100 @@
-// components/asset/Mic/MicRecorder.jsx
-import React, { useState } from "react";
-import { ReactMic } from "react-mic";
-import axios from "axios";
+import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "react";
 
-function MicRecorder() {
-  const [record, setRecord] = useState(false);
-  const [sttText, setSttText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const MicRecorder = forwardRef(({ isRecording, onStop }, ref) => {
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationIdRef = useRef(null);
+  const SILENCE_THRESHOLD = 0.01; // 무음 기준 (볼륨 크기)
+  const SILENCE_DURATION = 3000; // 무음이 3초 지속되면 종료ㄴ
 
-  const startRecording = () => setRecord(true);
-  const stopRecording = () => setRecord(false);
+  useImperativeHandle(ref, () => ({
+    stop: () => {
+      mediaRecorderRef.current?.stop();
+    },
+  }));
 
-  const onStop = async (recordedBlob) => {
-    console.log("녹음 끝:", recordedBlob);
-    setLoading(true);
+  const startSilenceDetection = () => {
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(streamRef.current);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
 
-    try {
-      const formData = new FormData();
-      formData.append("audio", recordedBlob.blob, "speech.wav");
+    source.connect(analyser);
+    const buffer = new Uint8Array(analyser.fftSize);
+    let silentTime = 0;
+    let lastTime = Date.now();
 
-      const res = await axios.post("http://localhost:8000/stt", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    const check = () => {
+      analyser.getByteTimeDomainData(buffer);
+      const rms = Math.sqrt(buffer.reduce((acc, val) => {
+        const norm = (val - 128) / 128;
+        return acc + norm * norm;
+      }, 0) / buffer.length);
 
-      setSttText(res.data.text);
-    } catch (err) {
-      console.error("STT 요청 실패:", err);
-      setSttText("STT 요청 실패");
-    }
+      const now = Date.now();
+      if (rms < SILENCE_THRESHOLD) {
+        silentTime += now - lastTime;
+      } else {
+        silentTime = 0;
+      }
 
-    setLoading(false);
+      if (silentTime >= SILENCE_DURATION) {
+        mediaRecorderRef.current?.stop();
+      } else {
+        animationIdRef.current = requestAnimationFrame(check);
+      }
+
+      lastTime = now;
+    };
+
+    check();
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
   };
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <ReactMic
-        record={record}
-        onStop={onStop}
-        strokeColor="#4caf50"
-        backgroundColor="#e8f5e9"
-        mimeType="audio/wav"
-        className="sound-wave"
-      />
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={startRecording} disabled={record}>🎙 녹음 시작</button>
-        <button onClick={stopRecording} disabled={!record}>🛑 녹음 종료</button>
-      </div>
-      {loading && <p>⏳ 음성 인식 중...</p>}
-      {sttText && <p>📝 인식 결과: {sttText}</p>}
-    </div>
-  );
-}
+  const stopSilenceDetection = () => {
+    cancelAnimationFrame(animationIdRef.current);
+    analyserRef.current?.disconnect();
+    audioContextRef.current?.close();
+  };
+
+  const start = useCallback(async () => {
+    streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: "audio/webm" });
+    audioChunksRef.current = [];
+  
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        audioChunksRef.current.push(e.data);
+      }
+    };
+  
+    mediaRecorder.onstop = () => {
+      stopSilenceDetection();
+      const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      onStop(blob);
+    };
+  
+    mediaRecorder.start();
+    mediaRecorderRef.current = mediaRecorder;
+    startSilenceDetection();
+  }, [onStop]); // 의존성으로 onStop만 있으면 됨
+  
+
+  useEffect(() => {
+    if (isRecording) start(); //  녹음 시작
+  
+    return () => {
+      stopSilenceDetection(); //  무음 감지 해제
+      streamRef.current?.getTracks().forEach((t) => t.stop()); // 마이크 정리
+    };
+  }, [isRecording, start]); //  start 누락 시 경고 발생
+
+  return null;
+});
 
 export default MicRecorder;
