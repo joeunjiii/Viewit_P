@@ -1,33 +1,77 @@
+// src/login/Login.jsx
+import React, { useEffect } from "react";
 import "./login.css";
-import { useNavigate } from "react-router-dom";
 
+export default function Login() {
+  useEffect(() => {
+    function handleMessage(event) {
+      // 1) 메시지 수신 확인용 로그
+      console.log("[Login] message event:", event.data, "from", event.origin);
 
-function Login() {
-  const navigate = useNavigate();
+      // 2) 보안: 반드시 origin 체크 (팝업과 같은 출처인지)
+      if (event.origin !== window.location.origin) {
+        console.warn("[Login] origin mismatch, ignoring message");
+        return;
+      }
+
+      const { source, accessToken } = event.data || {};
+      if (source === "naver" && accessToken) {
+        console.log("[Login] got Naver accessToken:", accessToken);
+
+        // 3) 백엔드에 토큰 전달 (proxy 활용)
+        fetch("/api/auth/naver", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",              // 쿠키 기반 인증 쓰려면 필요
+          body: JSON.stringify({ accessToken }),
+        })
+            .then(res => {
+              console.log("[Login] /api/auth/naver response status:", res.status);
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json();
+            })
+            .then(data => {
+              console.log("[Login] /api/auth/naver response body:", data);
+              if (data.token) {
+                localStorage.setItem("token", data.token);
+                window.location.href = "/main";
+              } else {
+                alert("로그인 실패: 토큰이 없습니다.");
+              }
+            })
+            .catch(err => {
+              console.error("[Login] 네트워크 오류 또는 백엔드 에러", err);
+              alert("네트워크 오류 발생");
+            });
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   const handleLogin = () => {
-    navigate("/main"); // 메인 페이지로 이동
+    window.open(
+        "/naver/callback.html",          // public/naver/callback.html 경로
+        "naverLoginPopup",
+        "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
+    );
   };
+
   return (
-    <div className="container">
-      <div className="login-box">
-        <img
-          src="/assets/logo.png"  // 또는 외부 URL 사용 가능
-          alt="로고"
-          className="login-logo"
-        />
-        <div className="horizontal-line"></div>
-        <button className="naver-button" onClick={handleLogin}>
-          <img
-            src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ae/c9/ec/aec9ecca-cdbc-0de4-d0bb-2dc45cb43373/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/230x0w.webp"
-            alt="Naver"
-            className="naver-icon"
-          />
-          네이버로 로그인
-        </button>
+      <div className="container">
+        <div className="login-box">
+          <img src="/assets/logo.png" alt="로고" className="login-logo" />
+          <div className="horizontal-line" />
+          <button className="naver-button" onClick={handleLogin}>
+            <img
+                src="/assets/naver.png"
+                alt="네이버 로그인"
+                className="naver-icon"
+            />
+            네이버로 로그인
+          </button>
+        </div>
       </div>
-    </div>
   );
 }
-
-export default Login;

@@ -20,10 +20,9 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
           <Route path="interview" element={<Interview />} />
-        
         </Route>
 
-        <Route path="AnalyzingModal" element={<AnalyzingModal/>} />
+        <Route path="AnalyzingModal" element={<AnalyzingModal />} />
       </Routes>
     </Router>
   );
