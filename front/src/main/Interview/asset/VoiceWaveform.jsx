@@ -1,68 +1,66 @@
 import React, { useEffect, useRef } from "react";
-import WaveSurfer from "wavesurfer.js";
-import MicrophonePlugin from "wavesurfer.js/dist/plugin/wavesurfer.microphone.min.js";
-
 
 function VoiceWaveform() {
-  const micWaveformRef = useRef(null); // 면접자
-  const audioWaveformRef = useRef(null); // 면접관
-  const micWaveSurfer = useRef(null);
-  const audioWaveSurfer = useRef(null);
+  const canvasRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationIdRef = useRef(null);
 
   useEffect(() => {
-    // 면접자 파형 (마이크 입력)
-    micWaveSurfer.current = WaveSurfer.create({
-      container: micWaveformRef.current,
-      waveColor: "#91d5ff",
-      interact: false,
-      cursorWidth: 0,
-      height: 80,
-      plugins: [
-        MicrophonePlugin.create({
-          bufferSize: 4096,
-          numberOfInputChannels: 1,
-          numberOfOutputChannels: 1,
-        }),
-      ],
-    });
+    const init = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      const analyser = audioContextRef.current.createAnalyser();
+      analyser.fftSize = 2048;
 
-    micWaveSurfer.current.microphone.on("deviceReady", () =>
-      console.log("🎙️ 마이크 연결됨")
-    );
-    micWaveSurfer.current.microphone.on("deviceError", (err) =>
-      console.error("❌ 마이크 오류:", err)
-    );
-    micWaveSurfer.current.microphone.start();
+      source.connect(analyser);
+      analyserRef.current = analyser;
 
-    // 면접관 파형 (파일 기반)
-    audioWaveSurfer.current = WaveSurfer.create({
-      container: audioWaveformRef.current,
-      waveColor: "#ffd591",
-      progressColor: "#fa8c16",
-      cursorWidth: 1,
-      height: 80,
-    });
+      const canvas = canvasRef.current;
+      const canvasCtx = canvas.getContext("2d");
 
-    // 예시 URL: 실제로는 질문 음성 파일 또는 TTS 출력 URL 사용
-    audioWaveSurfer.current.load("/sample-audio/question1.mp3");
+      const draw = () => {
+        animationIdRef.current = requestAnimationFrame(draw);
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteTimeDomainData(dataArray);
+
+        canvasCtx.fillStyle = "#f5f5f5";
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = "#1890ff";
+        canvasCtx.beginPath();
+
+        const sliceWidth = (canvas.width * 1.0) / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = (v * canvas.height) / 2;
+          if (i === 0) canvasCtx.moveTo(x, y);
+          else canvasCtx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        canvasCtx.lineTo(canvas.width, canvas.height / 2);
+        canvasCtx.stroke();
+      };
+
+      draw();
+    };
+
+    init();
 
     return () => {
-      micWaveSurfer.current.microphone.stop();
-      micWaveSurfer.current.destroy();
-      audioWaveSurfer.current.destroy();
+      cancelAnimationFrame(animationIdRef.current);
+      audioContextRef.current?.close();
     };
   }, []);
 
   return (
-    <div className="voice-area">
-      <div className="voice-item">
-        <div className="voice-label">면접관</div>
-        <div className="waveform" ref={audioWaveformRef}>나중에 파형추가</div>
-      </div>
-      <div className="voice-item">
-        <div className="voice-label">면접자</div>
-        <div className="waveform" ref={micWaveformRef}>나중에 파형추가</div>
-      </div>
+    <div>
+      <div className="voice-label">면접자 (마이크 입력)</div>
+      <canvas ref={canvasRef} width={400} height={80} style={{ background: "#fff", border: "1px solid #ddd" }} />
     </div>
   );
 }

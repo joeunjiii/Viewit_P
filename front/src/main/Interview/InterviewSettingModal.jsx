@@ -14,6 +14,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck,onTTSComplete
   const [allowRetry, setAllowRetry] = useState(true); //다시답변버튼 상태
   const navigate = useNavigate();
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [waitTime, setWaitTime] = useState(5);
 
   console.log("✅ 선택된 waitTime:", waitTime);
   const handleCancel = () => {
