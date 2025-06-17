@@ -22,3 +22,10 @@ app:
   jwt:
     secret: ThisIsASecretKeyThatIsAtLeast32BytesLong!!
     expiration-ms: 3600000            # 만료 시간(ms 단위)
+
+logging:
+  level:
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.core: DEBUG
+    org.springframework.web.reactive.function.client.ExchangeFunctions: TRACE
+
