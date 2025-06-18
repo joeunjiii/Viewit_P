@@ -59,8 +59,8 @@
   min-width: 80px;
 }
 .tab.selected {
-  background-color: #5e9c76;
-  color: white;
+  background-color: rgb(107, 170, 127);
+  color: rgb(0, 0, 0);
 }
 
 /* 질문 파형 + 타이머를 나란히 배치 */

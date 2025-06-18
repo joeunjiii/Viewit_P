@@ -7,10 +7,10 @@ import QuestionTabs from "./asset/QuestionTabs";
 import InterviewHeader from "./asset/InterviewHeader";
 import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
-import Timer from "./asset/Timer";
+import AssessmentIntro from "./AssessmentIntro";
 import WelcomeMessage from "./WelcomeMessage";
 function Interview() {
-  const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview"
+  const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview | guide"
   const [micCheckOpen, setMicCheckOpen] = useState(false);
   const [autoQuestion, setAutoQuestion] = useState(false);
   const [allowRetry, setAllowRetry] = useState(true);
@@ -20,19 +20,20 @@ function Interview() {
     useState("면접관: 자기소개 부탁드립니다.");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
-  // ⭐ 핵심 수정: WelcomeMessage는 처음에는 보이지 않아야 합니다.
-  // 설정 모달이 닫힌 후에 보이도록 합니다.
-  const [showWelcome, setShowWelcome] = useState(false); 
-  
 
   const handleStartSettings = (settings) => {
-    console.log("🛠️ InterviewSettingsModal에서 설정 완료, WelcomeMessage 표시.");
-    setStep("welcome");
     setAutoQuestion(settings.autoQuestion);
     setWaitTime(settings.waitTime);
     setAllowRetry(settings.allowRetry);
+    setStep("guide"); // 바로 안내화면으로
   };
-
+  const handleSettingComplete = (settings) => {
+    setStep("guide");
+    // settings 저장 가능
+  };
+  const handleGuideConfirm = () => {
+    setStep("welcome");
+  };
   const handleWelcomeStart = () => {
     console.log("👋 WelcomeMessage '바로 시작하기' 버튼 클릭, 면접 시작.");
     setStep("interview");
@@ -49,7 +50,7 @@ function Interview() {
           onOpenMicCheck={openMicCheck}
         />
       )}
-
+      {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
       {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
 
       {step === "welcome" && (

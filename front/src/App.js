@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,6 +12,7 @@ import Login from "./login/Login";
 import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
+import AssessmentIntro from './main/Interview/AssessmentIntro';
 function App() {
   
 
@@ -28,6 +29,7 @@ function App() {
         </Route>
 
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
+        <Route path="AssessmentIntro" element={<AssessmentIntro />} />
       </Routes>
     </Router>
   );

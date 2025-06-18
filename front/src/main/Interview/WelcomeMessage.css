@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(120deg, #f3f7fa 0%, #e4ecff 100%);
+  background: rgb(219, 248, 208);
   animation: fadeIn 1s;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .start-btn {
-  background: linear-gradient(92deg, #7286d3 40%, #b2b8ff 100%);
+  background: linear-gradient(92deg, #b8f7d2 40%, #98f38c 100%);
   color: #fff;
   font-weight: bold;
   font-size: 1.08rem;
@@ -79,6 +79,6 @@
 }
 
 .start-btn:hover {
-  background: linear-gradient(92deg, #5b66a5 30%, #a1a7ff 100%);
+  background: linear-gradient(92deg, #8ee0ad 40%, #7bcd96 100%);
   transform: scale(1.04);
 }

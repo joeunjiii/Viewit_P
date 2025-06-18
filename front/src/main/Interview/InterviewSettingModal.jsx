@@ -126,6 +126,6 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
     </div>
   );
 }
-}
+
 
 export default InterviewSettingsModal;
