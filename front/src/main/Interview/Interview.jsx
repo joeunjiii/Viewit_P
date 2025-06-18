@@ -8,9 +8,9 @@ import InterviewHeader from "./asset/InterviewHeader";
 import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
 import Timer from "./asset/Timer";
-
+import WelcomeMessage from "./WelcomeMessage";
 function Interview() {
-  const [showModal, setShowModal] = useState(true);
+  const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview"
   const [micCheckOpen, setMicCheckOpen] = useState(false);
   const [autoQuestion, setAutoQuestion] = useState(false);
   const [allowRetry, setAllowRetry] = useState(true);
@@ -19,27 +19,43 @@ function Interview() {
   const [captionText, setCaptionText] = useState("면접관: 자기소개 부탁드립니다.");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
+  // ⭐ 핵심 수정: WelcomeMessage는 처음에는 보이지 않아야 합니다.
+  // 설정 모달이 닫힌 후에 보이도록 합니다.
+  const [showWelcome, setShowWelcome] = useState(false); 
+  
 
-  const handleStart = (settings) => {
-    setShowModal(false);
+  const handleStartSettings = (settings) => {
+    console.log("🛠️ InterviewSettingsModal에서 설정 완료, WelcomeMessage 표시.");
+    setStep("welcome");
     setAutoQuestion(settings.autoQuestion);
     setWaitTime(settings.waitTime);
     setAllowRetry(settings.allowRetry);
   };
 
+  const handleWelcomeStart = () => {
+    console.log("👋 WelcomeMessage '바로 시작하기' 버튼 클릭, 면접 시작.");
+    setStep("interview");
+  };
+  const openMicCheck = () => setMicCheckOpen(true);
+  const closeMicCheck = () => setMicCheckOpen(false);
+
   return (
     <>
-      {showModal && (
+      {step === "settings" && (
         <InterviewSettingsModal
-          onClose={() => setShowModal(false)}
-          onStart={handleStart}
-          onOpenMicCheck={() => setMicCheckOpen(true)}
+          onClose={() => setStep("interview")}
+          onStart={handleStartSettings}
+          onOpenMicCheck={openMicCheck}
         />
       )}
 
-      {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
+      {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
 
-      {!showModal && (
+      {step === "welcome" && (
+        <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
+      )}
+
+      {step === "interview" && (
         <div className="interview-wrapper">
           <InterviewHeader totalDuration={600} />
           <div className="interview-section-body">
@@ -55,16 +71,12 @@ function Interview() {
                 onStatusChange={setStatus}
                 onTimeUpdate={setRemainingTime}
                 onAnswerComplete={(text) => {
-                  console.log("답변 결과:", text);
                   setCaptionText(`이용자: ${text}`);
                   setQuestionNumber((prev) => prev + 1);
                 }}
               />
             </div>
-
-           
           </div>
-
           {autoQuestion && <CaptionBox text={captionText} />}
         </div>
       )}

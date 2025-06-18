@@ -32,16 +32,8 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       allowRetry,
     });
 
-    const audioUrl = await requestTTS();
-    if (audioUrl) {
-      const audio = new Audio("http://localhost:8000" + audioUrl);
-      audio.play();
-
-      audio.onended = () => {
-        console.log("🔊 TTS 재생 완료, 타이머 시작");
-       
-      };
-    }
+    
+    
   };
 
   return (
