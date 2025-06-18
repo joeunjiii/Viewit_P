@@ -1,8 +1,10 @@
+import React, { useState } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation
 } from "react-router-dom";
 import "./main/Layout.css";
 import Main from "./main/Main";
@@ -11,8 +13,11 @@ import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
 function App() {
+  
+
   return (
     <Router>
+      
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
@@ -27,4 +32,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;

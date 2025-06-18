@@ -33,6 +33,8 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
     });
 
     
+    
+  };
 
   return (
     <div className="modal-overlay">

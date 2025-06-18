@@ -7,9 +7,10 @@ import QuestionTabs from "./asset/QuestionTabs";
 import InterviewHeader from "./asset/InterviewHeader";
 import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
+import Timer from "./asset/Timer";
 import WelcomeMessage from "./WelcomeMessage";
 function Interview() {
-  const [showModal, setShowModal] = useState(true);
+  const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview"
   const [micCheckOpen, setMicCheckOpen] = useState(false);
   const [autoQuestion, setAutoQuestion] = useState(false);
   const [allowRetry, setAllowRetry] = useState(true);
@@ -19,12 +20,14 @@ function Interview() {
     useState("면접관: 자기소개 부탁드립니다.");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(true);
+  // ⭐ 핵심 수정: WelcomeMessage는 처음에는 보이지 않아야 합니다.
+  // 설정 모달이 닫힌 후에 보이도록 합니다.
+  const [showWelcome, setShowWelcome] = useState(false); 
+  
 
   const handleStartSettings = (settings) => {
     console.log("🛠️ InterviewSettingsModal에서 설정 완료, WelcomeMessage 표시.");
-    setShowModal(false);
-    setShowWelcome(true);
+    setStep("welcome");
     setAutoQuestion(settings.autoQuestion);
     setWaitTime(settings.waitTime);
     setAllowRetry(settings.allowRetry);
@@ -32,35 +35,28 @@ function Interview() {
 
   const handleWelcomeStart = () => {
     console.log("👋 WelcomeMessage '바로 시작하기' 버튼 클릭, 면접 시작.");
-    setShowWelcome(false);
+    setStep("interview");
   };
+  const openMicCheck = () => setMicCheckOpen(true);
+  const closeMicCheck = () => setMicCheckOpen(false);
 
   return (
     <>
-      {/* 1. InterviewSettingsModal: showModal이 true일 때만 표시 */}
-      {showModal && (
+      {step === "settings" && (
         <InterviewSettingsModal
-          // InterviewSettingsModal 내의 onClose는 현재 로직에서 직접 사용되지 않습니다.
-          // '취소' 버튼은 navigate('/main')을 호출하여 메인으로 돌아갑니다.
-          // '설정하기' 버튼은 handleStartSettings를 호출하여 다음 단계로 넘어갑니다.
-          onClose={() => setShowModal(false)} // 현재로선 크게 사용되지 않지만, prop으로 유지
-          onStart={handleStartSettings} // ⭐ 이름 변경된 함수로 연결
-          onOpenMicCheck={() => setMicCheckOpen(true)}
+          onClose={() => setStep("interview")}
+          onStart={handleStartSettings}
+          onOpenMicCheck={openMicCheck}
         />
       )}
 
-      {/* 2. MicCheckModal: micCheckOpen이 true일 때만 표시 */}
-      {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
+      {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
 
-      {/* 3. WelcomeMessage: showModal이 false이고 showWelcome이 true일 때만 표시 */}
-      {/* 이 조건이 중요합니다. 설정 모달이 닫히고 WelcomeMessage가 열려야 합니다. */}
-      {!showModal && showWelcome && (
+      {step === "welcome" && (
         <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
       )}
 
-      {/* 4. 실제 면접 콘텐츠: showModal도 false, showWelcome도 false일 때만 표시 */}
-      {/* 두 모달이 모두 닫혔을 때만 면접 내용이 나타나도록 조건 변경 */}
-      {!showModal && !showWelcome && (
+      {step === "interview" && (
         <div className="interview-wrapper">
           <InterviewHeader totalDuration={600} />
           <div className="interview-section-body">
@@ -83,7 +79,6 @@ function Interview() {
                 onStatusChange={setStatus}
                 onTimeUpdate={setRemainingTime}
                 onAnswerComplete={(text) => {
-                  console.log("답변 결과:", text);
                   setCaptionText(`이용자: ${text}`);
                   setQuestionNumber((prev) => prev + 1);
                 }}

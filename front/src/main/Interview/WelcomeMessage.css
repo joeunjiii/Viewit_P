@@ -1,55 +1,84 @@
 .welcome-bg {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 20% 80%, #fff799, transparent 70%),
-                radial-gradient(circle at 90% 0%, #7ee8fa, transparent 70%),
-                linear-gradient(120deg, #70e49d 50%, #77e8e2 100%);
-  }
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(120deg, #f3f7fa 0%, #e4ecff 100%);
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
+
+.welcome-card {
+  background: white;
+  padding: 48px 36px 40px 36px;
+  border-radius: 32px;
+  box-shadow: 0 8px 32px rgba(120, 140, 255, 0.15), 0 1.5px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 380px;
+  min-width: 300px;
+  gap: 16px;
+  animation: cardPop 0.8s cubic-bezier(.21,1.02,.73,1.04);
+}
+
+@keyframes cardPop {
+  0% { transform: scale(0.95) translateY(30px); opacity: 0;}
+  100% { transform: scale(1) translateY(0); opacity: 1;}
+}
+
+.emoji-wave {
+  font-size: 44px;
+  margin-bottom: 8px;
+  animation: waveEmoji 1.5s infinite ease-in-out alternate;
+}
+
+@keyframes waveEmoji {
+  from { transform: rotate(-10deg) scale(1);}
+  to   { transform: rotate(12deg) scale(1.1);}
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #25274d;
+  text-align: center;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.username {
   
-  .welcome-content {
-    text-align: center;
-    background: rgba(255,255,255,0.10);
-    border-radius: 30px;
-    padding: 50px 36px 36px 36px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.11);
-  }
-  
-  .welcome-title {
-    font-size: 2.1rem;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.4;
-    margin-bottom: 16px;
-  }
-  
-  .username {
-    color: #fffde4;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.10);
-  }
-  
-  .welcome-message {
-    font-size: 1.15rem;
-    margin: 10px 0 24px 0;
-    color: #fdfde7;
-  }
-  
-  .countdown {
-    font-size: 1.2rem;
-    color: #ffffffd8;
-    font-weight: 500;
-    margin-bottom: 20px;
-    transition: all 0.3s;
-  }
-  
-  .start-btn {
-    background: #fff;
-    color: #22c58b;
-    font-weight: bold;
-    border: none;
-    border-radius: 24px;
-    padding: 10px 36px;
-    font-size: 1.07rem;
-    box-shadow: 0 2px 12px 0 rgba(34, 197, 138, 0.11)
-  }
+}
+
+.welcome-message {
+  font-size: 1.12rem;
+  color: #444;
+  text-align: center;
+  margin: 14px 0 18px 0;
+  font-weight: 500;
+}
+
+.start-btn {
+  background: linear-gradient(92deg, #7286d3 40%, #b2b8ff 100%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.08rem;
+  padding: 13px 0;
+  width: 180px;
+  border: none;
+  border-radius: 26px;
+  box-shadow: 0 2px 8px rgba(114,134,211,0.13);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.start-btn:hover {
+  background: linear-gradient(92deg, #5b66a5 30%, #a1a7ff 100%);
+  transform: scale(1.04);
+}
