@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# 환경설정 파일
+.env
+
+# 기타 임시 파일
+*.log
+.DS_Store
+
+# uploads, 음성 파일(원하면)
+interview/uploads/*
+!interview/uploads/.gitkeep   # 폴더만 유지하려면(옵션)
