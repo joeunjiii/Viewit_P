@@ -27,7 +27,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
     onStart({
       micEnabled,
       waitTime,
-      job,
+      jobRole : job,
       autoQuestion,
       allowRetry,
     });
@@ -126,7 +126,16 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           <button className="cancel" onClick={handleCancel}>
             취소
           </button>
-          <button className="start" onClick={handleStart}>
+          <button
+              className="start"
+              onClick={() => handleStart({
+                micEnabled,
+                waitTime,
+                jobRole: job,        // camelCase!
+                autoQuestion,
+                allowRetry,
+              })}
+          >
             시작하기
           </button>
         </div>

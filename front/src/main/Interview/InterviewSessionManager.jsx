@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
-import { requestNextTTSQuestion, requestTTS } from "./api/tts";
+import { nextQuestion } from "./api/interview"; // ⭐️ initSession 삭제!
 import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 
@@ -14,16 +14,19 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
+                                   sessionId,
+                                   jobRole,
                                    waitTime = 3,
                                    answerDuration = 10,
                                    allowRetry = true,
+                                   initialQuestion, // ⭐️ Interview.jsx에서 전달
                                    onStatusChange,
                                    onTimeUpdate,
                                    onAnswerComplete,
-                                   onNewQuestion, // 👈 질문 전달 prop 추가
+                                   onNewQuestion,
                                  }) {
-  const [phase, setPhase] = useState(PHASE.READY);
-  const [question, setQuestion] = useState(null);
+  const [phase, setPhase] = useState(PHASE.TTS); // ⭐️ 바로 TTS로!
+  const [question, setQuestion] = useState(initialQuestion); // ⭐️ 초기 질문 세팅
   const [remainingTime, setRemainingTime] = useState(0);
   const [sttResult, setSttResult] = useState(null);
 
@@ -31,89 +34,65 @@ function InterviewSessionManager({
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
 
+  // ⭐️ 질문 오디오 재생
+  useEffect(() => {
+    if (phase === PHASE.TTS && question?.audio_url) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      const audio = new Audio("http://localhost:8000" + question.audio_url);
+      audioRef.current = audio;
+      audio.onended = () => setPhase(PHASE.WAITING);
+      audio.play().catch(() => setPhase(PHASE.WAITING));
+    }
+  }, [phase, question]);
+
+  // ⭐️ 대기/녹음 타이머는 기존과 동일
   useEffect(() => {
     onStatusChange?.(phase);
     clearInterval(timerRef.current);
 
-    switch (phase) {
-      case PHASE.READY:
-        (async () => {
-          let result;
-          if (!question) {
-            const audioUrl = await requestTTS();
-            result = { audioUrl, question: "자기소개 부탁드립니다." };
-          } else {
-            result = await requestNextTTSQuestion();
+    if (phase === PHASE.WAITING) {
+      setRemainingTime(waitTime);
+      onTimeUpdate?.(waitTime);
+      timerRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          onTimeUpdate?.(prev - 1);
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setPhase(PHASE.RECORDING);
+            return 0;
           }
-          setQuestion(result);
-          onNewQuestion?.(result.question); // 👈 질문 텍스트 전달
-          setPhase(PHASE.TTS);
-        })();
-        break;
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-      case PHASE.TTS:
-        if (question?.audioUrl) {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
+    if (phase === PHASE.RECORDING) {
+      setRemainingTime(answerDuration);
+      onTimeUpdate?.(answerDuration);
+      recorderRef.current?.start?.();
+      timerRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          onTimeUpdate?.(prev - 1);
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setPhase(PHASE.UPLOADING);
+            recorderRef.current?.stop();
+            return 0;
           }
-          const audio = new Audio("http://localhost:8000" + question.audioUrl);
-          audioRef.current = audio;
-          audio.onended = () => setPhase(PHASE.WAITING);
-          audio.play().catch(() => setPhase(PHASE.WAITING));
-        }
-        break;
-
-      case PHASE.WAITING:
-        setRemainingTime(waitTime);
-        onTimeUpdate?.(waitTime);
-        timerRef.current = setInterval(() => {
-          setRemainingTime((prev) => {
-            onTimeUpdate?.(prev - 1);
-            if (prev <= 1) {
-              clearInterval(timerRef.current);
-              setPhase(PHASE.RECORDING);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        break;
-
-      case PHASE.RECORDING:
-        setRemainingTime(answerDuration);
-        onTimeUpdate?.(answerDuration);
-        recorderRef.current?.start?.();
-        timerRef.current = setInterval(() => {
-          setRemainingTime((prev) => {
-            onTimeUpdate?.(prev - 1);
-            if (prev <= 1) {
-              clearInterval(timerRef.current);
-              setPhase(PHASE.UPLOADING);
-              recorderRef.current?.stop();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        break;
-
-      case PHASE.UPLOADING:
-        break;
-
-      case PHASE.COMPLETE:
-        setTimeout(() => setPhase(PHASE.READY), 1000);
-        break;
-
-      default:
-        break;
+          return prev - 1;
+        });
+      }, 1000);
     }
 
     return () => clearInterval(timerRef.current);
+    // eslint-disable-next-line
   }, [phase]);
 
+  // ⭐️ 답변(STT) 업로드/완료 → 다음 질문
   const handleRecordingComplete = async (blob) => {
-    console.log("🔄 [UPLOADING] 서버에 파일 업로드 중...");
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -124,12 +103,27 @@ function InterviewSessionManager({
     }
   };
 
+  // ⭐️ COMPLETE에서 다음 질문/오디오 받기
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       onAnswerComplete?.(sttResult);
+
+      (async () => {
+        const res = await nextQuestion(sessionId, sttResult);
+        const { question: q, audio_url, done } = res.data;
+        if (done) {
+          setQuestion({ question: q, audio_url, done: true });
+        } else {
+          setQuestion({ question: q, audio_url });
+          onNewQuestion?.(q);
+          setPhase(PHASE.TTS); // 다음 질문 오디오 재생!
+        }
+      })();
+
       setSttResult(null);
     }
-  }, [phase, sttResult, onAnswerComplete]);
+    // eslint-disable-next-line
+  }, [phase, sttResult, sessionId]);
 
   const handleRetry = () => {
     setRemainingTime(waitTime);

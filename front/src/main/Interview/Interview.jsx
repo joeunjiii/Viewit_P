@@ -23,7 +23,10 @@ function Interview() {
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
 
-  /* ───────────── SettingsModal “시작” ───────────── */
+  // ⭐️ 최초 질문(오디오 포함)을 여기에 저장!
+  const [firstQuestion, setFirstQuestion] = useState(null);
+
+  // 면접 설정에서 "시작" 버튼 눌렀을 때
   const handleStart = async (settings) => {
     setShowModal(false);
     setAutoQuestion(settings.autoQuestion);
@@ -33,6 +36,7 @@ function Interview() {
 
     try {
       const res = await initSession(sessionId, settings.jobRole);
+      setFirstQuestion(res.data); // { question, audio_url }
       if (settings.autoQuestion) {
         setCaptionText(`면접관: ${res.data.question}`);
       }
@@ -42,7 +46,6 @@ function Interview() {
     }
   };
 
-  /* ──────────────────────────────── */
   return (
       <>
         {showModal && (
@@ -55,7 +58,8 @@ function Interview() {
 
         {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
 
-        {!showModal && (
+        {/* 최초 질문이 세팅되어야 진행! */}
+        {!showModal && firstQuestion && (
             <div className="interview-wrapper">
               <InterviewHeader totalDuration={600} />
 
@@ -68,15 +72,16 @@ function Interview() {
                   </div>
 
                   <InterviewSessionManager
+                      sessionId={sessionId}
+                      jobRole={jobRole}
                       waitTime={waitTime}
                       allowRetry={allowRetry}
+                      initialQuestion={firstQuestion} // ⭐️ 최초 질문을 prop으로 전달!
                       onStatusChange={setStatus}
                       onTimeUpdate={setRemainingTime}
-                      /* ⬇️ 면접관 새 질문 수신 → 자막 갱신 */
                       onNewQuestion={(q) => {
                         if (autoQuestion) setCaptionText(`면접관: ${q}`);
                       }}
-                      /* 사용자가 답변 완료됐을 때 */
                       onAnswerComplete={async (userText) => {
                         if (autoQuestion) setCaptionText(`이용자: ${userText}`);
 
@@ -87,7 +92,6 @@ function Interview() {
                           if (autoQuestion) setCaptionText(`면접관: ${nextQ}`);
                           setQuestionNumber((prev) => prev + 1);
 
-                          /* 마지막 질문이면 */
                           if (res.data.done) {
                             await finalAnswer(sessionId, userText);
                           }
@@ -99,8 +103,6 @@ function Interview() {
                   />
                 </div>
               </div>
-
-              {/* 자막 스위치 켜져 있을 때만 표시 */}
               {autoQuestion && <CaptionBox text={captionText} />}
             </div>
         )}

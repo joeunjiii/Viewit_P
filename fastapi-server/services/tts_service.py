@@ -1,10 +1,12 @@
 # services/tts_service.py
 from gtts import gTTS
 import os
-from datetime import datetime
+import hashlib
 
 def generate_tts_audio(text: str) -> str:
-    filename = "intromyself.mp3"
+    # filename = "intromyself.mp3"
+    h = hashlib.md5(text.encode()).hexdigest()[:8]
+    filename = f"q_{h}.mp3"
     save_path = os.path.join("static", "audio", filename)
 
     # 🔍 파일이 이미 존재하면 생성하지 않고 경로만 반환
