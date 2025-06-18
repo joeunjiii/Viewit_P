@@ -2,11 +2,18 @@
 import whisper
 import os
 import subprocess
+from dotenv import load_dotenv
 
-FFMPEG_BIN_PATH = r"C:\Users\smhrd\ffmpeg-7.1.1-essentials_build\bin\ffmpeg.exe"
+
+# .env 파일 읽기
+load_dotenv()
+FFMPEG_BIN_PATH = os.getenv("FFMPEG_BIN_PATH")
+if not FFMPEG_BIN_PATH:
+    raise RuntimeError("FFMPEG_BIN_PATH 환경변수가 설정되지 않았습니다.")
+
 
 print("🔊 Whisper 모델 불러오는 중...")
-model = whisper.load_model("small")
+model = whisper.load_model("base")
 print("✅ Whisper 모델 로딩 완료")
 
 def convert_webm_to_wav(webm_path: str, wav_path: str):
