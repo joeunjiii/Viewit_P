@@ -13,6 +13,7 @@ import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
 import AssessmentIntro from './main/Interview/AssessmentIntro';
+import ScreenSizeGuard from './main/ScreenSizeGuard';
 function App() {
   
 
@@ -25,8 +26,16 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
-          <Route path="interview" element={<Interview />} />
+          <Route
+            path="interview"
+            element={
+              <ScreenSizeGuard>
+                <Interview />
+              </ScreenSizeGuard>
+            }
+          />
         </Route>
+        
 
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
         <Route path="AssessmentIntro" element={<AssessmentIntro />} />
