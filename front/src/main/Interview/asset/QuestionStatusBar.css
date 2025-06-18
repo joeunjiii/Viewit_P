@@ -1,0 +1,23 @@
+.question-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  font-size: 22px; /* 글자 크게 */
+  font-weight: 600;
+
+  padding: 14px 28px; /* 패딩 증가 */
+  background-color: #e8f0fe;
+  border: 2px solid #a0c4ff;
+  border-radius: 12px;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+
+  /* 크기 커질수록 더 강조 */
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+.question-status-bar .icon {
+  font-size: 28px; /* 아이콘도 키우기 */
+}
