@@ -5,6 +5,7 @@ import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 
 const PHASE = {
+  IDLE: "idle",  
   READY: "ready",         // 준비(시작)
   TTS: "tts",             // 질문 음성 재생
   WAITING: "wait",        // 대기시간
@@ -14,6 +15,7 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
+  startInterview = false,
   waitTime = 3,
   answerDuration = 10,
   allowRetry = true,
@@ -30,14 +32,23 @@ function InterviewSessionManager({
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
 
+  useEffect(() => {
+    if (startInterview && phase === PHASE.IDLE) {
+      console.log("🚀 InterviewSessionManager: 면접 시작 신호 감지, READY로 전환");
+      setPhase(PHASE.READY);
+    }
+  }, [startInterview, phase]);
+  
   // phase 바뀔 때마다 로직 분기(useEffect 1개)
   useEffect(() => {
     onStatusChange?.(phase);
-
     // 공통: 타이머 항상 정리
     clearInterval(timerRef.current);
 
     switch (phase) {
+      case PHASE.IDLE:
+        // startInterview가 true가 되기 전까지 대기
+        break;
       case PHASE.READY:
         // 1. 질문+TTS URL 요청
         (async () => {
@@ -157,7 +168,7 @@ function InterviewSessionManager({
   // STT 결과 → 부모로 전달
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
-      console.log("🎉 [COMPLETE] 부모에 결과 전달:", sttResult);
+      console.log("🎉 [COMPLETE] 프론트에 결과 전달:", sttResult);
       onAnswerComplete?.(sttResult); // 부모 컴포넌트로 전달 등
       setSttResult(null);
       // 또는 결과 UI에 표시

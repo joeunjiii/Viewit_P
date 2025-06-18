@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import {  useNavigate } from "react-router-dom";
 import "./InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { requestTTS } from "./api/tts";
+
 
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [micEnabled] = useState(true);// 마이크상태
@@ -13,7 +13,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
 
 
   const navigate = useNavigate();
-  const [isTimerActive, setIsTimerActive] = useState(false);
+  
   const [waitTime, setWaitTime] = useState(5); // 기본값 5초
 
 
@@ -23,7 +23,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   };
 
   const handleStart = async (settings) => {
-    console.log("시작 설정:", settings);
+    console.log("시작 설정(InterviewSettingsModal) 버튼 클릭됨.");
     onStart({
       micEnabled,
       waitTime,
@@ -32,17 +32,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       allowRetry,
     });
 
-    const audioUrl = await requestTTS();
-    if (audioUrl) {
-      const audio = new Audio("http://localhost:8000" + audioUrl);
-      audio.play();
-
-      audio.onended = () => {
-        console.log("🔊 TTS 재생 완료, 타이머 시작");
-       
-      };
-    }
-  };
+    
 
   return (
     <div className="modal-overlay">
@@ -127,12 +117,13 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
             취소
           </button>
           <button className="start" onClick={handleStart}>
-            시작하기
+            설정하기
           </button>
         </div>
       </div>
     </div>
   );
+}
 }
 
 export default InterviewSettingsModal;
