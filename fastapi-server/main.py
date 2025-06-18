@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from routers import stt
+from interview.routers.stt import router as stt_router
+from interview.routers.tts import router as tts_router
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -18,5 +20,8 @@ class Question(BaseModel):
     text: str
 
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-app.include_router(stt.router)
+app.include_router(stt_router, prefix="/interview")
+app.include_router(tts_router, prefix="/interview")
+
