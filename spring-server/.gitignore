@@ -31,3 +31,24 @@ build/
 
 ### VS Code ###
 .vscode/
+
+<<<<<<< HEAD
+
+
+__pycache__/
+*.pyc
+=======
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# Python virtual environment (optional, if used)
+.venv/
+env/
+venv/
+ENV/
+>>>>>>> ykm

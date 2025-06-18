@@ -9,3 +9,4 @@ export const getExample = async () => {
     const res = await axios.get('/api/example');
     return res.data;
 }
+

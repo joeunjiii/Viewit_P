@@ -7,6 +7,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.viewit.springserver.repository.UserDao;
 import com.example.viewit.springserver.security.JwtTokenProvider;
 
 import java.util.Map;
@@ -16,13 +18,16 @@ import java.util.Map;
 public class NaverAuthController {
     private static final Logger log = LoggerFactory.getLogger(NaverAuthController.class);
 
+    private final UserDao userDao;
     private final RestTemplate rest;
     private final JwtTokenProvider jwtProvider;
 
     public NaverAuthController(RestTemplateBuilder builder,
-                               JwtTokenProvider jwtProvider) {
+                               JwtTokenProvider jwtProvider,
+                               UserDao userDao) {
         this.rest        = builder.build();
         this.jwtProvider = jwtProvider;
+        this.userDao = userDao;
     }
 
     @PostMapping("/naver")
@@ -55,11 +60,16 @@ public class NaverAuthController {
 
         // 3) 사용자 정보 파싱 및 로깅
         String email = userInfo.get("email").toString();
+        String name = userInfo.get("name").toString();
         log.info("[NaverAuth] 3) 파싱된 이메일 = {}", email);
-
+        log.info("[NaverAuth] 3) 파싱된 이름 = {}", name);
         // 4) JWT 발급 및 로깅
-        String jwt = jwtProvider.createToken(email);
+        String jwt = jwtProvider.createToken(email,name);
         log.info("[NaverAuth] 4) 발급된 JWT = {}", jwt);
+        String naverId = userInfo.get("id").toString();
+        //DB저장
+        userDao.saveOrUpdateUser(naverId, name, email);
+
 
         return ResponseEntity.ok(Map.of("token", jwt));
     }

@@ -33,7 +33,7 @@ export default function Login() {
             .then(data => {
               console.log("[Login] /api/auth/naver response body:", data);
               if (data.token) {
-                localStorage.setItem("jwt", data.token);
+                localStorage.setItem("token", data.token);
                 window.location.href = "/main";
               } else {
                 alert("로그인 실패: 토큰이 없습니다.");
@@ -65,7 +65,7 @@ export default function Login() {
           <div className="horizontal-line" />
           <button className="naver-button" onClick={handleLogin}>
             <img
-                src="https://static.nid.naver.com/img/default/naverlogin_logo.png"
+                src="/assets/naver.png"
                 alt="네이버 로그인"
                 className="naver-icon"
             />

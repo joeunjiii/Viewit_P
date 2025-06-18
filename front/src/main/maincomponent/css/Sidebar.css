@@ -214,3 +214,66 @@
 .settings-button span {
   padding-left: 8px;
 }
+
+.logout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-modal {
+  background-color: white;
+  width: 320px;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.logout-title {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.logout-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logout-cancel,
+.logout-confirm {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-cancel {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.logout-cancel:hover {
+  background-color: #d5d5d5;
+}
+
+.logout-confirm {
+  background-color: #e0e0e0;
+  color: rgb(0, 0, 0);
+}
+
+.logout-confirm:hover {
+  background-color: #d5d5d5;
+}
