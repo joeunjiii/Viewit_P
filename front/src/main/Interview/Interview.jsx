@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Interview.css";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
@@ -9,6 +9,7 @@ import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
 import AssessmentIntro from "./AssessmentIntro";
 import WelcomeMessage from "./WelcomeMessage";
+import ScreenSizeGuard from "./asset/ScreenSizeGuard";
 function Interview() {
   const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview | guide"
   const [micCheckOpen, setMicCheckOpen] = useState(false);
@@ -27,10 +28,7 @@ function Interview() {
     setAllowRetry(settings.allowRetry);
     setStep("guide"); // 바로 안내화면으로
   };
-  const handleSettingComplete = (settings) => {
-    setStep("guide");
-    // settings 저장 가능
-  };
+  
   const handleGuideConfirm = () => {
     setStep("welcome");
   };
@@ -40,9 +38,12 @@ function Interview() {
   };
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
-
+  useEffect(() => {
+    console.log("[Interview] 현재 step 상태:", step);
+  }, [step]);
   return (
     <>
+      <ScreenSizeGuard />
       {step === "settings" && (
         <InterviewSettingsModal
           onClose={() => setStep("interview")}
