@@ -1,8 +1,10 @@
+import React from 'react';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation
 } from "react-router-dom";
 import "./main/Layout.css";
 import Main from "./main/Main";
@@ -10,21 +12,36 @@ import Login from "./login/Login";
 import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
+import AssessmentIntro from './main/Interview/AssessmentIntro';
+import ScreenSizeGuard from './main/ScreenSizeGuard';
 function App() {
+  
+
   return (
     <Router>
+      
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
 
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
-          <Route path="interview" element={<Interview />} />
+          <Route
+            path="interview"
+            element={
+              <ScreenSizeGuard>
+                <Interview />
+              </ScreenSizeGuard>
+            }
+          />
         </Route>
+        
 
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
+        <Route path="AssessmentIntro" element={<AssessmentIntro />} />
       </Routes>
     </Router>
   );
 }
+
 export default App;

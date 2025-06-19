@@ -51,4 +51,9 @@ __pycache__/
 env/
 venv/
 ENV/
+<<<<<<< HEAD
+
+.env
+=======
 >>>>>>> ykm
+>>>>>>> master

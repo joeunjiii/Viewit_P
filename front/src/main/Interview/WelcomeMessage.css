@@ -1,0 +1,84 @@
+.welcome-bg {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(219, 248, 208);
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
+
+.welcome-card {
+  background: white;
+  padding: 48px 36px 40px 36px;
+  border-radius: 32px;
+  box-shadow: 0 8px 32px rgba(120, 140, 255, 0.15), 0 1.5px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 380px;
+  min-width: 300px;
+  gap: 16px;
+  animation: cardPop 0.8s cubic-bezier(.21,1.02,.73,1.04);
+}
+
+@keyframes cardPop {
+  0% { transform: scale(0.95) translateY(30px); opacity: 0;}
+  100% { transform: scale(1) translateY(0); opacity: 1;}
+}
+
+.emoji-wave {
+  font-size: 44px;
+  margin-bottom: 8px;
+  animation: waveEmoji 1.5s infinite ease-in-out alternate;
+}
+
+@keyframes waveEmoji {
+  from { transform: rotate(-10deg) scale(1);}
+  to   { transform: rotate(12deg) scale(1.1);}
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #25274d;
+  text-align: center;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.username {
+  
+}
+
+.welcome-message {
+  font-size: 1.12rem;
+  color: #444;
+  text-align: center;
+  margin: 14px 0 18px 0;
+  font-weight: 500;
+}
+
+.start-btn {
+  background: linear-gradient(92deg, #b8f7d2 40%, #98f38c 100%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.08rem;
+  padding: 13px 0;
+  width: 180px;
+  border: none;
+  border-radius: 26px;
+  box-shadow: 0 2px 8px rgba(114,134,211,0.13);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.start-btn:hover {
+  background: linear-gradient(92deg, #8ee0ad 40%, #7bcd96 100%);
+  transform: scale(1.04);
+}

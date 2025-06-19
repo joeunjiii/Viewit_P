@@ -1,0 +1,73 @@
+.resize-alert-bg {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    width: 100vw;
+    min-height: 100vh;
+    background: rgba(70, 215, 178, 0.14); /* 민트 투명 오버레이 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  
+  .resize-alert-modal {
+    background: #fff;
+    border-radius: 32px;
+    box-shadow: 0 12px 48px rgba(55,214,178,0.09), 0 2px 16px rgba(80,120,200,0.12);
+    padding: 54px 38px 38px 38px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 390px;
+    max-width: 430px;
+    animation: cardPop 0.6s cubic-bezier(.21,1.02,.73,1.04);
+  }
+  
+  @keyframes cardPop {
+    0% { transform: scale(0.95) translateY(20px); opacity: 0;}
+    100% { transform: scale(1) translateY(0); opacity: 1;}
+  }
+  
+  .resize-alert-icon {
+    background: #f6fbf8;
+    border-radius: 18px;
+    width: 120px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    box-shadow: 0 1.5px 7px rgba(70,215,178,0.12);
+  }
+  
+  .resize-alert-title {
+    font-size: 1.28rem;
+    font-weight: 700;
+    color: #27baa0;
+    margin-bottom: 11px;
+    text-align: center;
+    letter-spacing: -0.2px;
+  }
+  
+  .resize-alert-desc {
+    color: #3b3f49;
+    font-size: 1.08rem;
+    text-align: center;
+    margin-top: 5px;
+    line-height: 1.75;
+  }
+  
+  @media (max-width: 500px) {
+    .resize-alert-modal {
+      padding: 28px 8vw 28px 8vw;
+      min-width: unset;
+      max-width: 96vw;
+    }
+    .resize-alert-icon {
+      width: 88px;
+      height: 68px;
+      margin-bottom: 15px;
+    }
+  }
+  
