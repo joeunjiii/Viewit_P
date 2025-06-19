@@ -1,7 +1,9 @@
 # Python
 __pycache__/
-*.pyc
-
+git rm -r --cached __pycache__/
+git rm --cached *.pyc
+git rm --cached fastapi-server/interview/routers/*.pyc
+git rm --cached fastapi-server/services/*.pyc
 # 환경설정 파일
 .env
 
