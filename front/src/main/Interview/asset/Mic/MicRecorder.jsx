@@ -8,7 +8,7 @@ import { useImperativeHandle, forwardRef, useRef, useEffect,useCallback } from "
   const analyserRef = useRef(null);
   const animationIdRef = useRef(null);
   const SILENCE_THRESHOLD = 0.01; // 무음 기준 (볼륨 크기)
-  const SILENCE_DURATION = 3000; // 무음이 3초 지속되면 종료
+  const SILENCE_DURATION = 5000; // 무음이 3초 지속되면 종료
 
   useImperativeHandle(ref, () => ({
     stop: () => {

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import os
+import time
 from services.whisper_service import stt_from_webm
 
 router = APIRouter()
@@ -13,6 +14,7 @@ async def speech_to_text(audio: UploadFile = File(...)):
     webm_path = os.path.join(UPLOAD_DIR, audio.filename)
     with open(webm_path, "wb") as f:
         f.write(await audio.read())
+    time.sleep(0.2)
     abs_webm_path = os.path.abspath(webm_path)
     
     

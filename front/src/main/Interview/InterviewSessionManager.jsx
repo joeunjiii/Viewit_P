@@ -97,21 +97,21 @@ function InterviewSessionManager({
 
       case PHASE.RECORDING:
         // 4. 녹음 시작 + 답변 타이머
-        setRemainingTime(answerDuration);
-        onTimeUpdate?.(answerDuration);
+        // setRemainingTime(answerDuration);
+        // onTimeUpdate?.(answerDuration);
         recorderRef.current?.start && recorderRef.current.start();
-        timerRef.current = setInterval(() => {
-          setRemainingTime((prev) => {
-            onTimeUpdate?.(prev - 1);
-            if (prev <= 1) {
-              clearInterval(timerRef.current);
-              setPhase(PHASE.UPLOADING);
-              recorderRef.current?.stop();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
+        // timerRef.current = setInterval(() => {
+        //   setRemainingTime((prev) => {
+        //     onTimeUpdate?.(prev - 1);
+        //     if (prev <= 1) {
+        //       clearInterval(timerRef.current);
+        //       setPhase(PHASE.UPLOADING);
+        //       recorderRef.current?.stop();
+        //       return 0;
+        //     }
+        //     return prev - 1;
+        //   });
+        // }, 1000);
         break;
 
       case PHASE.UPLOADING:
