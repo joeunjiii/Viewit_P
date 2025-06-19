@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaHome, FaCog, FaUsers, FaMicrophone } from "react-icons/fa";
+import {
+  FaHome,
+  FaCog,
+  FaUsers,
+  FaMicrophone,
+  FaUserCircle,
+} from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "./css/Sidebar.css";
 
@@ -48,12 +54,12 @@ function Sidebar({ onSpeechClick }) {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [token]);
+  }, [token,navigate]);
 
   const handleLogout = () => {
     // 🔐 프론트에서 토큰 제거 + 메인 이동
     localStorage.removeItem("token"); // 예시
-    window.location.href = "/"
+    window.location.href = "/";
   };
 
   return (
@@ -67,7 +73,7 @@ function Sidebar({ onSpeechClick }) {
 
       <div className="profile-section">
         <div className="profile-icon">
-          <span>프로필</span>
+          <FaUserCircle size={60} color="#bfcbe7" />
         </div>
         <div className="profile-info">
           <div className="username">{username || "로그인 필요"}</div>
