@@ -4,6 +4,7 @@ import "./QuestionStatusBar.css";
 function QuestionStatusBar({ status, remainingTime }) {
   let icon = null;
   let message = "";
+  
 
   switch (status) {
     case "tts":

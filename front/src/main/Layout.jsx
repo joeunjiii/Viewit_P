@@ -9,15 +9,13 @@ function Layout() {
   console.log("🔁 Layout 렌더링됨");
   const [showSpeechModal, setShowSpeechModal] = useState(false);
   const location = useLocation();
-  const isInterviewPage = location.pathname.includes('/interview');
-  const hideSidebar = location.pathname.startsWith("/Interview");
+  const isInterviewPage = location.pathname.includes('/Interview');
+  
 
   console.log("인터뷰 페이지인가요?", isInterviewPage);
   return (
-    <div className="layout-container">
-      {!hideSidebar && (
-        <Sidebar onSpeechClick={() => setShowSpeechModal(true)} />
-      )}
+    <div className="layout-container">{!isInterviewPage && <Sidebar />}
+      
       {showSpeechModal && (
         <SpeechAlertModal onClose={() => setShowSpeechModal(false)} />
       )}

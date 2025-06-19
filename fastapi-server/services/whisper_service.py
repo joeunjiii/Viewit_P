@@ -13,7 +13,7 @@ if not FFMPEG_BIN_PATH:
 
 
 print("🔊 Whisper 모델 불러오는 중...")
-model = whisper.load_model("base")
+model = whisper.load_model("medium")
 print("✅ Whisper 모델 로딩 완료")
 
 def convert_webm_to_wav(webm_path: str, wav_path: str):
