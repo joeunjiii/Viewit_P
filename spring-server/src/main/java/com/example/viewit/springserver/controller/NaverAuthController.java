@@ -70,7 +70,6 @@ public class NaverAuthController {
         //DB저장
         userDao.saveOrUpdateUser(naverId, name, email);
 
-
         return ResponseEntity.ok(Map.of("token", jwt));
     }
 }

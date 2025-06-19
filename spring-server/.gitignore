@@ -37,13 +37,9 @@ build/
 
 __pycache__/
 *.pyc
-=======
-# Python cache files
-__pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.pyc
 *.pdb
 
 # Python virtual environment (optional, if used)
@@ -51,4 +47,6 @@ __pycache__/
 env/
 venv/
 ENV/
->>>>>>> ykm
+
+.env
+

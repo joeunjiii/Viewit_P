@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+// src/main/Interview/Interview.jsx
 import { v4 as uuidv4 } from "uuid";
 import { initSession, nextQuestion, finalAnswer } from "./api/interview";
+
+import React, { useState, useEffect } from "react";
 import "./Interview.css";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
@@ -33,7 +35,6 @@ function Interview() {
     setWaitTime(settings.waitTime);
     setAllowRetry(settings.allowRetry);
     setJobRole(settings.jobRole);
-
     try {
       const res = await initSession(sessionId, settings.jobRole);
       setFirstQuestion(res.data); // { question, audio_url }
@@ -46,17 +47,24 @@ function Interview() {
     }
   };
 
+  const openMicCheck = () => setMicCheckOpen(true);
+  const closeMicCheck = () => setMicCheckOpen(false);
+
+  useEffect(() => {
+    console.log("[Interview] firstQuestion:", firstQuestion);
+  }, [firstQuestion]);
+
   return (
       <>
         {showModal && (
             <InterviewSettingsModal
                 onClose={() => setShowModal(false)}
                 onStart={handleStart}
-                onOpenMicCheck={() => setMicCheckOpen(true)}
+                onOpenMicCheck={openMicCheck}
             />
         )}
 
-        {micCheckOpen && <MicCheckModal onClose={() => setMicCheckOpen(false)} />}
+        {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
 
         {/* 최초 질문이 세팅되어야 진행! */}
         {!showModal && firstQuestion && (

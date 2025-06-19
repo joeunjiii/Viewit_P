@@ -1,10 +1,12 @@
+// src/main/Interview/InterviewSessionManager.jsx
 import React, { useState, useRef, useEffect } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
-import { nextQuestion } from "./api/interview"; // ⭐️ initSession 삭제!
+import { nextQuestion } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 
 const PHASE = {
+  IDLE: "idle",
   READY: "ready",
   TTS: "tts",
   WAITING: "wait",
@@ -13,20 +15,34 @@ const PHASE = {
   COMPLETE: "complete",
 };
 
+/**
+ * Props:
+ *  - sessionId: string
+ *  - jobRole: string
+ *  - waitTime: number
+ *  - answerDuration: number
+ *  - allowRetry: boolean
+ *  - initialQuestion: { question: string; audio_url: string }
+ *  - onStatusChange: (phase: string) => void
+ *  - onTimeUpdate: (remaining: number) => void
+ *  - onNewQuestion: (question: string) => void
+ *  - onAnswerComplete: (userText: string) => void
+ */
 function InterviewSessionManager({
                                    sessionId,
                                    jobRole,
                                    waitTime = 3,
                                    answerDuration = 10,
                                    allowRetry = true,
-                                   initialQuestion, // ⭐️ Interview.jsx에서 전달
+                                   initialQuestion,
                                    onStatusChange,
                                    onTimeUpdate,
-                                   onAnswerComplete,
                                    onNewQuestion,
+                                   onAnswerComplete,
                                  }) {
-  const [phase, setPhase] = useState(PHASE.TTS); // ⭐️ 바로 TTS로!
-  const [question, setQuestion] = useState(initialQuestion); // ⭐️ 초기 질문 세팅
+  // 시작은 TTS 단계로: initialQuestion의 audio_url 재생
+  const [phase, setPhase] = useState(PHASE.TTS);
+  const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
   const [sttResult, setSttResult] = useState(null);
 
@@ -34,8 +50,9 @@ function InterviewSessionManager({
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
 
-  // ⭐️ 질문 오디오 재생
+  // 🔊 TTS(오디오) 재생
   useEffect(() => {
+    onStatusChange?.(phase);
     if (phase === PHASE.TTS && question?.audio_url) {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -46,18 +63,17 @@ function InterviewSessionManager({
       audio.onended = () => setPhase(PHASE.WAITING);
       audio.play().catch(() => setPhase(PHASE.WAITING));
     }
-  }, [phase, question]);
+  }, [phase, question, onStatusChange]);
 
-  // ⭐️ 대기/녹음 타이머는 기존과 동일
+  // ⏱️ WAITING & RECORDING 타이머 관리
   useEffect(() => {
-    onStatusChange?.(phase);
     clearInterval(timerRef.current);
 
     if (phase === PHASE.WAITING) {
       setRemainingTime(waitTime);
       onTimeUpdate?.(waitTime);
       timerRef.current = setInterval(() => {
-        setRemainingTime((prev) => {
+        setRemainingTime(prev => {
           onTimeUpdate?.(prev - 1);
           if (prev <= 1) {
             clearInterval(timerRef.current);
@@ -74,7 +90,7 @@ function InterviewSessionManager({
       onTimeUpdate?.(answerDuration);
       recorderRef.current?.start?.();
       timerRef.current = setInterval(() => {
-        setRemainingTime((prev) => {
+        setRemainingTime(prev => {
           onTimeUpdate?.(prev - 1);
           if (prev <= 1) {
             clearInterval(timerRef.current);
@@ -88,11 +104,10 @@ function InterviewSessionManager({
     }
 
     return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line
-  }, [phase]);
+  }, [phase, waitTime, answerDuration, onTimeUpdate]);
 
-  // ⭐️ 답변(STT) 업로드/완료 → 다음 질문
-  const handleRecordingComplete = async (blob) => {
+  // 🎤 녹음 완료 → STT 요청
+  const handleRecordingComplete = async blob => {
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -103,28 +118,30 @@ function InterviewSessionManager({
     }
   };
 
-  // ⭐️ COMPLETE에서 다음 질문/오디오 받기
+  // ✅ COMPLETE 단계 → nextQuestion 요청 후 다음 TTS
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       onAnswerComplete?.(sttResult);
-
       (async () => {
-        const res = await nextQuestion(sessionId, sttResult);
-        const { question: q, audio_url, done } = res.data;
-        if (done) {
-          setQuestion({ question: q, audio_url, done: true });
-        } else {
-          setQuestion({ question: q, audio_url });
-          onNewQuestion?.(q);
-          setPhase(PHASE.TTS); // 다음 질문 오디오 재생!
+        try {
+          const res = await nextQuestion(sessionId, sttResult);
+          const { question: q, audio_url, done } = res.data;
+          if (done) {
+            setQuestion({ question: q, audio_url, done: true });
+          } else {
+            setQuestion({ question: q, audio_url });
+            onNewQuestion?.(q);
+            setPhase(PHASE.TTS);
+          }
+        } catch (err) {
+          console.error("next_question 실패", err);
         }
       })();
-
       setSttResult(null);
     }
-    // eslint-disable-next-line
-  }, [phase, sttResult, sessionId]);
+  }, [phase, sttResult, sessionId, onAnswerComplete, onNewQuestion]);
 
+  // ↺ 다시 답변하기
   const handleRetry = () => {
     setRemainingTime(waitTime);
     setPhase(PHASE.WAITING);
@@ -137,6 +154,7 @@ function InterviewSessionManager({
             isRecording={phase === PHASE.RECORDING}
             onStop={handleRecordingComplete}
         />
+
         {phase === PHASE.WAITING && (
             <div className="timer-area">
               <Timer duration={remainingTime} autoStart label="대기시간" />

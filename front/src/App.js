@@ -1,3 +1,4 @@
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,6 +11,8 @@ import Login from "./login/Login";
 import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
+import AssessmentIntro from "./main/Interview/AssessmentIntro";
+
 function App() {
   return (
     <Router>
@@ -21,10 +24,14 @@ function App() {
           <Route path="main" element={<Main />} />
           <Route path="interview" element={<Interview />} />
         </Route>
+        
+        
 
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
+        <Route path="AssessmentIntro" element={<AssessmentIntro />} />
       </Routes>
     </Router>
   );
 }
+
 export default App;

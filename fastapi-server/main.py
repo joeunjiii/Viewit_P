@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from openai import OpenAI
+from pydantic import BaseModel
 
 from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
@@ -22,6 +23,7 @@ load_dotenv(dotenv_path=env_path)
 # — 로거 설정 —
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn")
+
 
 app = FastAPI()
 start_time = time.time()
@@ -72,6 +74,20 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ⬅️ 인터뷰 라우터 등록
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 추후 React 주소로 제한
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class Question(BaseModel):
+    text: str
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(stt_router, prefix="/interview")
 app.include_router(tts_router, prefix="/interview")
