@@ -73,4 +73,6 @@ public class NaverAuthController {
 
         return ResponseEntity.ok(Map.of("token", jwt));
     }
+
+
 }

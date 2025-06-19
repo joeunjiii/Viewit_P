@@ -21,7 +21,7 @@ function QuestionStatusBar({ status, remainingTime }) {
       break;
     case "uploading":
       icon = "📤";
-      message = "답변 업로드 중...";
+      message = "답변 제출 및 질문 생성 중입니다";
       break;
     default:
       return null; // 표시 안 함

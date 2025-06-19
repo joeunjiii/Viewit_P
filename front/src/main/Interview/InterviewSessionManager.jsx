@@ -182,7 +182,7 @@ function InterviewSessionManager({
     setPhase(PHASE.WAITING);
   };
 
-  // UI 렌더
+  // UI 렌더링
   return (
     <div className="interview-session">
       <MicRecorder

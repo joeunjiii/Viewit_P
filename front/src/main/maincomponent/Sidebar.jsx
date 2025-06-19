@@ -7,9 +7,8 @@ import {
   FaMicrophone,
   FaUserCircle,
 } from "react-icons/fa";
-import { jwtDecode } from "jwt-decode";
 import "./css/Sidebar.css";
-
+import { getUserInfoFromToken } from "./asset/getUserInfoFromToken";
 function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
@@ -24,37 +23,24 @@ function Sidebar({ onSpeechClick }) {
   const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
-
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-
-    if (!storedToken) {
-      navigate("/login"); // 또는 navigate("/") 원하는 경로
-      return; // 아래 코드 실행 안 함
-    }
-    // 콘솔에 토큰 출력!
-    console.log("[Sidebar] 현재 JWT 토큰:", storedToken);
-    setToken(localStorage.getItem("token"));
-
-    if (token) {
-      try {
-        const payload = jwtDecode(storedToken);
-        console.log("[Sidebar] payload:", payload);
-        setUsername(payload.name || "사용자");
-        setEmail(payload.sub || payload.email || "");
-      } catch (e) {
-        setUsername("");
-        setEmail("");
-      }
+    const userInfo = getUserInfoFromToken();
+    if (userInfo) {
+      setUsername(userInfo.name);
+      setEmail(userInfo.email);
     } else {
       setUsername("");
       setEmail("");
+      // 인증 실패시 로그인 페이지로 이동(선택)
+      // navigate("/login");
     }
+  }, []);
+  useEffect(() => {
+    
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [token,navigate]);
+  }, [token, navigate]);
 
   const handleLogout = () => {
     // 🔐 프론트에서 토큰 제거 + 메인 이동

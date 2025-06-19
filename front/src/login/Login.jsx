@@ -57,7 +57,14 @@ export default function Login() {
         "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
     );
   };
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      // ✅ 토큰이 있으면 바로 메인 페이지로 이동
+      window.location.href = "/main";
+    }
+  }, []);
+  
   return (
       <div className="container">
         <div className="login-box">
@@ -69,7 +76,7 @@ export default function Login() {
                 alt="네이버 로그인"
                 className="naver-icon"
             />
-            네이버로 로그인
+            네이버 로그인
           </button>
         </div>
       </div>

@@ -10,6 +10,9 @@ import InterviewSessionManager from "./InterviewSessionManager";
 import AssessmentIntro from "./AssessmentIntro";
 import WelcomeMessage from "./WelcomeMessage";
 import ScreenSizeGuard from "./asset/ScreenSizeGuard";
+
+
+
 function Interview() {
   const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview | guide"
   const [micCheckOpen, setMicCheckOpen] = useState(false);
@@ -21,6 +24,7 @@ function Interview() {
     useState("면접관: 자기소개 부탁드립니다.");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
+  const [username, setUsername] = useState("지원자");
 
   const handleStartSettings = (settings) => {
     setAutoQuestion(settings.autoQuestion);
@@ -28,7 +32,7 @@ function Interview() {
     setAllowRetry(settings.allowRetry);
     setStep("guide"); // 바로 안내화면으로
   };
-  
+ 
   const handleGuideConfirm = () => {
     setStep("welcome");
   };
@@ -40,6 +44,7 @@ function Interview() {
   const closeMicCheck = () => setMicCheckOpen(false);
   useEffect(() => {
     console.log("[Interview] 현재 step 상태:", step);
+
   }, [step]);
   return (
     <>
@@ -55,7 +60,7 @@ function Interview() {
       {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
 
       {step === "welcome" && (
-        <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
+        <WelcomeMessage username={username} onStart={handleWelcomeStart} />
       )}
 
       {step === "interview" && (

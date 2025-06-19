@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -29,7 +30,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 2. 네이버 로그인인 경우에만 커스텀 처리
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         if ("naver".equals(registrationId)) {
-            Map<String, Object> response = (Map<String, Object>) oauth2User.getAttributes().get("response");
+            Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
             String id = (String) response.get("id");
             String email = (String) response.get("email");
@@ -39,8 +41,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             
             return new DefaultOAuth2User(
                     Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                    response,
-                    "email" // 사용자의 고유 키
+                    attributes,
+                    "response"
             );
         }
 

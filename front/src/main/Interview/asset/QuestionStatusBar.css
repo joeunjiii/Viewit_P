@@ -43,10 +43,18 @@
   }
 }
 
+
 .question-status-bar.uploading {
   border: 2px solid #bbbbbb;
   background: #f6f6f6;
   color: #888;
+  animation: blink-bar 1s infinite;
+}
+
+@keyframes blink-bar {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 /* 아이콘 크기 강조 */

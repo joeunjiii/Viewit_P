@@ -11,13 +11,12 @@
 }
 
 .main-header h1 {
-  font-size: 18px;
+  font-size: 30px;
   color: #555;
   font-weight: 500;
 }
 .main-header .explain h2 {
   max-width: 1024px;        /* 글이 너무 퍼지지 않게 제한 */
-  
   margin: 0 auto;          /* 가운데 정렬 */
   text-align: left;
   word-break: keep-all;    /* 단어 중간 줄바꿈 방지 (한글에 효과적) */
@@ -34,7 +33,7 @@
 }
 
 .explain h2 {
-  font-size: 16px;
+  font-size: 18px;
   color: #2f3a33;
 }
 
@@ -70,8 +69,8 @@
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-7px) scale(1.025);
+  box-shadow: 0 8px 24px rgba(80,180,120,0.16), 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .card-icon {
@@ -128,7 +127,10 @@
 
 
 .feedback-card:hover {
-  background-color: #d3e7d3;
+  
+  transform: translateY(-7px) scale(1.025);
+  box-shadow: 0 8px 24px rgba(80,180,120,0.16), 0 2px 8px rgba(0,0,0,0.05);
+  
 }
 
 @media (max-width: 1024px) {

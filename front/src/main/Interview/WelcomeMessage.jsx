@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./WelcomeMessage.css";
-
+import { getUserInfoFromToken } from "../maincomponent/asset/getUserInfoFromToken";
 const cheerMessages = [
   "오늘도 멋진 답변 기대할게요!",
-  "유광명님의 멋진 취업을 응원합니다!",
+  "당신의 멋진 취업을 응원합니다!",
   "긴장하지 말고, 당신의 이야기를 들려주세요!",
 ];
 
-export default function WelcomeMessage({ username = "지원자", onStart }) {
+export default function WelcomeMessage({ onStart }) {
+  const userInfo = getUserInfoFromToken();
+  const username = userInfo?.name || "지원자";
+
   // 랜덤 문구 선택
   const [message] = useState(
     () => cheerMessages[Math.floor(Math.random() * cheerMessages.length)]

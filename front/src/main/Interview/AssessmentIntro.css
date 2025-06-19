@@ -26,8 +26,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 720px; /* 카드 4개 x 160px + gap 감안해서 넉넉하게! */
-  max-width: 900px;
+  min-width: 820px;
+  
   gap: 22px;
   animation: cardPop 0.8s cubic-bezier(0.21, 1.02, 0.73, 1.04);
 }
@@ -76,12 +76,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 160px;
-  padding: 24px 10px 18px 10px;
+  min-width: 160px;         /* 최소 너비만! */
+  /* width: 160px;   <= 이 줄은 지워주세요 */
+  padding: 24px 16px 18px 16px; /* 패딩 넉넉히 */
   min-height: 120px;
   transition: box-shadow 0.15s, transform 0.15s;
 }
-
 .assessment-card:hover {
   box-shadow: 0 7px 28px rgba(90, 150, 255, 0.15),
     0 2.5px 8px rgba(120, 140, 255, 0.08);
@@ -98,6 +98,8 @@
   text-align: center;
   font-weight: 500;
   line-height: 1.35;
+  white-space: nowrap;   /* 한 줄로만! */
+  /* overflow, text-overflow, max-width 등은 빼세요 */
 }
 
 .assessment-confirm-btn {

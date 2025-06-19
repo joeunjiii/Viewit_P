@@ -17,7 +17,7 @@ function MainContent() {
     <div className="main-content">
       <header className="main-header">
         <div className="explain">
-          <strong>AI 모의면접 서비스 소개</strong>
+          <h1>AI 모의면접 서비스 소개</h1>
           <br />
           <h2>
             AI 모의면접은 사용자의 음성 답변을 실시간으로 분석하여, 실제 면접과

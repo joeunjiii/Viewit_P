@@ -1,7 +1,10 @@
 package com.example.viewit.springserver.repository;
 
+import com.example.viewit.springserver.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -21,5 +24,24 @@ public class UserDao {
             jdbcTemplate.update(insertSql, naverId, name, email);
             System.out.println("✅ 신규 사용자 저장 완료");
         }
+    }
+    public User findByEmail(String email) {
+        String sql = "SELECT * FROM USER WHERE email = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, userRowMapper(), email);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    private RowMapper<User> userRowMapper() {
+        return (rs, rowNum) -> {
+            User user = new User();
+            user.setUserId(rs.getLong("user_id"));
+            user.setNaverId(rs.getString("naver_id"));
+            user.setName(rs.getString("name"));
+            user.setEmail(rs.getString("email"));
+            user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            return user;
+        };
     }
 }
