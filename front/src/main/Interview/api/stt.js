@@ -4,7 +4,7 @@
 export async function requestSpeechToText(blob) {
     const formData = new FormData();
     formData.append("audio", blob, "answer.webm");
-    const res = await fetch("http://localhost:8000/interview/stt", {
+    const res = await fetch("http://localhost:8000/api/stt", {
       method: "POST",
       body: formData,
     });
