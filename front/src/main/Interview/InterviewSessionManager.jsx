@@ -60,7 +60,7 @@ function InterviewSessionManager({
       }
       const url = question.audio_url.startsWith("http")
         ? question.audio_url
-        : "http://localhost:8001" + question.audio_url;
+        : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
       audio.onended = () => setPhase(PHASE.WAITING);
