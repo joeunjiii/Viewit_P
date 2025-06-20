@@ -1,11 +1,14 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import SectionHeader from "./SectionHeader";
 import RecentSection from "./RecentSection";
+import MainHeader from "./MainHeader";
 import SpeechAlertModal from "../ex/SpeechAlertModal";
 import { FaUsers, FaMicrophone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./css/Maincontent.css";
-
+import feedbackImg3x from "./css/img/images1.jpg";
+import feedbackImg2x from "./css/img/images2.png";
+import feedbackImg1x from "./css/img/images3.jpg";
 function MainContent() {
   const [showModal, setShowModal] = useState(false);
 
@@ -15,35 +18,22 @@ function MainContent() {
 
   return (
     <div className="main-content">
-      <header className="main-header">
-        <div className="explain">
-          <h1>AI 모의면접 서비스 소개</h1>
-          <br />
-          <h2>
-            AI 모의면접은 사용자의 음성 답변을 실시간으로 분석하여, 실제 면접과
-            유사한 환경에서 효과적으로 면접 연습을 할 수 있도록 도와주는 훈련
-            서비스입니다.
-          </h2>
-        </div>
-      </header>
-
       <div className="content-section">
-        <SectionHeader />
-
         <div className="cards-container">
           <Link to="/Interview" className="card">
-            <div className="card-icon">
-              <FaUsers />
-            </div>
+            <div className="card-icon"></div>
             <div className="card-title">모의면접</div>
+            <div className="card-semititle">
+              실제 면접처럼 답변하고 나의 강점 알아보기
+            </div>
           </Link>
 
-          <div className="card" onClick={handleSpeechClick}>
+          {/* <div className="card" onClick={handleSpeechClick}>
             <div className="card-icon">
               <FaMicrophone />
             </div>
             <div className="card-title">스피치 연습</div>
-          </div>
+          </div> */}
         </div>
 
         <RecentSection />
@@ -56,31 +46,31 @@ function MainContent() {
         </div>
 
         <div className="feedback-list">
-          <div
-            className="feedback-card"
-            onClick={() => alert("피드백 1 클릭됨")}
-          >
-            수정예정
-          </div>
-          <div
-            className="feedback-card"
-            onClick={() => alert("피드백 2 클릭됨")}
-          >
-            수정예정
-          </div>
-          <div
-            className="feedback-card"
-            onClick={() => alert("피드백 3 클릭됨")}
-          >
-            수정예정
+          <div className="feedback-list">
+            {/* 첫 번째 이미지 */}
+            <div>
+              <img
+                src={feedbackImg3x}
+                alt="피드백 1"
+                className="feedback-image"
+              />
+              <div className="feedback-semitext">면접 어떻게해야할까요?</div>
+            </div>
+
+            <div>
+              <img
+                src={feedbackImg1x}
+                alt="피드백 3"
+                className="feedback-image"
+              />
+              <div className="feedback-semitext">멋지게 인사하는법</div>
+            </div>
           </div>
         </div>
       </div>
       {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}
     </div>
-    
   );
-  
 }
 
 export default MainContent;

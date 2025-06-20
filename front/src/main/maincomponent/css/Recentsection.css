@@ -1,5 +1,9 @@
 .Recent-section {
   margin-top: 24px;
+  margin-bottom: 40px;
+}
+.Recent-section h3{
+  font-size: 26px;
 }
 
 .Recent-header {
@@ -12,7 +16,7 @@
 }
 
 .Recent-icon {
-  font-size: 18px;
+  font-size: 48px;
   color: #666;
 }
 

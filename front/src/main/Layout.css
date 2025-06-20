@@ -1,12 +1,13 @@
 .layout-container {
-  display: flex;
   min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
 }
 
-
 .content-area {
-  flex: 1;
- 
+  flex-grow: 1;
+  display: flex;
   background-color: rgb(255, 255, 255);
   overflow-y: auto;
 }

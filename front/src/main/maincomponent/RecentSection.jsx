@@ -48,7 +48,7 @@ function RecentSection() {
     <div className="Recent-section">
       <div className="Recent-header">
         <FaRegFileAlt className="Recent-icon" />
-        <h3>최근 모의면접 결과</h3>
+        <h3>최근 기록</h3>
       </div>
 
       <div className="Recent-list">

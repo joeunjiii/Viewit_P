@@ -1,42 +1,17 @@
-/* 헤더 영역 */
 .main-content {
-  flex: 1;
-  background-color: #d9e9d9;
-  padding: 20px;
-  min-width: 768px;
+  display: flex;
+  flex-direction: column; /* main-content 내부의 요소들도 세로로 쌓이도록 */
+  flex-grow: 1;
+  background-color: #ffffff;
+  padding-left: 50px;
+  padding-top: 25px;
 }
-
-.main-header {
-  padding: 10px 0 20px;
+.content-section {
+  margin-left: 50px;
+  /* 필요하다면 다른 스타일도 여기에 추가할 수 있습니다. */
+  /* 예: padding-right: 20px; (오른쪽 여백도 필요하다면) */
+  /* 예: max-width: 1200px; (최대 너비 제한) */
 }
-
-.main-header h1 {
-  font-size: 30px;
-  color: #555;
-  font-weight: 500;
-}
-.main-header .explain h2 {
-  max-width: 1024px;        /* 글이 너무 퍼지지 않게 제한 */
-  margin: 0 auto;          /* 가운데 정렬 */
-  text-align: left;
-  word-break: keep-all;    /* 단어 중간 줄바꿈 방지 (한글에 효과적) */
-  line-height: 1.6;
-}
-
-.explain {
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.8;
-  color: #444;
-  margin: 32px 0;
-  letter-spacing: 0.3px;
-}
-
-.explain h2 {
-  font-size: 18px;
-  color: #2f3a33;
-}
-
 .section-header {
   display: flex;
   align-items: center;
@@ -53,24 +28,30 @@
 }
 
 .card {
-  max-width: 800px;
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
+  max-width: 600px;
+  background-color: #639f86;
+  border-radius: 20px;
+  padding: 30px;
   margin: 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none; /* 링크의 밑줄을 제거합니다. */
+  color: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07),
+    /* 작은 그림자: 가까운 깊이감 */ 0 8px 16px rgba(0, 0, 0, 0.1); /* 큰 그림자: 더 깊은 느낌 */
 }
 
 .card:hover {
   transform: translateY(-7px) scale(1.025);
-  box-shadow: 0 8px 24px rgba(80,180,120,0.16), 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 8px 24px rgba(80, 180, 120, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .card-icon {
@@ -80,11 +61,16 @@
 }
 
 .card-title {
-  font-size: 16px;
+  font-size: 30px;
   font-weight: 500;
-  color: #333;
+  color: #ffffff;
 }
-
+.card-semititle {
+  font-size: 14px;
+  color: #e0e0e0;
+  margin-top: 5px;
+  text-align: center;
+}
 /* 피드백 부분*/
 .feedback-section {
   display: flex;
@@ -93,46 +79,43 @@
 }
 
 .feedback-icon {
-  font-size: 18px;
+  font-size: 48px;
   margin-right: 8px;
   color: #555;
 }
 
 .feedback-text {
-  font-size: 14px;
+  font-size: 26px;
   color: #333;
 }
 
 /* 피드백 리스트 카드 */
 .feedback-list {
   display: flex;
-  gap: 16px;
+  gap: 50px; /* 이미지 사이의 간격 */
+  
 }
 
-.feedback-card {
-  background-color: #e9f3e9;
+.feedback-image {
+  width: 300px;
+  height: 150px;
+  object-fit: cover;
   border-radius: 12px;
-  min-height: 100px;
-  padding: 16px 24px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #333;
-  font-size: 15px;
-  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-
-
 .feedback-card:hover {
-  
   transform: translateY(-7px) scale(1.025);
-  box-shadow: 0 8px 24px rgba(80,180,120,0.16), 0 2px 8px rgba(0,0,0,0.05);
-  
+  box-shadow: 0 8px 24px rgba(80, 180, 120, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-
+.feedback-semitext{
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+  padding: 4px 0 0 0;
+}
 @media (max-width: 1024px) {
   .cards-container {
     flex-direction: column;
@@ -146,10 +129,10 @@
     padding: 20px;
   }
   .feedback-section {
-    align-items: flex-start;  /* ✅ 왼쪽 정렬 유지 */
-    text-align: left;   
+    align-items: flex-start; /* ✅ 왼쪽 정렬 유지 */
+    text-align: left;
     flex-direction: column;
-    
+
     margin-top: 30px;
   }
 
