@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/assets/**",
                                 "/oauth2/**", "/error", "/naver/callback.html", "/naver/**"
                         ).permitAll()
+                        .requestMatchers("/oauth2/authorization/naver").permitAll()
 
                         // 3-4) 그 외 /api/** 요청은 인증 필요
                         .requestMatchers("/api/**").authenticated()

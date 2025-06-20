@@ -69,7 +69,6 @@ public class NaverAuthController {
         String naverId = userInfo.get("id").toString();
         //DB저장
         userDao.saveOrUpdateUser(naverId, name, email);
-       
 
         return ResponseEntity.ok(Map.of("token", jwt));
     }

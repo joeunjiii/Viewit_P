@@ -6,7 +6,6 @@ function InterviewHeader({ totalDuration = 600 }) {
   const navigate = useNavigate();
 
   return (
-    
     <div className="interview-header">
        <div className="timer-simple-box">
       <div className="header-left">
@@ -18,7 +17,6 @@ function InterviewHeader({ totalDuration = 600 }) {
         종료하기
       </button>
     </div>
-    
   );
 }
 

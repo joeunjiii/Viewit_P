@@ -16,7 +16,7 @@ function Main() {
             <span>pro</span>
           </div>
           <div className="profile-info">
-            <div className="username">사용자네네임</div>
+            <div className="username">사용자 닉네임</div>
             <div className="email">아이디@naver.com</div>
           </div>
         </div>
@@ -46,8 +46,8 @@ function Main() {
 
       {/* 메인 콘텐츠 영역 */}
       <div className="main-content">
-        <header className="main-header">
-          <h1>대충 모의 면접 소개글</h1>
+            <header className="main-header">
+              <h1>대충 모의 면접 소개글</h1>
         </header>
 
         <div className="content-section">

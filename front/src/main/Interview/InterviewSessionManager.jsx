@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/main/Interview/InterviewSessionManager.jsx
+import React, { useState, useRef, useEffect } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
-import { requestNextTTSQuestion, requestTTS } from "./api/tts";
+import { nextQuestion } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 
@@ -15,16 +16,20 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
-  startInterview = false,
-  waitTime = 3,
-  answerDuration = 10,
-  allowRetry = true,
-  onStatusChange,
-  onTimeUpdate,
-  onAnswerComplete,
-}) {
-  const [phase, setPhase] = useState(PHASE.READY);
-  const [question, setQuestion] = useState(null);
+                                   sessionId,
+                                   jobRole,
+                                   waitTime = 3,
+                                   answerDuration = 10,
+                                   allowRetry = true,
+                                   initialQuestion,
+                                   onStatusChange,
+                                   onTimeUpdate,
+                                   onNewQuestion,
+                                   onAnswerComplete,
+                                 }) {
+  // 시작은 TTS 단계로: initialQuestion의 audio_url 재생
+  const [phase, setPhase] = useState(PHASE.TTS);
+  const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
   const [sttResult, setSttResult] = useState(null);
 
@@ -44,58 +49,37 @@ function InterviewSessionManager({
   // phase 바뀔 때마다 로직 분기(useEffect 1개)
   useEffect(() => {
     onStatusChange?.(phase);
-    // 공통: 타이머 항상 정리
+    if (phase === PHASE.TTS && question?.audio_url) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      const audio = new Audio("http://localhost:8000" + question.audio_url);
+      audioRef.current = audio;
+      audio.onended = () => setPhase(PHASE.WAITING);
+      audio.play().catch(() => setPhase(PHASE.WAITING));
+    }
+  }, [phase, question, onStatusChange]);
+
+  // ⏱️ WAITING & RECORDING 타이머 관리
+  useEffect(() => {
     clearInterval(timerRef.current);
 
-    switch (phase) {
-      case PHASE.IDLE:
-        // startInterview가 true가 되기 전까지 대기
-        break;
-      case PHASE.READY:
-        // 1. 질문+TTS URL 요청
-        (async () => {
-          let result;
-          if (!question) {
-            const audioUrl = await requestTTS();
-            result = { audioUrl, question: "자기소개 부탁드립니다." };
-          } else {
-            result = await requestNextTTSQuestion();
+    if (phase === PHASE.WAITING) {
+      setRemainingTime(waitTime);
+      onTimeUpdate?.(waitTime);
+      timerRef.current = setInterval(() => {
+        setRemainingTime(prev => {
+          onTimeUpdate?.(prev - 1);
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setPhase(PHASE.RECORDING);
+            return 0;
           }
-          setQuestion(result);
-          setPhase(PHASE.TTS);
-        })();
-        break;
-
-      case PHASE.TTS:
-        // 2. 오디오 재생
-        if (question?.audioUrl) {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
-          }
-          const audio = new Audio("http://localhost:8000" + question.audioUrl);
-          audioRef.current = audio;
-          audio.onended = () => setPhase(PHASE.WAITING);
-          audio.play().catch(() => setPhase(PHASE.WAITING)); // 실패 시도 WAITING
-        }
-        break;
-
-      case PHASE.WAITING:
-        // 3. 대기 타이머 시작
-        setRemainingTime(waitTime);
-        onTimeUpdate?.(waitTime);
-        timerRef.current = setInterval(() => {
-          setRemainingTime((prev) => {
-            onTimeUpdate?.(prev - 1);
-            if (prev <= 1) {
-              clearInterval(timerRef.current);
-              setPhase(PHASE.RECORDING);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        break;
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
       case PHASE.RECORDING:
         recorderRef.current?.start && recorderRef.current.start();
@@ -132,9 +116,7 @@ function InterviewSessionManager({
 
     // Clean-up: phase 바뀔 때마다 타이머 정리
     return () => clearInterval(timerRef.current);
-
-    // eslint-disable-next-line
-  }, [phase]); // phase만 감시!
+  }, [phase, waitTime, answerDuration, onTimeUpdate]);
 
   // 답변 녹음 끝 → 서버 전송
   const handleRecordingComplete = async (blob) => {
@@ -164,9 +146,8 @@ function InterviewSessionManager({
     console.log("🔄 [UPLOADING] 서버에 파일 업로드 중...");
     setPhase(PHASE.UPLOADING); // (로딩 표시 등)
     try {
-      const data = await requestSpeechToText(blob); // 이 한 줄로 OK!
+      const data = await requestSpeechToText(blob);
       setSttResult(data.text);
-      console.log("✅ [COMPLETE] 변환 결과 수신:", data.text);
       setPhase(PHASE.COMPLETE);
     } catch (err) {
       console.error("STT 오류:", err);
@@ -179,12 +160,10 @@ function InterviewSessionManager({
       console.log("🎉 [COMPLETE] 프론트에 결과 전달:", sttResult);
       onAnswerComplete?.(sttResult); // 인터뷰 컴포넌트로 전달 등
       setSttResult(null);
-      // 또는 결과 UI에 표시
-      // 그 후 다음 질문 준비(phase READY로 재전환)
     }
-  }, [phase, sttResult, onAnswerComplete]);
+  }, [phase, sttResult, sessionId, onAnswerComplete, onNewQuestion]);
 
-  // 다시 답변하기
+  // ↺ 다시 답변하기
   const handleRetry = () => {
     setRemainingTime(waitTime);
     setPhase(PHASE.WAITING);
@@ -192,12 +171,12 @@ function InterviewSessionManager({
 
   // UI 렌더링
   return (
-    <div className="interview-session">
-      <MicRecorder
-        ref={recorderRef}
-        isRecording={phase === PHASE.RECORDING}
-        onStop={handleRecordingComplete}
-      />
+      <div className="interview-session">
+        <MicRecorder
+            ref={recorderRef}
+            isRecording={phase === PHASE.RECORDING}
+            onStop={handleRecordingComplete}
+        />
 
       {phase === PHASE.WAITING && (
         <div className="timer-area">

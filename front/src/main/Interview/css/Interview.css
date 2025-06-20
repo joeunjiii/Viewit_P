@@ -1,16 +1,4 @@
 /* 전체 인터뷰 콘텐츠 영역 */
-.layout-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-
-.content-area {
-  flex: 1;
- 
-  background-color: rgb(255, 255, 255);
-  overflow-y: auto;
-}
 .interview-content {
   padding: 24px;
   margin-left: 8vw;
@@ -34,39 +22,6 @@
   margin-top: 35px;
 }
 
-
-.timer-simple-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  border-radius: 18px;
-  border: 2.2px solid #222;
-  min-width: 150px;
-  min-height: 46px;
-  padding: 10px;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #222;
-  box-shadow: 0 2px 10px rgba(40,40,40,0.05);
-}
-
-.timer-simple-box .timer-label {
-  margin-right: 14px;
-  color: #222;
-  font-weight: 700;
-  font-size: 1em;
-  letter-spacing: -0.2px;
-}
-
-.timer-simple-box .timer-value {
-  font-size: 1.2em;
-  color: #222;
-  font-weight: 800;
-}
-
-
-
 /* 상단: 남은 시간 + 종료 버튼 */
 .interview-section-header {
   margin-top: 50px;
@@ -79,10 +34,10 @@
 .interview-section-body {
   display: flex;
   flex-direction: column;
-  gap: 40px;         /* 24px → 40px로 더 넓게 */
-  margin-top: 50px;  /* 30px → 50px */
-  margin-left: 80px; /* 30px → 80px */
-  margin-right: 80px;
+  gap: 24px;
+  margin-top: 30px;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 /* 질문 탭 */
@@ -95,52 +50,43 @@
   padding: 10px 20px;
   font-size: 16px;
   border-radius: 999px;
-  border: 2px solid #5e9b87;    /* 연민트 테두리로 가볍게 */
-  background: #fff;
-  color: #000000;
+  border: none;
+  background-color: #eee;
+  color: #333;
   font-weight: 600;
   cursor: pointer;
-  transition: box-shadow 0.19s, border 0.13s, background 0.16s, color 0.13s;
+  transition: 0.2s;
   min-width: 80px;
-  box-shadow: 0 1.5px 6px rgba(40, 60, 110, 0.10); /* 은은한 그림자 */
 }
-
 .tab.selected {
-  background: rgb(218, 247, 227);
-  font-weight: 700;
-  box-shadow: 0 4px 14px rgba(54, 179, 126, 0.08); /* 조금 더 강조된 그림자 */
-  
+  background-color: #5e9c76;
+  color: white;
 }
 
 /* 질문 파형 + 타이머를 나란히 배치 */
 .interview-body {
   display: flex;
+  /* justify-content: space-between; */
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 0;         /* 기존 5vw에서 0으로 */
+  padding: 40px 5vw;
   gap: 80px;
   box-sizing: border-box;
-  width: 100%;
- 
+
 }
+
 .status-display-box {
-  width: 100%;
-  margin: 0 auto 24px auto;
-  padding: 28px 0 26px 0;
-  background: #f9fafb;  /* 아주 밝은 연그레이 */
-  border-radius: 18px;
-  box-shadow:
-    0 2.5px 10px rgba(70, 80, 130, 0.07),
-    0 0.5px 2px rgba(60, 80, 130, 0.03);
-  border: 1.5px solid #dde3ec;
+  min-width: 220px;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 74px;
-  transition: box-shadow 0.15s, border-color 0.13s, background 0.18s;
-  position: relative;
-  z-index: 2;
+  padding: 16px;
+  background-color: #f9fbff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-left:80px;
 }
+
 
 
 
@@ -177,16 +123,16 @@
   gap: 16px;
   margin-right: 150px;
   margin-left: 150px;
-  
+
 }
 
 /* 타이머 원형 */
 .timer-circle {
-  width: 280px;      
-  height: 280px;     
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   background-color: white;
-  border: 18px solid #5e9b87;
+  border: 14px solid #5e9b87;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -229,7 +175,7 @@
   background-color: white;
   border: 1px solid red;
   color: red;
-  padding: 10px 30px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 20px;
   cursor: pointer;
@@ -253,3 +199,83 @@
   white-space: pre-wrap;
 }
 
+
+@media (max-width: 1024px) {
+  .interview-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 16px;
+  }
+  .interview-body {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .header-spacer {
+    flex-grow: 0;       /* ✅ 오른쪽 밀지 않도록 */
+    max-width: none;    /* ✅ 너비 제한 제거 */
+  }
+  .header-left {
+    margin-right: 650px;
+  }
+  .end-button {
+    transform: none;    /* ✅ 위치 조정 제거 */
+    font-size: 13px;
+    padding: 5px 12px;
+    margin-left: 0;     /* 혹시 auto 같은 속성 있었으면 제거 */
+  }
+  .voice-area {
+    margin: 0;
+    gap: 40px;
+    flex: 1;
+    margin-right: 80px;
+  }
+  .voice-item {
+    flex-direction: column;
+    align-items: flex-start; /* 세로 배치 시 왼쪽 정렬 */
+    gap: 8px;
+  }
+  .timer-area {
+    align-self: center;
+    margin-left:200px;
+  }
+
+  .waveform {
+    max-width: 250px;
+  }
+
+  .timer-circle {
+    width: 160px;
+    height: 160px;
+    border-width: 12px;
+  }
+
+  .timer-value {
+    font-size: 40px;
+  }
+
+  .replay-button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .caption-box {
+    background-color: #f4f9f4;
+    padding: 16px 24px;
+    margin: 20px auto 0;
+    border-radius: 12px;
+    max-width: 800px;
+    width: 90%; /* 💡 반응형 너비 */
+    font-size: 16px;
+    color: #333;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+}

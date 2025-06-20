@@ -4,7 +4,7 @@ import "./QuestionStatusBar.css";
 function QuestionStatusBar({ status, remainingTime }) {
   let icon = null;
   let message = "";
-  
+
 
   switch (status) {
     case "tts":
@@ -13,7 +13,7 @@ function QuestionStatusBar({ status, remainingTime }) {
       break;
     case "wait":
       icon = "⏱";
-      message = `대기중입니다 `; 
+      message = `대기중입니다 `;
       break;
     case "recording":
       icon = "🎤";
@@ -28,10 +28,10 @@ function QuestionStatusBar({ status, remainingTime }) {
   }
 
   return (
-    <div className="question-status-bar">
-      <span className="icon">{icon}</span>
-      <span className="text">{message}</span>
-    </div>
+      <div className="question-status-bar">
+        <span className="icon">{icon}</span>
+        <span className="text">{message}</span>
+      </div>
   );
 }
 
