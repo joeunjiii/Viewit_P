@@ -105,12 +105,12 @@ function MicCheckModal({ onClose }) {
             </p>
             <div className="modal-actions">
               <button onClick={onClose}>닫기</button>
-              <button
+              {/* <button
                 onClick={handleCheck}
                 disabled={!micAvailable || recording}
               >
                 {recording ? "테스트 중..." : "마이크 테스트"}
-              </button>
+              </button> */}
               <button onClick={checkInitialDeviceStatus} disabled={recording}>
                 장치 새로고침
               </button>

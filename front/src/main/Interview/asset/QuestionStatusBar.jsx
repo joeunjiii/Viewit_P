@@ -17,7 +17,7 @@ function QuestionStatusBar({ status, remainingTime }) {
       break;
     case "recording":
       icon = "🎤";
-      message = `답변 녹음 중입니다... (${remainingTime}초)`;
+      message = `답변 녹음 중입니다...`;
       break;
     case "uploading":
       icon = "📤";

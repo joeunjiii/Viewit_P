@@ -1,5 +1,5 @@
 import React from "react";
-import "./SpeechAlertModal.css";
+import "./css/SpeechAlertModal.css";
 
 function SpeechAlertModal({ onClose }) {
   return (

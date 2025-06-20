@@ -5,13 +5,13 @@ import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 
 const PHASE = {
-  IDLE: "idle",  
-  READY: "ready",         // 준비(시작)
-  TTS: "tts",             // 질문 음성 재생
-  WAITING: "wait",        // 대기시간
+  IDLE: "idle",
+  READY: "ready", // 준비(시작)
+  TTS: "tts", // 질문 음성 재생
+  WAITING: "wait", // 대기시간
   RECORDING: "recording", // 답변 녹음
   UPLOADING: "uploading", // 업로드
-  COMPLETE: "complete",   // 다음 질문 대기
+  COMPLETE: "complete", // 다음 질문 대기
 };
 
 function InterviewSessionManager({
@@ -34,11 +34,13 @@ function InterviewSessionManager({
 
   useEffect(() => {
     if (startInterview && phase === PHASE.IDLE) {
-      console.log("🚀 InterviewSessionManager: 면접 시작 신호 감지, READY로 전환");
+      console.log(
+        "🚀 InterviewSessionManager: 면접 시작 신호 감지, READY로 전환"
+      );
       setPhase(PHASE.READY);
     }
   }, [startInterview, phase]);
-  
+
   // phase 바뀔 때마다 로직 분기(useEffect 1개)
   useEffect(() => {
     onStatusChange?.(phase);
@@ -96,10 +98,11 @@ function InterviewSessionManager({
         break;
 
       case PHASE.RECORDING:
+        recorderRef.current?.start && recorderRef.current.start();
         // 4. 녹음 시작 + 답변 타이머
         // setRemainingTime(answerDuration);
         // onTimeUpdate?.(answerDuration);
-        recorderRef.current?.start && recorderRef.current.start();
+        
         // timerRef.current = setInterval(() => {
         //   setRemainingTime((prev) => {
         //     onTimeUpdate?.(prev - 1);
@@ -135,14 +138,20 @@ function InterviewSessionManager({
 
   // 답변 녹음 끝 → 서버 전송
   const handleRecordingComplete = async (blob) => {
-
     //잘 들리는지 확인한 코드 개발중에는 두고 나중에 지우기
-    console.log("녹음 결과 Blob:", blob, "size:", blob.size, "type:", blob.type);
+    console.log(
+      "녹음 결과 Blob:",
+      blob,
+      "size:",
+      blob.size,
+      "type:",
+      blob.type
+    );
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
+    const a = document.createElement("a");
+    a.style.display = "none";
     a.href = url;
-    a.download = '녹음_결과.webm'; // 파일 이름
+    a.download = "녹음_결과.webm"; // 파일 이름
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
@@ -162,14 +171,13 @@ function InterviewSessionManager({
     } catch (err) {
       console.error("STT 오류:", err);
     }
-    
   };
 
-  // STT 결과 → 부모로 전달
+  // STT 결과 → 인터뷰로 전달
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       console.log("🎉 [COMPLETE] 프론트에 결과 전달:", sttResult);
-      onAnswerComplete?.(sttResult); // 부모 컴포넌트로 전달 등
+      onAnswerComplete?.(sttResult); // 인터뷰 컴포넌트로 전달 등
       setSttResult(null);
       // 또는 결과 UI에 표시
       // 그 후 다음 질문 준비(phase READY로 재전환)
@@ -193,11 +201,7 @@ function InterviewSessionManager({
 
       {phase === PHASE.WAITING && (
         <div className="timer-area">
-          <Timer
-            duration={remainingTime}
-            autoStart={true}
-            label="대기시간"
-          />
+          <Timer duration={remainingTime} autoStart={true} label="대기시간" />
           {allowRetry && (
             <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
               <button className="replay-button" onClick={handleRetry}>

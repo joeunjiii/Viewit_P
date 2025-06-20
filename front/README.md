@@ -2,7 +2,7 @@
 git clone https://github.com/joeunjiii/View-it.git
 
 # 의존성설치
-front폴더로 이동한후에(cd front)
+front폴더로 이동(cd front)
 npm install
 
 # 실행

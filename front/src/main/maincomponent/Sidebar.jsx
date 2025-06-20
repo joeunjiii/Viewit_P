@@ -32,7 +32,7 @@ function Sidebar({ onSpeechClick }) {
       setUsername("");
       setEmail("");
       // 인증 실패시 로그인 페이지로 이동(선택)
-      // navigate("/login");
+      navigate("/login");
     }
   }, []);
   useEffect(() => {

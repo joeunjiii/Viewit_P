@@ -1,7 +1,7 @@
 // components/InterviewSettingsModal.jsx
 import React, { useState } from "react";
 import {  useNavigate } from "react-router-dom";
-import "./InterviewSettingModal.css";
+import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 

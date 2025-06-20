@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./WelcomeMessage.css";
+import "./css/WelcomeMessage.css";
 import { getUserInfoFromToken } from "../maincomponent/asset/getUserInfoFromToken";
 const cheerMessages = [
   "오늘도 멋진 답변 기대할게요!",

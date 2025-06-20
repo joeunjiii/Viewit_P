@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Interview.css";
+import "./css/Interview.css";
 import InterviewSettingsModal from "./InterviewSettingModal";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
 import CaptionBox from "./asset/CaptionBox";

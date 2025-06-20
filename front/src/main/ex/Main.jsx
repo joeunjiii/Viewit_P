@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from 'react-router-dom';
 
-import "./main.css"
+import "./css/main.css"
 import { FaHome, FaMicrophone, FaFileAlt, FaCog, FaUsers, FaRegFileAlt } from "react-icons/fa"
 
 function Main() {

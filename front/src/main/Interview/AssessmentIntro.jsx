@@ -1,12 +1,12 @@
 import React from "react";
 import { FaClock, FaVolumeUp, FaHourglassHalf, FaUserTie } from "react-icons/fa";
-import "./AssessmentIntro.css";
+import "./css/AssessmentIntro.css";
 
 export default function AssessmentIntro({ onConfirm }) {
   const cards = [
     {
       icon: <FaClock size={44} color="#36b37e" />,
-      text: "면접은 10분 동안 진행됩니다.",
+      text: "모의면접은 10분 동안 진행됩니다.",
     },
     {
       icon: <FaUserTie size={44} color="#725ffe" />,
