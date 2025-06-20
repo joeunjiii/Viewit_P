@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import SectionHeader from "./SectionHeader";
 import RecentSection from "./RecentSection";
-import MainHeader from "./MainHeader";
 import SpeechAlertModal from "../ex/SpeechAlertModal";
 import { FaUsers, FaMicrophone } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -11,10 +9,6 @@ import feedbackImg2x from "./css/img/images2.png";
 import feedbackImg1x from "./css/img/images3.jpg";
 function MainContent() {
   const [showModal, setShowModal] = useState(false);
-
-  const handleSpeechClick = () => {
-    setShowModal(true);
-  };
 
   return (
     <div className="main-content">
@@ -27,13 +21,6 @@ function MainContent() {
               실제 면접처럼 답변하고 나의 강점 알아보기
             </div>
           </Link>
-
-          {/* <div className="card" onClick={handleSpeechClick}>
-            <div className="card-icon">
-              <FaMicrophone />
-            </div>
-            <div className="card-title">스피치 연습</div>
-          </div> */}
         </div>
 
         <RecentSection />
