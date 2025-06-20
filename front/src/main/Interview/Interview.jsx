@@ -1,101 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
 import "./css/Interview.css";
-import InterviewSettingsModal from "./InterviewSettingModal";
-import MicCheckModal from "./asset/Mic/MicCheckModal";
-import CaptionBox from "./asset/CaptionBox";
-import QuestionTabs from "./asset/QuestionTabs";
-import InterviewHeader from "./asset/InterviewHeader";
-import QuestionStatusBar from "./asset/QuestionStatusBar";
-import InterviewSessionManager from "./InterviewSessionManager";
+import InterviewSettingModal from "./InterviewSettingModal";
 import AssessmentIntro from "./AssessmentIntro";
 import WelcomeMessage from "./WelcomeMessage";
 import ScreenSizeGuard from "./asset/ScreenSizeGuard";
-
-
+import MicCheckModal from "./asset/Mic/MicCheckModal";
+import InterviewHeader from "./asset/InterviewHeader";
+import QuestionTabs from "./asset/QuestionTabs";
+import QuestionStatusBar from "./asset/QuestionStatusBar";
+import InterviewSessionManager from "./InterviewSessionManager";
+import CaptionBox from "./asset/CaptionBox";
 
 function Interview() {
-  const [step, setStep] = useState("settings"); // "settings" | "welcome" | "interview | guide"
-  const [micCheckOpen, setMicCheckOpen] = useState(false);
-  const [autoQuestion, setAutoQuestion] = useState(false);
+  const [step, setStep] = useState("settings");
+  const [sessionId] = useState(uuidv4());
+  const [jobRole, setJobRole] = useState("backend");
+  const [autoQuestion, setAutoQuestion] = useState(true);
   const [allowRetry, setAllowRetry] = useState(true);
   const [waitTime, setWaitTime] = useState(5);
+  const [micCheckOpen, setMicCheckOpen] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(1);
-  const [captionText, setCaptionText] =
-    useState("면접관: 자기소개 부탁드립니다.");
+  const [captionText, setCaptionText] = useState("");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
-  const [username, setUsername] = useState("지원자");
 
-  const handleStartSettings = (settings) => {
-    setAutoQuestion(settings.autoQuestion);
-    setWaitTime(settings.waitTime);
-    setAllowRetry(settings.allowRetry);
-    setStep("guide"); // 바로 안내화면으로
-  };
- 
-  const handleGuideConfirm = () => {
-    setStep("welcome");
-  };
-  const handleWelcomeStart = () => {
-    console.log("👋 WelcomeMessage '바로 시작하기' 버튼 클릭, 면접 시작.");
-    setStep("interview");
-  };
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
-  useEffect(() => {
-    console.log("[Interview] 현재 step 상태:", step);
 
-  }, [step]);
+  const handleStartSettings = ({ jobRole, autoQuestion, allowRetry, waitTime }) => {
+    setJobRole(jobRole);
+    setAutoQuestion(autoQuestion);
+    setAllowRetry(allowRetry);
+    setWaitTime(waitTime);
+    setStep("guide");
+  };
+  const handleGuideConfirm = () => setStep("welcome");
+  const handleWelcomeStart = () => setStep("interview");
+
+  const handleNewQuestion = useCallback(
+      async (q) => {
+        setCaptionText(`면접관: ${q}`);
+        setQuestionNumber((n) => n + 1);
+      },
+      []
+  );
+
+  const handleAnswerComplete = (text) => {
+    setCaptionText(`이용자: ${text}`);
+  };
+
   return (
-    <>
-      <ScreenSizeGuard />
-      {step === "settings" && (
-        <InterviewSettingsModal
-          onClose={() => setStep("interview")}
-          onStart={handleStartSettings}
-          onOpenMicCheck={openMicCheck}
-        />
-      )}
-      {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
-      {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
+      <>
+        <ScreenSizeGuard />
 
-      {step === "welcome" && (
-        <WelcomeMessage username={username} onStart={handleWelcomeStart} />
-      )}
+        {step === "settings" && (
+            <InterviewSettingModal
+                onStart={handleStartSettings}
+                onOpenMicCheck={openMicCheck}
+            />
+        )}
 
-      {step === "interview" && (
-        <div className="interview-wrapper">
-          <InterviewHeader totalDuration={600} />
-          <div className="interview-section-body">
-            <QuestionTabs questionNumber={questionNumber} />
-            <div className="interview-body">
-              <div className="status-display-box">
-                <QuestionStatusBar
-                  status={status}
-                  remainingTime={remainingTime}
-                />
+        {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
+        {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
+        {step === "welcome" && (
+            <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
+        )}
+
+        {step === "interview" && (
+            <div className="interview-wrapper">
+              <InterviewHeader totalDuration={600} />
+              <div className="interview-section-body">
+                <QuestionTabs questionNumber={questionNumber} />
+                <div className="interview-body">
+                  <div className="status-display-box">
+                    <QuestionStatusBar status={status} remainingTime={remainingTime} />
+                  </div>
+                  <InterviewSessionManager
+                      sessionId={sessionId}
+                      jobRole={jobRole}
+                      waitTime={waitTime}
+                      allowRetry={allowRetry}
+                      onStatusChange={setStatus}
+                      onTimeUpdate={setRemainingTime}
+                      onNewQuestion={handleNewQuestion}
+                      onAnswerComplete={handleAnswerComplete}
+                  />
+                </div>
               </div>
-
-              {/* InterviewSessionManager는 항상 startInterview={true}로 전달하여,
-                  WelcomeMessage가 닫히자마자 바로 면접이 시작되도록 합니다.
-                  InterviewSessionManager 내부에서 PHASE.IDLE -> PHASE.READY로 전환됩니다. */}
-              <InterviewSessionManager
-                startInterview={true} // ⭐ 이 부분이 중요합니다.
-                waitTime={waitTime}
-                allowRetry={allowRetry}
-                onStatusChange={setStatus}
-                onTimeUpdate={setRemainingTime}
-                onAnswerComplete={(text) => {
-                  setCaptionText(`이용자: ${text}`);
-                  setQuestionNumber((prev) => prev + 1);
-                }}
-              />
+              <CaptionBox text={captionText} />
             </div>
-          </div>
-          {autoQuestion && <CaptionBox text={captionText} />}
-        </div>
-      )}
-    </>
+        )}
+      </>
   );
 }
 

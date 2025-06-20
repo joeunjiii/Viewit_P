@@ -1,0 +1,10 @@
+/* src/main/Interview/InterviewLayout.css */
+.interview-page-container {
+   /* 1. 뷰포트 전체를 꽉 채우기 */
+  min-height: 100vh;
+  height: 100vh; /* 정확히 뷰포트 높이만큼 */
+  width: 100vw; /* 뷰포트 전체 너비만큼 */
+  margin: 0; /* 혹시 모를 마진 제거 */
+  padding: 0; /* 혹시 모를 패딩 제거 */
+  background-color: rgb(255, 255, 255);
+  }

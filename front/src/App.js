@@ -12,7 +12,7 @@ import Interview from "./main/Interview/Interview";
 import Layout from "./main/Layout";
 import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
 import AssessmentIntro from "./main/Interview/AssessmentIntro";
-
+import InterviewLayout from "./main/maincomponent/InterviewLayout";
 function App() {
   return (
     <Router>
@@ -23,8 +23,10 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
-          <Route path="interview" element={<Interview />} />
         </Route>
+    
+       
+        <Route path="/interview" element={<InterviewLayout />} /> 
 
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
         <Route path="AssessmentIntro" element={<AssessmentIntro />} />

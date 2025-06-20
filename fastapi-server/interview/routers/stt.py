@@ -1,38 +1,38 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-import time
 from services.whisper_service import stt_from_webm
 
 router = APIRouter()
-
 UPLOAD_DIR = "./interview/uploads/webm"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@router.post("/stt")
+@router.post("/")
 async def speech_to_text(audio: UploadFile = File(...)):
-    # 1. webm 저장
+    print("STT API 진입")
+    print("audio.filename:", audio.filename)
+
+    # 1) 파일 읽기
+    audio_bytes = await audio.read()
+    print("audio_bytes size:", len(audio_bytes))
+
+    # 2) 파일 저장
     webm_path = os.path.join(UPLOAD_DIR, audio.filename)
     with open(webm_path, "wb") as f:
-        f.write(await audio.read())
-    time.sleep(0.2)
-    abs_webm_path = os.path.abspath(webm_path)
-    
-    
-    print("파일 저장됨:", abs_webm_path)
-    print("저장 경로 존재 여부:", os.path.exists(abs_webm_path))
-    print("현재 작업 디렉토리:", os.getcwd())
-    
-    if not os.path.exists(webm_path):
-        print("실제 경로에 파일 없음:", webm_path)
-        return {"error": "파일이 저장되지 않았습니다."}
-    # 2. STT 처리
+        f.write(audio_bytes)
+    print("실제 저장된 파일 사이즈", os.path.getsize(webm_path))
+
+    # 3) 파일 존재/사이즈 체크
+    if not os.path.exists(webm_path) or os.path.getsize(webm_path) == 0:
+        raise HTTPException(500, detail="저장된 파일이 존재하지 않거나 사이즈가 0입니다.")
+
+    # 4) STT 처리
     try:
+        abs_webm_path = os.path.abspath(webm_path)
         text = stt_from_webm(abs_webm_path)
-        print("STT 결과:", repr(text))
-        if not text or text.strip() == "":
-            # 결과가 없을 때
+        if not text or not text.strip():
             text = "소리없음"
+        return {"text": text}
     except Exception as e:
-        print("STT 오류:", e)
-        return {"error": str(e)}
-    return {"text": text}
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, detail=f"STT 처리 오류: {e}")

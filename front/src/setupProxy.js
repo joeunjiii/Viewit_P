@@ -14,10 +14,8 @@ module.exports = function(app) {
         "/api/interview",
         createProxyMiddleware({
             target: "http://localhost:8000",
-            changeOrigin: true,
-            pathRewrite: {
-                "^/api/interview": ""
-            }
+            changeOrigin: true
+        
         })
     );
     app.use(

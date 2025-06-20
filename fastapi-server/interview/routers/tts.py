@@ -1,20 +1,16 @@
-# routers/tts.py
-
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from services.tts_service import generate_tts_audio
 
 router = APIRouter()
 
-@router.get("/start")
-async def tts_start():
-    # 고정 질문 예시
-    text = "자기소개 부탁드립니다."
-    audio_url = generate_tts_audio(text)
-    return {"audio_url": audio_url}
+class TTSRequest(BaseModel):
+    text: str
 
-@router.get("/next")
-async def tts_next():
-    # 임시로 다음 질문 제공
-    text = "지원 동기는 무엇인가요?"
-    audio_url = generate_tts_audio(text)
-    return {"audio_url": audio_url, "question": text}
+@router.post("/")
+async def tts_synthesize(data: TTSRequest):
+    try:
+        audio_url = generate_tts_audio(data.text)  # 실제 mp3 파일 URL 반환
+        return {"audio_url": audio_url}
+    except Exception as e:
+        raise HTTPException(500, detail=f"TTS 에러: {e}")

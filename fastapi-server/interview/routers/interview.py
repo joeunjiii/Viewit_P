@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from services.tts_service import generate_tts_audio
 from interview.interview_session import InterviewSession
 
-router = APIRouter(prefix="/api/interview")
+router = APIRouter()
 
 # 요청 모델
 class InitRequest(BaseModel):
