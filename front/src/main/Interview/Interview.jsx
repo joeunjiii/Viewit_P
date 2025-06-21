@@ -69,52 +69,54 @@ function Interview() {
   };
 
   return (
-      <>
-        <ScreenSizeGuard />
+    <>
+      <ScreenSizeGuard />
 
-        {step === "settings" && (
-            <InterviewSettingModal
-                onStart={handleStartSettings}
-                onOpenMicCheck={openMicCheck}
-            />
-        )}
+      {step === "settings" && (
+        <InterviewSettingModal
+          onStart={handleStartSettings}
+          onOpenMicCheck={openMicCheck}
+        />
+      )}
 
-        {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
-        {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
-        {step === "welcome" && (
-            <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
-        )}
+      {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
+      {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
+      {step === "welcome" && (
+        <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
+      )}
 
-        {step === "interview" && (
-            <div className="interview-wrapper">
-              <InterviewHeader totalDuration={600} />
-              <div className="interview-section-body">
-                <QuestionTabs questionNumber={questionNumber} />
-                <div className="interview-body">
-                  <div className="status-display-box">
-                    <QuestionStatusBar status={status} remainingTime={remainingTime} />
-                  </div>
-                  {initialQuestion ? (
-                      <InterviewSessionManager
-                          sessionId={sessionId}
-                          jobRole={jobRole}
-                          waitTime={waitTime}
-                          allowRetry={allowRetry}
-                          initialQuestion={initialQuestion}
-                          onStatusChange={setStatus}
-                          onTimeUpdate={setRemainingTime}
-                          onNewQuestion={handleNewQuestion}
-                          onAnswerComplete={handleAnswerComplete}
-                      />
-                  ) : (
-                      <div>첫 질문을 불러오는 중입니다...</div>
-                  )}
+      {step === "interview" && (
+        <div className="interview-wrapper">
+          <InterviewHeader totalDuration={200} />
+          <div className="interview-section-body">
+            <QuestionTabs questionNumber={questionNumber} />
+            <div className="interview-body">
+              {status !== "wait" && status !== "WAITING" && (
+                <div className="status-display-box">
+                  <QuestionStatusBar status={status} remainingTime={remainingTime} />
                 </div>
-              </div>
-              <CaptionBox text={captionText} />
+              )}
+              {initialQuestion ? (
+                <InterviewSessionManager
+                  sessionId={sessionId}
+                  jobRole={jobRole}
+                  waitTime={waitTime}
+                  allowRetry={allowRetry}
+                  initialQuestion={initialQuestion}
+                  onStatusChange={setStatus}
+                  onTimeUpdate={setRemainingTime}
+                  onNewQuestion={handleNewQuestion}
+                  onAnswerComplete={handleAnswerComplete}
+                />
+              ) : (
+                <div>첫 질문을 불러오는 중입니다...</div>
+              )}
             </div>
-        )}
-      </>
+          </div>
+          <CaptionBox text={captionText} />
+        </div>
+      )}
+    </>
   );
 }
 

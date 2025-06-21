@@ -8,7 +8,7 @@ function QuestionStatusBar({ status, remainingTime }) {
 
   switch (status) {
     case "tts":
-      icon = "🔊";
+      icon = "🔊";  
       message = "면접관 질문 재생 중...";
       break;
     case "wait":

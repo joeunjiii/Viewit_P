@@ -83,7 +83,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   margin-left: 80px;
-}
+} 
 
 /* 아이콘 공통 스타일 */
 .icon {
@@ -122,8 +122,8 @@
 
 /* 타이머 원형 */
 .timer-circle {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
   background-color: white;
   border: 14px solid #5e9b87;
