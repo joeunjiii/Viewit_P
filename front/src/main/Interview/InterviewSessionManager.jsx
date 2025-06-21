@@ -14,16 +14,16 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
-                                   sessionId,
-                                   jobRole,
-                                   waitTime = 3,
-                                   allowRetry = true,
-                                   initialQuestion,
-                                   onStatusChange,
-                                   onTimeUpdate,
-                                   onNewQuestion,
-                                   onAnswerComplete,
-                                 }) {
+  sessionId,
+  jobRole,
+  waitTime = 3,
+  allowRetry = true,
+  initialQuestion,
+  onStatusChange,
+  onTimeUpdate,
+  onNewQuestion,
+  onAnswerComplete,
+}) {
   // 첫 질문부터 셋팅!
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
@@ -49,8 +49,8 @@ function InterviewSessionManager({
         audioRef.current = null;
       }
       const url = question.audio_url.startsWith("http")
-          ? question.audio_url
-          : "http://localhost:8000" + question.audio_url;
+        ? question.audio_url
+        : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
       audio.onended = () => setPhase(PHASE.WAITING);
@@ -127,23 +127,23 @@ function InterviewSessionManager({
   };
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-        {phase === PHASE.WAITING && (
-            <div className="timer-area">
-              <Timer duration={remainingTime} autoStart label="대기시간" />
-              {allowRetry && (
-                  <button className="replay-button" onClick={handleRetry}>
-                    다시 답변하기
-                  </button>
-              )}
-            </div>
-        )}
-      </div>
+    <div className="interview-session">
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+      {phase === PHASE.WAITING && (
+        <div className="timer-area">
+          <Timer duration={remainingTime} autoStart label="대기시간" />
+          {allowRetry && (
+            <button className="replay-button" onClick={handleRetry}>
+              다시 답변하기
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
