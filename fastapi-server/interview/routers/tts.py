@@ -7,10 +7,10 @@ router = APIRouter()
 class TTSRequest(BaseModel):
     text: str
 
-@router.post("/")
+@router.post("/start")
 async def tts_synthesize(data: TTSRequest):
     try:
-        audio_url = generate_tts_audio(data.text)  # 실제 mp3 파일 URL 반환
+        audio_url = generate_tts_audio(data.text)
         return {"audio_url": audio_url}
     except Exception as e:
         raise HTTPException(500, detail=f"TTS 에러: {e}")
