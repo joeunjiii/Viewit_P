@@ -57,7 +57,7 @@ function Interview() {
     setStep("interview");
     setInitialQuestion(null);
     try {
-      // 2초 대기 
+      // 2초 대기
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
       const resPromise = initSession(sessionId, jobRole);
 
@@ -127,7 +127,7 @@ function Interview() {
                   />
                 </div>
               )}
-              {initialQuestion ? (
+              {initialQuestion && (
                 <InterviewSessionManager
                   sessionId={sessionId}
                   jobRole={jobRole}
@@ -139,8 +139,6 @@ function Interview() {
                   onNewQuestion={handleNewQuestion}
                   onAnswerComplete={handleAnswerComplete}
                 />
-              ) : (
-                <div className="first-question-loading">첫 질문을 불러오는 중입니다...</div>
               )}
             </div>
           </div>

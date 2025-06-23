@@ -9,7 +9,7 @@ function InterviewHeader({ totalDuration = 600 }) {
     <div className="interview-header">
        <div className="timer-simple-box">
       <div className="header-left">
-        <Timer duration={totalDuration} label="남은시간" mode="text" />
+        <Timer duration={totalDuration} label="남은시간" mode="text" className="header-timer"  />
       </div>
       </div>
       <div className="header-spacer" />

@@ -21,7 +21,7 @@ export default function WelcomeMessage({ onStart }) {
       <div className="welcome-card">
         <div className="emoji-wave">🌟</div>
         <h1 className="welcome-title">
-          <span>{username}</span>님,
+          <span>{username}</span>님
           <br />
           꿈을 향한 첫걸음을 응원해요!
         </h1>
