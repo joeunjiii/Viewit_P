@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaCog,
-  FaUsers,
-  FaMicrophone,
+  FaUserTie,
+  FaRegCommentDots,
+  FaClipboardCheck,
   FaUserCircle,
 } from "react-icons/fa";
 import "./css/Sidebar.css";
 import { getUserInfoFromToken } from "./asset/getUserInfoFromToken";
+import FeedbackModal from "./FeedbackModal";
 function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
@@ -21,6 +23,9 @@ function Sidebar({ onSpeechClick }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  //더미데이터 추후에 삭제
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -36,7 +41,6 @@ function Sidebar({ onSpeechClick }) {
     }
   }, []);
   useEffect(() => {
-    
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -86,21 +90,22 @@ function Sidebar({ onSpeechClick }) {
             }`}
           >
             <div className="menu-icon">
-              <FaUsers />
+              <FaUserTie />
             </div>
             {!isTablet && <span>모의면접</span>}
           </Link>
 
           <div
-            to="/speech"
-            className={`menu-link ${currentPath === "/speech" ? "active" : ""}`}
-            onClick={onSpeechClick}
+            className={`menu-link ${
+              currentPath === "/feedback" ? "active" : ""
+            }`}
+            onClick={() => setShowFeedbackModal(true)}
             style={{ cursor: "pointer" }}
           >
             <div className="menu-icon">
-              <FaMicrophone />
+              <FaClipboardCheck />
             </div>
-            {!isTablet && <span>스피치연습</span>}
+            {!isTablet && <span>피드백 결과</span>}
           </div>
         </div>
       </nav>
@@ -128,6 +133,10 @@ function Sidebar({ onSpeechClick }) {
           </div>
         </div>
       )}
+      <FeedbackModal
+        open={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+      />
     </div>
   );
 }

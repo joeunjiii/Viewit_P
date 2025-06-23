@@ -105,9 +105,10 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.feedback-card:hover {
-  transform: translateY(-7px) scale(1.025);
-  box-shadow: 0 8px 24px rgba(80, 180, 120, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05);
+.feedback-image:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(34,40,49,0.16);
+  border-color: #4673ea;
 }
 .feedback-semitext {
   font-size: 16px;
@@ -115,6 +116,7 @@
   text-align: center;
   padding: 4px 0 0 0;
 }
+
 @media (max-width: 1024px) {
   .cards-container {
     flex-direction: column;

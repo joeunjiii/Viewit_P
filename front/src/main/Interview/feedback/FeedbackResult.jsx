@@ -64,8 +64,6 @@ function FeedbackResult() {
             setSelectedTab={setSelectedTab}
           />
         </section>
-
-      
       </main>
     </div>
   );

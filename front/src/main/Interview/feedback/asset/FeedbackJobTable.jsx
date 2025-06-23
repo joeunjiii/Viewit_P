@@ -7,8 +7,8 @@ export default function FeedbackJobTable({ job, fillerWords }) {
     <table className="job-filler-table">
       <thead>
         <tr>
-          <th>직무</th>
-          <th>불필요한 단어</th>
+          <th className="job-th">직무</th>
+          <th className="filler-th">불필요한 단어</th>
         </tr>
       </thead>
       <tbody>

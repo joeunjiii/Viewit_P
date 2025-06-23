@@ -1,10 +1,12 @@
 .job-filler-table {
     width: 100%;
-    border-collapse: collapse;
+    border: 2px solid #d6e8d0;  
     font-size: 1rem;
+    border-collapse: separate;
     margin-bottom: 24px;
     background: #fff;
     box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    overflow: hidden;
   }
   
   .job-filler-table th, .job-filler-table td {
@@ -17,8 +19,8 @@
   
   .job-filler-table th {
     background: #e3f3de;
-    color: #486e43;
-    font-weight: 700;
+    color: rgb(3, 3, 3);
+    font-weight: 500;
     font-size: 1.05rem;
   }
   
@@ -28,5 +30,13 @@
     color: #b27248;
     font-weight: 500;
     font-size: 0.98rem;
+  }
+  .job-th {
+    color: #5e9c76;
+    font-weight: 700;
+  }
+  .filler-th {
+    color: #b27248;
+    font-weight: 700;
   }
   
