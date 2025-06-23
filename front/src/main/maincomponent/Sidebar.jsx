@@ -4,7 +4,6 @@ import {
   FaHome,
   FaCog,
   FaUserTie,
-  FaRegCommentDots,
   FaClipboardCheck,
   FaUserCircle,
 } from "react-icons/fa";

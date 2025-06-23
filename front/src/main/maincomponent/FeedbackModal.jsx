@@ -9,7 +9,9 @@ export default function FeedbackModal({ open, onClose, feedbackList = [] }) {
       <div className="feedback-modal">
         <h3 className="feedback-modal-title">피드백 결과</h3>
         {feedbackList.length === 0 ? (
-          <div className="feedback-modal-empty">아직 받은 피드백이 없습니다.</div>
+          <div className="feedback-modal-empty">
+            아직 받은 피드백이 없습니다.
+          </div>
         ) : (
           <ul className="feedback-modal-list">
             {feedbackList.map((item, idx) => (

@@ -1,52 +1,65 @@
 .feedback-modal-overlay {
-    position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.22); z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.22);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.feedback-modal {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px 32px 22px 32px;
+  min-width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+  animation: popIn 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.feedback-modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.feedback-modal-list {
+  margin: 0;
+  padding: 0 0 16px 0;
+  list-style: none;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.feedback-modal-list li {
+  margin-bottom: 13px;
+  line-height: 1.5;
+}
+.feedback-modal-empty {
+  color: #aaa;
+  text-align: center;
+  padding: 40px 0 30px 0;
+}
+.feedback-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.feedback-modal-close {
+  padding: 8px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #4673ea;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+@keyframes popIn {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.6;
   }
-  .feedback-modal {
-    background: #fff;
-    border-radius: 18px;
-    padding: 32px 32px 22px 32px;
-    min-width: 340px;
-    max-width: 90vw;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-    animation: popIn .16s cubic-bezier(0.4,0,0.2,1);
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  .feedback-modal-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  .feedback-modal-list {
-    margin: 0; padding: 0 0 16px 0;
-    list-style: none;
-    max-height: 250px;
-    overflow-y: auto;
-  }
-  .feedback-modal-list li {
-    margin-bottom: 13px;
-    line-height: 1.5;
-  }
-  .feedback-modal-empty {
-    color: #aaa;
-    text-align: center;
-    padding: 40px 0 30px 0;
-  }
-  .feedback-modal-actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .feedback-modal-close {
-    padding: 8px 22px;
-    border: none;
-    border-radius: 8px;
-    background: #4673ea;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  @keyframes popIn {
-    0% { transform: scale(0.96); opacity: 0.6; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  
+}

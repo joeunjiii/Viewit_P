@@ -85,8 +85,11 @@ button.tab {
 .interview-body {
   display: flex;
   /* justify-content: space-between; */
+  height: 100%;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  height: 300px; /* or 100%, 부모 높이에 맞게 */
   padding: 40px 5vw;
   gap: 80px;
   box-sizing: border-box;
@@ -101,9 +104,18 @@ button.tab {
   background-color: #f9fbff;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  margin-left: 80px;
+  
 }
-
+.first-question-loading {
+  display: flex;
+  justify-content: center;   /* 가로 중앙 */
+  align-items: center;       /* 세로 중앙 */
+        
+  font-size: 1.25rem;        /* 원하는 크기로 */
+  color: #444;
+  letter-spacing: 0.02em;
+  
+}
 /* 아이콘 공통 스타일 */
 .icon {
   font-size: 28px;

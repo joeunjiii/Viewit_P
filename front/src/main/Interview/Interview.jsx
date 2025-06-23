@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { initSession } from "./api/interview"; // 추가!
 import "./css/Interview.css";
@@ -12,8 +13,10 @@ import QuestionTabs from "./asset/QuestionTabs";
 import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
 import CaptionBox from "./asset/CaptionBox";
-
+import LoadingModal from "./asset/LoadingModal";
+import ErrorModal from "./asset/ErrorModal";
 function Interview() {
+  const navigate = useNavigate();
   const [step, setStep] = useState("settings");
   const [sessionId] = useState(uuidv4());
   const [jobRole, setJobRole] = useState("backend");
@@ -30,8 +33,16 @@ function Interview() {
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleStartSettings = ({ jobRole, autoQuestion, allowRetry, waitTime }) => {
+  const handleStartSettings = ({
+    jobRole,
+    autoQuestion,
+    allowRetry,
+    waitTime,
+  }) => {
     setJobRole(jobRole);
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
@@ -42,19 +53,28 @@ function Interview() {
 
   // 면접 시작 시 첫 질문
   const handleWelcomeStart = async () => {
+    setShowLoadingModal(true);
     setStep("interview");
     setInitialQuestion(null);
     try {
-      const res = await initSession(sessionId, jobRole);
+      // 2초 대기 
+      const delay = new Promise((resolve) => setTimeout(resolve, 2000));
+      const resPromise = initSession(sessionId, jobRole);
+
+      const [res] = await Promise.all([resPromise, delay]);
       setInitialQuestion({
         question: res.data.question,
         audio_url: res.data.audio_url,
       });
       setQuestionNumber(1);
       setCaptionText(`면접관: ${res.data.question}`);
+      setShowLoadingModal(false);
     } catch (err) {
-      alert("면접 세션 초기화에 실패했습니다.");
-      setStep("settings");
+      setShowLoadingModal(false);
+      setShowErrorModal(true);
+      setErrorMsg(
+        "면접 세션 초기화에 실패했습니다.\n서버 상태를 확인해주세요."
+      );
     }
   };
 
@@ -71,7 +91,15 @@ function Interview() {
   return (
     <>
       <ScreenSizeGuard />
-
+      <LoadingModal
+        open={showLoadingModal}
+        text="면접 세션을 불러오는 중입니다..."
+      />
+      <ErrorModal
+        open={showErrorModal}
+        message={errorMsg}
+        onClose={() => setShowErrorModal(false)}
+      />
       {step === "settings" && (
         <InterviewSettingModal
           onStart={handleStartSettings}
@@ -93,7 +121,10 @@ function Interview() {
             <div className="interview-body">
               {status !== "wait" && status !== "WAITING" && (
                 <div className="status-display-box">
-                  <QuestionStatusBar status={status} remainingTime={remainingTime} />
+                  <QuestionStatusBar
+                    status={status}
+                    remainingTime={remainingTime}
+                  />
                 </div>
               )}
               {initialQuestion ? (
@@ -109,10 +140,11 @@ function Interview() {
                   onAnswerComplete={handleAnswerComplete}
                 />
               ) : (
-                <div>첫 질문을 불러오는 중입니다...</div>
+                <div className="first-question-loading">첫 질문을 불러오는 중입니다...</div>
               )}
             </div>
           </div>
+
           <CaptionBox text={captionText} />
         </div>
       )}

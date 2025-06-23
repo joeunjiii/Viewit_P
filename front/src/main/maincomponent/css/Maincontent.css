@@ -107,7 +107,7 @@
 }
 .feedback-image:hover {
   transform: scale(1.04);
-  box-shadow: 0 8px 24px rgba(34,40,49,0.16);
+  box-shadow: 0 8px 24px rgba(34, 40, 49, 0.16);
   border-color: #4673ea;
 }
 .feedback-semitext {
