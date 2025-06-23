@@ -1,0 +1,76 @@
+.summary-softskills-row {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 24px;
+   
+  }
+  
+  .summary-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left:80px;
+  }
+  
+  .summary-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  
+  .summary-text {
+    width: 100%;
+    min-height: 110px;
+    max-height: 180px;
+    border: 1px solid #c8dcc4;
+    border-radius: 8px;
+    padding: 14px;
+    resize: none;
+    font-size: 1rem;
+    background: #f7faf8;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  
+  .softskills-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 80px;
+  }
+  
+  .softskills-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  
+  .softskills-table {
+    width: 100%;
+    border: 1.5px solid #c8dcc2;
+    border-radius: 10px;
+    background: #fff;
+    border-collapse: separate;
+    box-sizing: border-box;
+  }
+  
+  .softskills-table th {
+    background: #e3f3de;
+    color: #486e43;
+    font-weight: 700;
+    font-size: 1.04rem;
+    padding: 10px 0;
+  }
+  
+  .softskills-table td {
+    padding: 12px 10px;
+    vertical-align: top;
+    font-size: 1rem;
+    min-width: 120px;
+  }
+  
+  .softskills-list {
+    margin: 0;
+    padding-left: 18px;
+  }
+  

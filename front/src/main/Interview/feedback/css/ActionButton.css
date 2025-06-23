@@ -1,0 +1,20 @@
+.action-btn {
+  background: transparent;
+  color: #444;                  /* 중간 그레이 */
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  border: 1.5px solid #b0b0b0;  /* 은은한 실버 테두리 */
+  border-radius: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: none;
+  transition: 
+    background 0.18s,
+    color 0.18s,
+    border 0.18s;
+}
+.action-btn:hover, .action-btn:focus {
+  background: #f5f5f5;
+  color: #111;
+  border-color: #222;
+}

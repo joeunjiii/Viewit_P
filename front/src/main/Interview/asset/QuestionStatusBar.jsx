@@ -1,5 +1,5 @@
 // components/Interview/QuestionStatusBar.jsx
-import "./QuestionStatusBar.css";
+import "./css/QuestionStatusBar.css";
 
 function QuestionStatusBar({ status, remainingTime }) {
   let icon = null;

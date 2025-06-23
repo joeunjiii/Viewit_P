@@ -77,8 +77,6 @@ class Question(BaseModel):
     text: str
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")

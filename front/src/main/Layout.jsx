@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./maincomponent/Sidebar";
 import SpeechAlertModal from "./ex/SpeechAlertModal";
-import "./Layout.css";
+import "./css/Layout.css";
 
 function Layout() {
   console.log("🔁 Layout 렌더링됨");

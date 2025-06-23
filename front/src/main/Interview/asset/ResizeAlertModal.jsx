@@ -1,6 +1,6 @@
 import React from "react";
 import { FaExclamationCircle } from "react-icons/fa";
-import "./ResizeAlertModal.css";
+import "./css/ResizeAlertModal.css";
 
 export default function ResizeAlertModal() {
   return (

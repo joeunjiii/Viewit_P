@@ -82,7 +82,7 @@ function Interview() {
       {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
       {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
       {step === "welcome" && (
-        <WelcomeMessage username="유광명" onStart={handleWelcomeStart} />
+        <WelcomeMessage username="회원" onStart={handleWelcomeStart} />
       )}
 
       {step === "interview" && (

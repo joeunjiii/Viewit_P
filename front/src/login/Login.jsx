@@ -1,6 +1,6 @@
 // src/login/Login.jsx
 import React, { useEffect } from "react";
-import "./login.css";
+import "./css/login.css";
 
 export default function Login() {
   useEffect(() => {

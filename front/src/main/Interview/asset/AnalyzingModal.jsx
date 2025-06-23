@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./AnalyzingModal.css";
+import "./css/AnalyzingModal.css";
 
 function AnalyzingModal({ onExit }) {
   const navigate = useNavigate();

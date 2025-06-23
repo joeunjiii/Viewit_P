@@ -1,5 +1,10 @@
 import React from "react";
-import { FaClock, FaVolumeUp, FaHourglassHalf, FaUserTie } from "react-icons/fa";
+import {
+  FaClock,
+  FaVolumeUp,
+  FaHourglassHalf,
+  FaUserTie,
+} from "react-icons/fa";
 import "./css/AssessmentIntro.css";
 
 export default function AssessmentIntro({ onConfirm }) {
@@ -25,7 +30,9 @@ export default function AssessmentIntro({ onConfirm }) {
   return (
     <div className="assessment-intro-bg">
       <div className="assessment-intro-container">
-        <h2 className="assessment-title">모의면접은 아래와 같이 이루어져 있어요.</h2>
+        <h2 className="assessment-title">
+          모의면접은 아래와 같이 이루어져 있어요.
+        </h2>
         <p className="assessment-subtitle">
           모든 내용을 읽어보셨다면 확인 버튼을 눌러 모의면접을 시작해 주세요.
         </p>

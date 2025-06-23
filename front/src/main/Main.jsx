@@ -1,7 +1,7 @@
 import React from "react";
 import MainContent from "./maincomponent/MainContent";
 import MainHeader from "./maincomponent/MainHeader";
-import "./main.css";
+import "./css/main.css";
 
 function Main() {
  

@@ -1,7 +1,7 @@
 // components/InterviewHeader.jsx
 import { useNavigate } from "react-router-dom";
 import Timer from "./Timer";
-import './Interviewheader.css';
+import './css/Interviewheader.css';
 function InterviewHeader({ totalDuration = 600 }) {
   const navigate = useNavigate();
 

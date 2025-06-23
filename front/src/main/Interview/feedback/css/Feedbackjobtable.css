@@ -1,0 +1,32 @@
+.job-filler-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    margin-bottom: 24px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  
+  .job-filler-table th, .job-filler-table td {
+    border: 1px solid #c5dcc2;
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 1rem;
+  }
+  
+  .job-filler-table th {
+    background: #e3f3de;
+    color: #486e43;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  
+  .job-filler-table td.filler-words {
+    /* 불필요한 단어 내용이 길면 자동 줄바꿈 */
+    word-break: break-all;
+    color: #b27248;
+    font-weight: 500;
+    font-size: 0.98rem;
+  }
+  

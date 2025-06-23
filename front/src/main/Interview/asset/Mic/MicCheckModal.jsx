@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "./MicCheckModal.css";
+import "./css/MicCheckModal.css";
 
 function MicCheckModal({ onClose }) {
   const [status, setStatus] = useState("");

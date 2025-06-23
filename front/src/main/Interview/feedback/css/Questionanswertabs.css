@@ -1,0 +1,74 @@
+
+.feedback-question-row {
+    margin-top: 32px;
+    margin-left: 80px;
+    margin-right: 80px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .question-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .question-tabs button {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 20px;
+    background: #e5efe7;
+    color: rgb(192, 221, 209);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .question-tabs button.active {
+    background: rgb(99, 159, 134);
+    color: #fff;
+  }
+  
+  .question-box {
+    margin-top: 8px;
+  }
+  
+  .q-label,
+  .a-label,
+  .filler-label,
+  .model-label {
+    font-weight: 600;
+    color: #6d906b;
+    margin-top: 10px;
+  }
+  
+  .q-text,
+  .a-text,
+  .model-text {
+    background: #f8f8f8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+  
+  .filler-list {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+  }
+  
+  .filler-highlight {
+    background: #ffe5e0;
+    color: #d35c47;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: bold;
+  }
+  
+  .feedback-actions {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+  }

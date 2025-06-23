@@ -45,21 +45,40 @@
   gap: 8px;
   margin-bottom: 50px;
 }
-.tab {
-  padding: 10px 20px;
-  font-size: 16px;
+button.tab {
+  padding: 12px 28px;
+  font-size: 1.15rem;
+  font-weight: 500;
   border-radius: 999px;
-  border: none;
-  background-color: #eee;
-  color: #333;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-  min-width: 80px;
+  background-color: #f8f8f8;
+  color: #222;
+  min-width: 90px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: background 0.22s, color 0.18s, border 0.2s, box-shadow 0.18s;
 }
 .tab.selected {
   background-color: #5e9c76;
   color: white;
+}
+.tab2 {
+  padding: 12px 28px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 2px solid #5e9c76; /* 연녹 테두리 */
+  background: #f3faf6; /* 거의 흰색에 가까운 연녹 */
+  color: #357851; /* 진한 녹색 글씨 */
+  min-width: 90px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(94, 156, 118, 0.09);
+  transition: background 0.18s, color 0.16s, border 0.19s, box-shadow 0.18s;
+}
+.tab2:hover {
+  background: #e3f5e5; /* 더 진한 연녹 */
+  color: #21613d; /* 더 진한 글씨 */
+  border-color: #387751;
+  box-shadow: 0 4px 16px rgba(94, 156, 118, 0.13);
 }
 
 /* 질문 파형 + 타이머를 나란히 배치 */
@@ -83,7 +102,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   margin-left: 80px;
-} 
+}
 
 /* 아이콘 공통 스타일 */
 .icon {
@@ -211,7 +230,7 @@
     flex-grow: 0; /* ✅ 오른쪽 밀지 않도록 */
     max-width: none; /* ✅ 너비 제한 제거 */
   }
- 
+
   .end-button {
     transform: none; /* ✅ 위치 조정 제거 */
     font-size: 13px;
