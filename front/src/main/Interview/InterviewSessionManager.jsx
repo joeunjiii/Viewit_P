@@ -24,7 +24,7 @@ function InterviewSessionManager({
                                    onNewQuestion,
                                    onAnswerComplete,
                                  }) {
-  // 첫 질문 셋팅
+  // 첫 질문부터 셋팅!
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
