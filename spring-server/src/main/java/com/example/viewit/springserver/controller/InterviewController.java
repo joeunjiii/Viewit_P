@@ -1,11 +1,15 @@
 package com.example.viewit.springserver.controller;
 
+import com.example.viewit.springserver.entity.Interview;
+import com.example.viewit.springserver.repository.InterviewDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,6 +19,9 @@ public class InterviewController {
     private static final Logger log = LoggerFactory.getLogger(InterviewController.class);
 
     private final RestTemplate rt;
+
+    @Autowired
+    private InterviewDao interviewDao;
 
     @Value("${fastapi.url}")
     private String fastapiUrl;
@@ -43,4 +50,20 @@ public class InterviewController {
         log.info("[Spring ▶ final_answer] session_id={} completed", body.get("session_id"));
         return resp;
     }
+
+    public String saveInterview(@RequestBody Interview interview) {
+        interviewDao.saveInterview(
+                interview.getSessionId(),
+                interview.getQuestionText(),
+                interview.getAnswerText(),
+                interview.getFilterWord(),
+                interview.getAnswerFeedback()
+        );
+        return "저장 완료";
+   }
+
+   @GetMapping("/{sessionId")
+    public List<Interview> getInterviews(@PathVariable Long sessionId) {
+        return interviewDao.findBySessionId(sessionId);
+   }
 }
