@@ -5,7 +5,6 @@ import { FaUsers, FaMicrophone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./css/Maincontent.css";
 import feedbackImg3x from "./css/img/images1.jpg";
-import feedbackImg2x from "./css/img/images2.png";
 import feedbackImg1x from "./css/img/images3.jpg";
 function MainContent() {
   const [showModal, setShowModal] = useState(false);
