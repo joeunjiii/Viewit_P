@@ -27,16 +27,15 @@ public class NaverAuthController {
                                UserDao userDao) {
         this.rest        = builder.build();
         this.jwtProvider = jwtProvider;
-        this.userDao = userDao;
+        this.userDao     = userDao;
     }
 
     @PostMapping("/naver")
     public ResponseEntity<?> loginWithNaver(@RequestBody Map<String,String> body) {
-        // 1) 받은 access token 로깅
         String accessToken = body.get("accessToken");
         log.info("[NaverAuth] 1) 받은 accessToken = {}", accessToken);
 
-        // 2) 네이버 프로필 조회
+        // 네이버 프로필 조회
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -58,20 +57,24 @@ public class NaverAuthController {
         @SuppressWarnings("unchecked")
         Map<String, Object> userInfo = (Map<String, Object>) profile.get("response");
 
-        // 3) 사용자 정보 파싱 및 로깅
         String email = userInfo.get("email").toString();
         String name = userInfo.get("name").toString();
+        String naverId = userInfo.get("id").toString();
+
         log.info("[NaverAuth] 3) 파싱된 이메일 = {}", email);
         log.info("[NaverAuth] 3) 파싱된 이름 = {}", name);
-        // 4) JWT 발급 및 로깅
-        String jwt = jwtProvider.createToken(email,name);
+
+        // JWT 발급
+        String jwt = jwtProvider.createToken(email, name);
         log.info("[NaverAuth] 4) 발급된 JWT = {}", jwt);
-        String naverId = userInfo.get("id").toString();
-        //DB저장
+
+        // DB 저장 & userId 반환
         userDao.saveOrUpdateUser(naverId, name, email);
+        Long userId = userDao.findUserIdByNaverId(naverId); // 반드시 구현되어 있어야 함!
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(Map.of(
+                "token", jwt,
+                "userId", userId
+        ));
     }
-
-
 }

@@ -2,7 +2,7 @@ package com.example.viewit.springserver.entity;
 
 public class Interview {
     private Long interviewId;
-    private Long sessionId;
+    private String sessionId;
     private String questionText;
     private String answerText;
     private String filterWord;
@@ -11,7 +11,7 @@ public class Interview {
 
     public Interview() {}
 
-    public Interview(Long interviewId, Long sessionId, String questionText, String answerText, String filterWord, String answerFeedback) {
+    public Interview(Long interviewId, String sessionId, String questionText, String answerText, String filterWord, String answerFeedback) {
         this.interviewId = interviewId;
         this.sessionId = sessionId;
         this.questionText = questionText;
@@ -24,8 +24,8 @@ public class Interview {
     public Long getInterviewId() { return interviewId; }
     public void setInterviewId(Long interviewId) { this.interviewId = interviewId; }
 
-    public Long getSessionId() { return sessionId; }
-    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 
     public String getQuestionText() { return questionText; }
     public void setQuestionText(String questionText) { this.questionText = questionText; }

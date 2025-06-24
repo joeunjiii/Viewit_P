@@ -5,10 +5,10 @@ import "./login.css";
 export default function Login() {
   useEffect(() => {
     function handleMessage(event) {
-      // 1) 메시지 수신 확인용 로그
+      // [1] 팝업에서 전달받은 메시지 확인
       console.log("[Login] message event:", event.data, "from", event.origin);
 
-      // 2) 보안: 반드시 origin 체크 (팝업과 같은 출처인지)
+      // [2] 보안: origin 체크
       if (event.origin !== window.location.origin) {
         console.warn("[Login] origin mismatch, ignoring message");
         return;
@@ -18,11 +18,11 @@ export default function Login() {
       if (source === "naver" && accessToken) {
         console.log("[Login] got Naver accessToken:", accessToken);
 
-        // 3) 백엔드에 토큰 전달 (proxy 활용)
+        // [3] 백엔드에 accessToken 전달 (userId, jwt 응답받음)
         fetch("/api/auth/naver", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",              // 쿠키 기반 인증 쓰려면 필요
+          credentials: "include",
           body: JSON.stringify({ accessToken }),
         })
             .then(res => {
@@ -32,11 +32,13 @@ export default function Login() {
             })
             .then(data => {
               console.log("[Login] /api/auth/naver response body:", data);
-              if (data.token) {
+              if (data.token && data.userId) {
+                // [4] jwt, userId 모두 저장! (이 부분이 핵심)
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("userId", data.userId);
                 window.location.href = "/main";
               } else {
-                alert("로그인 실패: 토큰이 없습니다.");
+                alert("로그인 실패: 토큰 또는 userId 없음");
               }
             })
             .catch(err => {
@@ -46,36 +48,35 @@ export default function Login() {
       }
     }
 
+    // [5] postMessage 이벤트 리스너 등록/해제
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  // 이미 로그인 되어 있으면 바로 메인으로 이동
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      window.location.href = "/main";
+    }
+  }, []);
+
+  // 네이버 로그인 버튼 클릭 시 팝업 열기
   const handleLogin = () => {
     window.open(
-        "/naver/callback.html",          // public/naver/callback.html 경로
+        "/naver/callback.html", // public/naver/callback.html 경로
         "naverLoginPopup",
         "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
     );
   };
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      // ✅ 토큰이 있으면 바로 메인 페이지로 이동
-      window.location.href = "/main";
-    }
-  }, []);
-  
+
   return (
       <div className="container">
         <div className="login-box">
           <img src="/assets/logo.png" alt="로고" className="login-logo" />
           <div className="horizontal-line" />
           <button className="naver-button" onClick={handleLogin}>
-            <img
-                src="/assets/naver.png"
-                alt="네이버 로그인"
-                className="naver-icon"
-            />
+            <img src="/assets/naver.png" alt="네이버 로그인" className="naver-icon" />
             네이버 로그인
           </button>
         </div>

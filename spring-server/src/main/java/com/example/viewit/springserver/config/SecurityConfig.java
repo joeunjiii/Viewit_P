@@ -36,7 +36,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/login", "/main", "/interview", "/AnalyzingModal",
                                 "/css/**", "/js/**", "/assets/**",
-                                "/oauth2/**", "/error", "/naver/callback.html", "/naver/**"
+                                "/oauth2/**", "/error", "/naver/callback.html", "/naver/**",
+                                "/api/interview/save", "/api/interview/init"
                         ).permitAll()
                         .requestMatchers("/oauth2/authorization/naver").permitAll()
 

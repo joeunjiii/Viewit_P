@@ -14,12 +14,18 @@ public class InterviewDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public void saveInterview(Long sessionId, String question, String answer, String filterWord, String feedback) {
+    public void saveInterview(Interview interview) {
         String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, filter_word, answer_feedback) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, sessionId, question, answer, filterWord, feedback);
+        jdbcTemplate.update(sql,
+                interview.getSessionId(),
+                interview.getQuestionText(),
+                interview.getAnswerText(),
+                interview.getFilterWord(),
+                interview.getAnswerFeedback()
+        );
     }
 
-    public List<Interview> findBySessionId(Long sessionId) {
+    public List<Interview> findBySessionId(String sessionId) {
         String sql = "SELECT * FROM INTERVIEW WHERE session_id = ?";
         return jdbcTemplate.query(sql, interviewRowMapper(), sessionId);
     }
@@ -28,7 +34,7 @@ public class InterviewDao {
         return (rs, rowNum) -> {
             Interview iv = new Interview();
             iv.setInterviewId(rs.getLong("interview_id"));
-            iv.setSessionId(rs.getLong("session_id"));
+            iv.setSessionId(rs.getString("session_id"));
             iv.setQuestionText(rs.getString("question_text"));
             iv.setAnswerText(rs.getString("answer_text"));
             iv.setFilterWord(rs.getString("filter_word"));
