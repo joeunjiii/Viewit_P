@@ -13,7 +13,7 @@ class InterviewSession:
         self.start_time = time.time()
         self.job_role = job_role
         self.softskill_label = softskill_label
-        self.state = {"step": 0, "current_topic": None, "topic_count": 0, "history": [], "completed": False}
+        self.state = {"step": 0, "current_topic": None, "topic_count": 0, "history": [], "completed": False, "final_question_given":False}
 
     def get_random_common_question(self) -> str | None:
         results = self.qdrant_client.search(

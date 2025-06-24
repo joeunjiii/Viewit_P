@@ -4,6 +4,7 @@ import { nextQuestion, saveInterview } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 import { endSession } from "./api/interview";
+import { useNavigate } from "react-router-dom";
 
 const PHASE = {
   READY: "ready",
@@ -34,6 +35,7 @@ function InterviewSessionManager({
   const timerRef = useRef(null);
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
+  const navigate = useNavigate();
 
   // initialQuestion 동기화
   useEffect(() => {
@@ -108,7 +110,7 @@ function InterviewSessionManager({
     }
   };
 
-  // 답변 끝나면 후속질문
+  // 답변 끝나면 후속질문 or 마지막 질문
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
@@ -124,6 +126,18 @@ function InterviewSessionManager({
         } catch (e) {
           alert("저장 실패: " + e.message);
         }
+        // 마지막 질문(고정질문) 체크
+        if (question?.done) {
+          try {
+            const res = await endSession(sessionId, sttResult)
+            //alert로 면정종료 알림
+            alert("면접이 종료되었습니다.\n" + (res.data.message || ""));
+            //결과 페이지로 이동 , 피드백 등 미구현상태
+            navigate("/feedback-result", { state: { feedback: res.data.feedback, history: res.data.history } });
+          } catch (err) {
+            alert("최종 제출에 실패했습니다.");
+          }
+        } else{
         // 2. 후속 질문 요청
         try {
           const res = await nextQuestion(sessionId, sttResult);
@@ -137,12 +151,13 @@ function InterviewSessionManager({
           }
         } catch (err) {
           console.error("next_question 실패", err);
+          }
         }
         setSttResult(null);
         onAnswerComplete?.(sttResult);
       })();
     }
-  }, [phase, sttResult, sessionId, question, onAnswerComplete, onNewQuestion]);
+  }, [phase, sttResult, sessionId, question, onAnswerComplete, onNewQuestion, navigate]);
 
   // 다시 답변하기
   const handleRetry = () => {

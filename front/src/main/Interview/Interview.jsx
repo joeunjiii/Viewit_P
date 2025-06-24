@@ -41,11 +41,11 @@ function Interview() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleStartSettings = ({
-    jobRole,
-    autoQuestion,
-    allowRetry,
-    waitTime,
-  }) => {
+                                 jobRole,
+                                 autoQuestion,
+                                 allowRetry,
+                                 waitTime,
+                               }) => {
     setJobRole(jobRole);
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
@@ -62,22 +62,22 @@ function Interview() {
       window.location.href = "/login";
       return;
     }
-  
+
     setStep("interview");
     setInitialQuestion(null);
     setShowLoadingModal(true); // 로딩모달 on
-  
+
     try {
       // 2초 대기 + 세션 초기화 병렬 실행
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-  
+
       // 면접 세션(백엔드/DB) 생성 -> 성공 후 initSession 호출
       await createInterviewSession({
         session_id: sessionId,
         user_id: safeUserId,
         job_role: jobRole
       });
-  
+
       const [res] = await Promise.all([
         initSession({
           session_id: sessionId,
@@ -86,7 +86,7 @@ function Interview() {
         }),
         delay
       ]);
-  
+
       setInitialQuestion({
         question: res.data.question,
         audio_url: res.data.audio_url,
@@ -101,7 +101,7 @@ function Interview() {
       setStep("settings");
     }
   };
-  
+
 
   // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
@@ -114,65 +114,65 @@ function Interview() {
   }, []);
 
   return (
-    <>
-      <ScreenSizeGuard />
-      <LoadingModal
-        open={showLoadingModal}
-        text="면접 세션을 불러오는 중입니다..."
-      />
-      <ErrorModal
-        open={showErrorModal}
-        message={errorMsg}
-        onClose={() => setShowErrorModal(false)}
-      />
-      {step === "settings" && (
-        <InterviewSettingModal
-          onStart={handleStartSettings}
-          onOpenMicCheck={openMicCheck}
+      <>
+        <ScreenSizeGuard />
+        <LoadingModal
+            open={showLoadingModal}
+            text="면접 세션을 불러오는 중입니다..."
         />
-      )}
+        <ErrorModal
+            open={showErrorModal}
+            message={errorMsg}
+            onClose={() => setShowErrorModal(false)}
+        />
+        {step === "settings" && (
+            <InterviewSettingModal
+                onStart={handleStartSettings}
+                onOpenMicCheck={openMicCheck}
+            />
+        )}
 
-      {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
-      {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
-      {step === "welcome" && (
-        <WelcomeMessage username="회원" onStart={handleWelcomeStart} />
-      )}
+        {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
+        {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
+        {step === "welcome" && (
+            <WelcomeMessage username="회원" onStart={handleWelcomeStart} />
+        )}
 
-      {step === "interview" && (
-        <div className="interview-wrapper">
-          <InterviewHeader totalDuration={200} />
-          <div className="interview-section-body">
-            <QuestionTabs questionNumber={questionNumber} />
-            <div className="interview-body">
-              {status !== "wait" && status !== "WAITING" && (
-                <div className="status-display-box">
-                  <QuestionStatusBar
-                    status={status}
-                    remainingTime={remainingTime}
-                  />
+        {step === "interview" && (
+            <div className="interview-wrapper">
+              <InterviewHeader totalDuration={200} />
+              <div className="interview-section-body">
+                <QuestionTabs questionNumber={questionNumber} />
+                <div className="interview-body">
+                  {status !== "wait" && status !== "WAITING" && (
+                      <div className="status-display-box">
+                        <QuestionStatusBar
+                            status={status}
+                            remainingTime={remainingTime}
+                        />
+                      </div>
+                  )}
+                  {initialQuestion && (
+                      <InterviewSessionManager
+                          sessionId={sessionId}
+                          jobRole={jobRole}
+                          waitTime={waitTime}
+                          allowRetry={allowRetry}
+                          initialQuestion={initialQuestion}
+                          onStatusChange={setStatus}
+                          onTimeUpdate={setRemainingTime}
+                          onNewQuestion={handleNewQuestion}
+                          onCaptionUpdate={handleCaptionUpdate}
+                          // onAnswerComplete={handleAnswerComplete}
+                      />
+                  )}
                 </div>
-              )}
-              {initialQuestion && (
-                <InterviewSessionManager
-                  sessionId={sessionId}
-                  jobRole={jobRole}
-                  waitTime={waitTime}
-                  allowRetry={allowRetry}
-                  initialQuestion={initialQuestion}
-                  onStatusChange={setStatus}
-                  onTimeUpdate={setRemainingTime}
-                  onNewQuestion={handleNewQuestion}
-                  onCaptionUpdate={handleCaptionUpdate} 
-                  // onAnswerComplete={handleAnswerComplete}
-                />
-              )}
-            </div>
-          </div>
+              </div>
 
-          <CaptionBox text={captionText} />
-        </div>
-      )}
-    </>
+              <CaptionBox text={captionText} />
+            </div>
+        )}
+      </>
   );
 }
 

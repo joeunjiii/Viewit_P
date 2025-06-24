@@ -24,12 +24,12 @@ export function finalAnswer(sessionId, answer) {
 }
 
 export function saveInterview({
-    sessionId,
-    questionText,
-    answerText,
-    filterWord,
-    answerFeedback,
-    }) {
+                                  sessionId,
+                                  questionText,
+                                  answerText,
+                                  filterWord,
+                                  answerFeedback,
+                              }) {
     return api.post("/api/interview/save",{
         interviewId: null,
         sessionId,
@@ -40,6 +40,9 @@ export function saveInterview({
     });
 }
 
-export function endSession(sessionId) {
-    return api.post("/api/interview/session/end", { sessionId });
+export function endSession(sessionId, answer) {
+    return api.post("/api/interview/final_answer", {
+        session_id: sessionId,
+        answer,
+    })
 }

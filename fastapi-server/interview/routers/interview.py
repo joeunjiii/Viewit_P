@@ -54,11 +54,20 @@ async def next_question(data: AnswerRequest, request: Request):
 
     # 종료 조건 체크
     import time
-    if time.time() - session.start_time >= 600:
+    if time.time() - session.start_time >= 600 and not session.state.get("final_question_given", False):
         final_q = session.ask_fixed_question("final")
+        session_state["final_question_given"] = True
         session.store_answer(final_q, "")
         audio_url = generate_tts_audio(final_q)
-        return {"question": final_q, "audio_url": audio_url, "done": True}
+        return {"question": final_q, "audio_url": audio_url, "done": False} # 답변을 받아야하기 때문에 False로
+
+    # 마지막 질문이 주어지면
+    if session.state.get("final_question_given", False):
+        return{
+            "message": "마지막 질문 답변을 기다립니다",
+            "done": True
+        }
+
 
     next_q = session.decide_next_question(data.answer)
     session.store_answer(next_q, "")
@@ -71,5 +80,5 @@ async def final_answer(data: AnswerRequest,  request: Request):
     session = session_store.get(data.session_id)
     if not session:
         raise HTTPException(404, "Session not found")
-    session.store_answer("마지막으로 하실 말 있나요?", data.answer)
+    session.store_answer("면접을 마무리 하기 전에 마지막으로 하실 말 있나요?", data.answer)
     return {"message": "면접 종료", "history": session.state["history"]}
