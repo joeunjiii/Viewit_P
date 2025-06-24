@@ -62,24 +62,31 @@ function Interview() {
       window.location.href = "/login";
       return;
     }
+  
     setStep("interview");
     setInitialQuestion(null);
+    setShowLoadingModal(true); // 로딩모달 on
+  
     try {
-      // 2초 대기
+      // 2초 대기 + 세션 초기화 병렬 실행
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-      const resPromise = initSession(sessionId, jobRole);
-
-      const [res] = await Promise.all([resPromise, delay]);
+  
+      // 면접 세션(백엔드/DB) 생성 -> 성공 후 initSession 호출
       await createInterviewSession({
         session_id: sessionId,
         user_id: safeUserId,
         job_role: jobRole
       });
-      const res = await initSession({
-        session_id: sessionId,
-        user_id: safeUserId,
-        job_role: jobRole
-      });
+  
+      const [res] = await Promise.all([
+        initSession({
+          session_id: sessionId,
+          user_id: safeUserId,
+          job_role: jobRole
+        }),
+        delay
+      ]);
+  
       setInitialQuestion({
         question: res.data.question,
         audio_url: res.data.audio_url,
@@ -90,11 +97,11 @@ function Interview() {
     } catch (err) {
       setShowLoadingModal(false);
       setShowErrorModal(true);
-      setErrorMsg(
-        "면접 세션 초기화에 실패했습니다.\n서버 상태를 확인해주세요."
-      );
+      setErrorMsg("면접 세션 초기화에 실패했습니다.\n서버 상태를 확인해주세요.");
+      setStep("settings");
     }
   };
+  
 
   // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
@@ -155,7 +162,8 @@ function Interview() {
                   onStatusChange={setStatus}
                   onTimeUpdate={setRemainingTime}
                   onNewQuestion={handleNewQuestion}
-                  onAnswerComplete={handleAnswerComplete}
+                  onCaptionUpdate={handleCaptionUpdate} 
+                  // onAnswerComplete={handleAnswerComplete}
                 />
               )}
             </div>

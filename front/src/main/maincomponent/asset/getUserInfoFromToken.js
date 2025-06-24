@@ -6,7 +6,8 @@ import { jwtDecode } from "jwt-decode";
  */
 export function getUserInfoFromToken() {
   const token = localStorage.getItem("token");
-  console.log("유저 토큰: " + token);
+  //토큰확인 콘솔창
+  // console.log("유저 토큰: " + token);
   if (!token) {
     window.location.href = "/login";
     return null;
