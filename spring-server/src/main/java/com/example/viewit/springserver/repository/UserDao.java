@@ -25,6 +25,7 @@ public class UserDao {
             System.out.println("✅ 신규 사용자 저장 완료");
         }
     }
+
     public User findByEmail(String email) {
         String sql = "SELECT * FROM USER WHERE email = ?";
         try {
@@ -33,6 +34,17 @@ public class UserDao {
             return null;
         }
     }
+
+    // ✅ userId(PK)로 조회
+    public Long findUserIdByNaverId(String naverId) {
+        String sql = "SELECT user_id FROM USER WHERE naver_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Long.class, naverId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     private RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> {
             User user = new User();

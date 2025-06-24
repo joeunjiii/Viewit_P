@@ -9,13 +9,34 @@ module.exports = function(app) {
             changeOrigin: true,
         })
     );
-    // FastAPI - AI 면접 등
+    // Spring - 세션 초기화/종료는 Spring으로!
+    app.use(
+        "/api/interview/init",
+        createProxyMiddleware({
+            target: "http://localhost:8083",
+            changeOrigin: true,
+        })
+    );
+    app.use(
+        "/api/interview/session/end",
+        createProxyMiddleware({
+            target: "http://localhost:8083",
+            changeOrigin: true,
+        })
+    );
+    app.use(
+        "/api/interview/save",
+        createProxyMiddleware({
+            target: "http://localhost:8083",
+            changeOrigin: true,
+        })
+    );
+    // FastAPI - 나머지 AI 기능
     app.use(
         "/api/interview",
         createProxyMiddleware({
             target: "http://localhost:8000",
             changeOrigin: true
-        
         })
     );
     app.use(

@@ -1,7 +1,8 @@
+// Interview.jsx
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { initSession } from "./api/interview"; // 추가!
+import { createInterviewSession, initSession } from "./api/interview";
 import "./css/Interview.css";
 import InterviewSettingModal from "./InterviewSettingModal";
 import AssessmentIntro from "./AssessmentIntro";
@@ -16,6 +17,7 @@ import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
 import ErrorModal from "./asset/ErrorModal";
 function Interview() {
+  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const [step, setStep] = useState("settings");
   const [sessionId] = useState(uuidv4());
@@ -28,11 +30,12 @@ function Interview() {
   const [captionText, setCaptionText] = useState("");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
-
   const [initialQuestion, setInitialQuestion] = useState(null);
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
+
+  const safeUserId = userId && userId !== "null" && userId !== "undefined" ? userId : null;
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -49,11 +52,16 @@ function Interview() {
     setWaitTime(waitTime);
     setStep("guide");
   };
+
   const handleGuideConfirm = () => setStep("welcome");
 
   // 면접 시작 시 첫 질문
   const handleWelcomeStart = async () => {
-    setShowLoadingModal(true);
+    if (!safeUserId) {
+      alert("로그인 정보가 없습니다. 로그인이 필요합니다.");
+      window.location.href = "/login";
+      return;
+    }
     setStep("interview");
     setInitialQuestion(null);
     try {
@@ -62,6 +70,16 @@ function Interview() {
       const resPromise = initSession(sessionId, jobRole);
 
       const [res] = await Promise.all([resPromise, delay]);
+      await createInterviewSession({
+        session_id: sessionId,
+        user_id: safeUserId,
+        job_role: jobRole
+      });
+      const res = await initSession({
+        session_id: sessionId,
+        user_id: safeUserId,
+        job_role: jobRole
+      });
       setInitialQuestion({
         question: res.data.question,
         audio_url: res.data.audio_url,
@@ -78,15 +96,15 @@ function Interview() {
     }
   };
 
-  // 후속질문마다 실행
+  // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
-    setCaptionText(`면접관: ${q}`);
     setQuestionNumber((n) => n + 1);
   }, []);
 
-  const handleAnswerComplete = (text) => {
-    setCaptionText(`이용자: ${text}`);
-  };
+  // 캡션 제어 콜백: 면접관/이용자 모두 InterviewSessionManager에서 직접 세팅
+  const handleCaptionUpdate = useCallback((text) => {
+    setCaptionText(text);
+  }, []);
 
   return (
     <>
