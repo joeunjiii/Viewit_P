@@ -8,9 +8,6 @@
 }
 .content-section {
   margin-left: 50px;
-  /* 필요하다면 다른 스타일도 여기에 추가할 수 있습니다. */
-  /* 예: padding-right: 20px; (오른쪽 여백도 필요하다면) */
-  /* 예: max-width: 1200px; (최대 너비 제한) */
 }
 .section-header {
   display: flex;
@@ -72,6 +69,9 @@
   text-align: center;
 }
 /* 피드백 부분*/
+.feedback-group {
+  margin-bottom: 80px; /* 원하는 만큼 조정 */
+}
 .feedback-section {
   display: flex;
   align-items: center;

@@ -24,7 +24,7 @@ function MainContent() {
         </div>
 
         <RecentSection />
-
+        <div className="feedback-group">
         <div className="feedback-section">
           <div className="feedback-icon">
             <FaUsers />
@@ -53,6 +53,7 @@ function MainContent() {
               <div className="feedback-semitext">멋지게 인사하는법</div>
             </div>
           </div>
+        </div>
         </div>
       </div>
       {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}
