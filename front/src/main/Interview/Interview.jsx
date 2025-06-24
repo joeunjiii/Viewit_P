@@ -1,6 +1,6 @@
 // Interview.jsx
 import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { createInterviewSession, initSession } from "./api/interview";
 import "./css/Interview.css";
@@ -16,9 +16,17 @@ import InterviewSessionManager from "./InterviewSessionManager";
 import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
 import ErrorModal from "./asset/ErrorModal";
+import PersonalizationModal from "./PersonalizationModal";
 function Interview() {
+  const location = useLocation();
+  const mode = new URLSearchParams(location.search).get("mode");
+  const [showPersonalModal, setShowPersonalModal] = useState(
+    mode === "personal"
+  );
+  const [showSettingModal, setShowSettingModal] = useState(mode === "common");
+  const [personalData, setPersonalData] = useState(null);
   const userId = localStorage.getItem("userId");
-  const navigate = useNavigate();
+
   const [step, setStep] = useState("settings");
   const [sessionId] = useState(uuidv4());
   const [jobRole, setJobRole] = useState("backend");
@@ -35,11 +43,17 @@ function Interview() {
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
 
-  const safeUserId = userId && userId !== "null" && userId !== "undefined" ? userId : null;
+  const safeUserId =
+    userId && userId !== "null" && userId !== "undefined" ? userId : null;
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const handlePersonalConfirm = (data) => {
+    setPersonalData(data); // JD/파일 등 저장
+    setShowPersonalModal(false); // PersonalizationModal 닫기
+    setShowSettingModal(true); // InterviewSettingModal 띄우기
+  };
   const handleStartSettings = ({
     jobRole,
     autoQuestion,
@@ -50,6 +64,7 @@ function Interview() {
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
     setWaitTime(waitTime);
+    setShowSettingModal(false);
     setStep("guide");
   };
 
@@ -62,31 +77,31 @@ function Interview() {
       window.location.href = "/login";
       return;
     }
-  
+
     setStep("interview");
     setInitialQuestion(null);
     setShowLoadingModal(true); // 로딩모달 on
-  
+
     try {
       // 2초 대기 + 세션 초기화 병렬 실행
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-  
+
       // 면접 세션(백엔드/DB) 생성 -> 성공 후 initSession 호출
       await createInterviewSession({
         session_id: sessionId,
         user_id: safeUserId,
-        job_role: jobRole
+        job_role: jobRole,
       });
-  
+
       const [res] = await Promise.all([
         initSession({
           session_id: sessionId,
           user_id: safeUserId,
-          job_role: jobRole
+          job_role: jobRole,
         }),
-        delay
+        delay,
       ]);
-  
+
       setInitialQuestion({
         question: res.data.question,
         audio_url: res.data.audio_url,
@@ -97,11 +112,12 @@ function Interview() {
     } catch (err) {
       setShowLoadingModal(false);
       setShowErrorModal(true);
-      setErrorMsg("면접 세션 초기화에 실패했습니다.\n서버 상태를 확인해주세요.");
+      setErrorMsg(
+        "면접 세션 초기화에 실패했습니다.\n서버 상태를 확인해주세요."
+      );
       setStep("settings");
     }
   };
-  
 
   // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
@@ -131,7 +147,24 @@ function Interview() {
           onOpenMicCheck={openMicCheck}
         />
       )}
+      {/* 개인화 모드면 먼저 PersonalizationModal 띄우기 */}
+      {showPersonalModal && (
+        <PersonalizationModal
+          onClose={() => setShowPersonalModal(false)}
+          onConfirm={handlePersonalConfirm}
+        />
+      )}
 
+      {/* 세팅 모달은 개인화/공통 모두에서 사용 */}
+      {showSettingModal && (
+        <InterviewSettingModal
+          onStart={handleStartSettings}
+          onOpenMicCheck={openMicCheck}
+          mode={mode}
+          personalData={personalData}
+          onClose={() => setShowSettingModal(false)}
+        />
+      )}
       {step === "guide" && <AssessmentIntro onConfirm={handleGuideConfirm} />}
       {micCheckOpen && <MicCheckModal onClose={closeMicCheck} />}
       {step === "welcome" && (
@@ -162,7 +195,7 @@ function Interview() {
                   onStatusChange={setStatus}
                   onTimeUpdate={setRemainingTime}
                   onNewQuestion={handleNewQuestion}
-                  onCaptionUpdate={handleCaptionUpdate} 
+                  onCaptionUpdate={handleCaptionUpdate}
                   // onAnswerComplete={handleAnswerComplete}
                 />
               )}
