@@ -25,6 +25,8 @@ function InterviewSessionManager({
                                    onNewQuestion,
                                    onAnswerComplete,
                                    onCaptionUpdate,  // 추가
+                                   jdText,        // optional
+                                   pdfText,       // optional
                                  }) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
@@ -126,7 +128,7 @@ function InterviewSessionManager({
         }
         // 2. 후속 질문 요청
         try {
-          const res = await nextQuestion(sessionId, sttResult);
+          const res = await nextQuestion(sessionId, sttResult,jdText, pdfText);
           const { question: q, audio_url, done } = res.data;
           if (done) {
             setQuestion({ question: q, audio_url, done: true });
@@ -142,7 +144,7 @@ function InterviewSessionManager({
         onAnswerComplete?.(sttResult);
       })();
     }
-  }, [phase, sttResult, sessionId, question, onAnswerComplete, onNewQuestion]);
+  }, [phase, sttResult, sessionId, question, onAnswerComplete, onNewQuestion,jdText, pdfText]);
 
   // 다시 답변하기
   const handleRetry = () => {

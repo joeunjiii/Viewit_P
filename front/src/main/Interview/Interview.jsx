@@ -17,6 +17,8 @@ import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
 import ErrorModal from "./asset/ErrorModal";
 import PersonalizationModal from "./PersonalizationModal";
+
+
 function Interview() {
   const location = useLocation();
   const mode = new URLSearchParams(location.search).get("mode");
@@ -53,6 +55,8 @@ function Interview() {
     setPersonalData(data); // JD/파일 등 저장
     setShowPersonalModal(false); // PersonalizationModal 닫기
     setShowSettingModal(true); // InterviewSettingModal 띄우기
+    console.log("JD 텍스트:", data.jd_text);
+    console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
   const handleStartSettings = ({
     jobRole,

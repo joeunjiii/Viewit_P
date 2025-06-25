@@ -15,6 +15,8 @@ from pydantic import BaseModel
 from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
 from interview.routers.interview import router as interview_router
+from interview.routers.jd_upload import router as jd_router
+
 
 # — .env 파일 로드 —
 env_path = Path(__file__).parent / ".env"
@@ -80,3 +82,4 @@ class Question(BaseModel):
 app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
+app.include_router(jd_router, prefix="/api/jd")

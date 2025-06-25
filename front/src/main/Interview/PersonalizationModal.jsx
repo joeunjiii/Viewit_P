@@ -1,11 +1,14 @@
 import React, { useRef, useState } from "react";
+import { uploadJDAndPDF } from "./api/personalization";
 import "./css/PersonalizationModal.css";
-
+import LoadingModal from "./asset/LoadingModal";
 export default function PersonalizationModal({ onClose, onConfirm }) {
   const [jobDesc, setJobDesc] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
   const fileInputRef = useRef();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAnalysisDone, setIsAnalysisDone] = useState(false); // 분석 완료 모달
+  const [analysisResult, setAnalysisResult] = useState(null); // 백엔드에서 받은 데이터
   // PDF 선택 시 파일명 저장
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -14,8 +17,58 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
       setPdfFile(null);
     }
   };
+
+  const handleConfirm = async ({ jobDesc, pdfFile }) => {
+    if (!jobDesc && !pdfFile) {
+      alert("JD 설명 또는 PDF 파일 중 하나 이상 입력해 주세요.");
+      return;
+    }
+    setIsLoading(true); // 분석 중 모달 열기
+
+    try {
+      const res = await uploadJDAndPDF(jobDesc, pdfFile);
+      console.log("JD 업로드 성공:", res.data);
+      setIsLoading(false);
+      setIsAnalysisDone(true); // 분석 완료 모달 열기
+      setAnalysisResult(res.data); // 분석 결과 저장
+
+      // PDF 업로드 했을 때만 "분석 완료" 모달 열기
+      if (pdfFile) {
+        setIsAnalysisDone(true);
+        setAnalysisResult(res.data);
+      } else {
+        // 텍스트만 보냈으면 바로 다음 단계로 넘김
+        if (onConfirm) onConfirm(res.data);
+      }
+      // 이후 질문 생성 or 처리
+    } catch (err) {
+      setIsLoading(false);
+      console.error("업로드 실패", err.message);
+    }
+  };
   return (
     <div className="personal-modal-overlay">
+      {isLoading && (
+        <LoadingModal message="PDF 분석 중입니다. 잠시만 기다려주세요..." />
+      )}
+      {isAnalysisDone && (
+        <div className="modal-bg">
+          <div className="modal-box">
+            <div style={{ fontSize: 22, fontWeight: 500, marginBottom: 24 }}>
+              PDF 분석이 완료되었습니다!
+            </div>
+            <button
+              className="modal-btn"
+              onClick={() => {
+                setIsAnalysisDone(false);
+                if (onConfirm) onConfirm(analysisResult);
+              }}
+            >
+              완료
+            </button>
+          </div>
+        </div>
+      )}
       <div className="personal-modal-content">
         <div className="personal-modal-title">맞춤형 질문 업로드</div>
         <div className="personal-modal-desc">
@@ -57,7 +110,7 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
         {/* PDF 파일 첨부 */}
         <div className="personal-form-group">
           <label className="personal-label" htmlFor="pdf-upload-input">
-            PDF 파일 첨부
+            PDF 파일 첨부(포트폴리오 PDF파일을 첨부해주세요)
           </label>
           <input
             id="pdf-upload-input"
@@ -91,7 +144,7 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
           </button>
           <button
             className="personal-confirm-btn"
-            onClick={() => onConfirm && onConfirm({ jobDesc, pdfFile })}
+            onClick={() => handleConfirm({ jobDesc, pdfFile })}
           >
             질문 생성
           </button>

@@ -14,6 +14,8 @@ class InitRequest(BaseModel):
     session_id: str
     job_role: str
     softskill_label: str | None = None
+    jdText: str | None = None
+    pdfText: str | None = None
 
 class AnswerRequest(BaseModel):
     session_id: str
@@ -73,3 +75,31 @@ async def final_answer(data: AnswerRequest,  request: Request):
         raise HTTPException(404, "Session not found")
     session.store_answer("마지막으로 하실 말 있나요?", data.answer)
     return {"message": "면접 종료", "history": session.state["history"]}
+
+
+
+#개인 맞춤 면접
+class PersonalQuestionRequest(BaseModel):
+    jd_text: str | None = None
+    pdf_text: str | None = None
+
+class PersonalQuestionResponse(BaseModel):
+    questions: list[str]
+
+@router.post("/personal_questions", response_model=PersonalQuestionResponse)
+async def personal_questions(data: PersonalQuestionRequest, request: Request):
+    print("==== [맞춤형 질문 추천 호출] ====")
+    print("JD:", repr(data.jd_text))
+    print("PDF:", repr(data.pdf_text))
+    
+    # 👉 실제 LLM 또는 간단 예시
+    base = (data.jd_text or "") + "\n" + (data.pdf_text or "")
+    questions = []
+    if "프론트엔드" in base:
+        questions.append("프론트엔드 개발자로 지원하신 동기는 무엇인가요?")
+    if "React" in base:
+        questions.append("React로 개발했던 경험에 대해 말씀해 주세요.")
+    if not questions:
+        questions.append("지원하신 직무와 관련된 경험을 소개해 주세요.")
+    questions.append("직무 관련 가장 자신있는 역량은 무엇인가요?")
+    return {"questions": questions}
