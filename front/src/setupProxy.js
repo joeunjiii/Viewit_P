@@ -1,56 +1,41 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = function(app) {
-    // Spring Boot - 인증/로그인 API
+    // FastAPI(8000) 경로 먼저!
     app.use(
-        "/api/auth",
-        createProxyMiddleware({
-            target: "http://localhost:8083",
-            changeOrigin: true,
-        })
+        [
+            "/api/interview/init_session",
+            "/api/interview/next_question",
+            "/api/interview/final_answer",
+            "/api/stt",
+            "/api/tts"
+        ],
+        createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
     );
-    // Spring - 세션 초기화/종료는 Spring으로!
+
+    // Spring(8083) 경로
     app.use(
         "/api/interview/init",
-        createProxyMiddleware({
-            target: "http://localhost:8083",
-            changeOrigin: true,
-        })
-    );
-    app.use(
-        "/api/interview/session/end",
-        createProxyMiddleware({
-            target: "http://localhost:8083",
-            changeOrigin: true,
-        })
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
     );
     app.use(
         "/api/interview/save",
-        createProxyMiddleware({
-            target: "http://localhost:8083",
-            changeOrigin: true,
-        })
-    );
-    // FastAPI - 나머지 AI 기능
-    app.use(
-        "/api/interview",
-        createProxyMiddleware({
-            target: "http://localhost:8000",
-            changeOrigin: true
-        })
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
     );
     app.use(
-        "/api/stt",
-        createProxyMiddleware({
-            target: "http://localhost:8000",
-            changeOrigin: true,
-        })
+        "/api/interview/session/end",
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
     );
     app.use(
-        "/api/tts",
-        createProxyMiddleware({
-            target: "http://localhost:8000",
-            changeOrigin: true,
-        })
+        "/api/interview/answer/feedback",
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
+    );
+    app.use(
+        "/api/interview/feedback",
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
+    );
+    app.use(
+        "/api/auth",
+        createProxyMiddleware({ target: "http://localhost:8083", changeOrigin: true })
     );
 };

@@ -20,8 +20,6 @@ import java.util.Map;
 @RequestMapping("/api/interview")
 public class InterviewController {
 
-
-    private static final Logger log = LoggerFactory.getLogger(InterviewController.class);
     private final InterviewSessionDao interviewSessionDao;
     private final InterviewService interviewService;
     private final RestTemplate rt;
@@ -29,19 +27,18 @@ public class InterviewController {
     @Value("${fastapi.url}")
     private String fastapiUrl;
 
-    public InterviewController(
-            RestTemplate rt,
-            InterviewService interviewService,
-            InterviewSessionDao interviewSessionDao) {
+    public InterviewController(RestTemplate rt,
+                               InterviewService interviewService,
+                               InterviewSessionDao interviewSessionDao) {
         this.rt = rt;
         this.interviewService = interviewService;
         this.interviewSessionDao = interviewSessionDao;
     }
 
+    // 세션 초기화 (Spring DB에 세션 저장 후 FastAPI 호출)
     @PostMapping("/init_session")
     public Map<String, Object> initSession(@RequestBody Map<String, Object> body) {
-        log.info("[init_session] body = {}", body);
-
+        // 세션정보 저장
         String sessionId = (String) body.get("session_id");
         String jobRole = (String) body.get("job_role");
         Object userIdRaw = body.get("user_id");
@@ -60,27 +57,38 @@ public class InterviewController {
         session.setStartedAt(new Timestamp(System.currentTimeMillis()));
         interviewSessionDao.insertSession(session);
 
+        // FastAPI 호출
         Map<String, Object> resp = rt.postForObject(fastapiUrl + "/init_session", body, Map.class);
-        log.info("[Spring ▶ init_session] session_id={} question={}", sessionId, resp.get("question"));
         return resp;
     }
 
+    // 최종 답변 API (FastAPI 호출)
     @PostMapping("/final_answer")
     public Map<String,Object> finalAnswer(@RequestBody Map<String,Object> body) {
         Map<String,Object> resp = rt.postForObject(fastapiUrl + "/final_answer", body, Map.class);
-        log.info("[Spring ▶ final_answer] session_id={} completed", body.get("session_id"));
         return resp;
     }
 
+    // 질문/답변 저장 API
     @PostMapping("/save")
     public String saveInterview(@RequestBody Interview interview) {
-        log.info("DEBUG >>> {}", interview);
         interviewService.saveInterviewWithSessionCheck(interview);
         return "저장 완료";
     }
 
+    // session_id별 질문/답변 조회 API
     @GetMapping("/{sessionId}")
     public List<Interview> getInterviews(@PathVariable String sessionId) {
         return interviewService.getInterviewsBySessionId(sessionId);
+    }
+
+    // 답변 피드백 업데이트 API (FastAPI에서 PUT 호출)
+    @PutMapping("/answer/feedback")
+    public String updateAnswerFeedback(@RequestBody Map<String, Object> body) {
+        String sessionId = (String) body.get("sessionId");
+        String questionText = (String) body.get("questionText");
+        String answerFeedback = (String) body.get("answerFeedback");
+        interviewService.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
+        return "피드백 저장 완료";
     }
 }

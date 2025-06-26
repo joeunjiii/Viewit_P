@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from services.tts_service import generate_tts_audio
+from interview.services.tts_service import generate_tts_audio
 
 router = APIRouter()
 

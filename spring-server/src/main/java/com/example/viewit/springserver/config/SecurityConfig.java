@@ -19,20 +19,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            CustomOAuth2UserService customOAuth2UserService) throws Exception {
         http
-                // 1) CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable)
-                // 2) WebConfig의 CORS 맵핑을 적용
                 .cors(Customizer.withDefaults())
 
-                // 3) 인가(Authorization) 설정
                 .authorizeHttpRequests(auth -> auth
-                        // 3-1) OPTIONS 프리플라이트는 무조건 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // 3-2) 네이버 토큰 전달용 API는 인증 없이 허용!
                         .requestMatchers("/api/auth/naver").permitAll()
-
-                        // 3-3) SPA 진입점 및 정적 리소스 허용
                         .requestMatchers(
                                 "/", "/login", "/main", "/interview", "/AnalyzingModal",
                                 "/css/**", "/js/**", "/assets/**",
@@ -41,13 +33,20 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/oauth2/authorization/naver").permitAll()
 
-                        // 3-4) 그 외 /api/** 요청은 인증 필요
-                        .requestMatchers("/api/**").authenticated()
+                        // ------- 피드백 관련 무인증 ------
+                        .requestMatchers("/api/interview/answer/feedback").permitAll()
+                        .requestMatchers("/api/interview/feedback").permitAll()
 
+                        // ------- FastAPI 연동 경로 무인증 ------
+                        .requestMatchers("/api/interview/init_session").permitAll()
+                        .requestMatchers("/api/interview/next_question").permitAll()
+                        .requestMatchers("/api/interview/final_answer").permitAll()
+
+                        // 나머지 /api/** 인증 필요
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
 
-                // 4) OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .authorizationEndpoint(a -> a.baseUri("/oauth2/authorization"))
@@ -57,20 +56,15 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {
-
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                         })
-                        //5) 로그아웃 설정
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-
-
                 );
-
         return http.build();
     }
 }
