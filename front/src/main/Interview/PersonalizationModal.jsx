@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { uploadJDAndPDF } from "./api/personalization";
 import "./css/PersonalizationModal.css";
 import LoadingModal from "./asset/LoadingModal";
+import AlertModal from "./asset/AlertModal";
 export default function PersonalizationModal({ onClose, onConfirm }) {
   const [jobDesc, setJobDesc] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
@@ -9,6 +10,7 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalysisDone, setIsAnalysisDone] = useState(false); // 분석 완료 모달
   const [analysisResult, setAnalysisResult] = useState(null); // 백엔드에서 받은 데이터
+  const [showAlert, setShowAlert] = useState(false); //모달 useState
   // PDF 선택 시 파일명 저장
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -20,7 +22,7 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
 
   const handleConfirm = async ({ jobDesc, pdfFile }) => {
     if (!jobDesc && !pdfFile) {
-      alert("JD 설명 또는 PDF 파일 중 하나 이상 입력해 주세요.");
+      setShowAlert(true);
       return;
     }
     setIsLoading(true); // 분석 중 모달 열기
@@ -49,13 +51,18 @@ export default function PersonalizationModal({ onClose, onConfirm }) {
   return (
     <div className="personal-modal-overlay">
       {isLoading && (
-        <LoadingModal message="PDF 분석 중입니다. 잠시만 기다려주세요..." />
+        <LoadingModal message="포트폴리오,JD 분석 중입니다. 잠시만 기다려주세요..." />
       )}
+      <AlertModal
+        open={showAlert}
+        message="JD 설명 또는 PDF 파일 중 하나 이상 입력해 주세요."
+        onClose={() => setShowAlert(false)}
+      />
       {isAnalysisDone && (
         <div className="modal-bg">
           <div className="modal-box">
             <div style={{ fontSize: 22, fontWeight: 500, marginBottom: 24 }}>
-              PDF 분석이 완료되었습니다!
+              포트폴리오 분석이 완료되었습니다!
             </div>
             <button
               className="modal-btn"

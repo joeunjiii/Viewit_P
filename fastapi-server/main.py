@@ -31,7 +31,8 @@ app = FastAPI()
 start_time = time.time()
 
 # 메모리 세션 스토어
-session_store: dict[str, 'InterviewSession'] = {}
+session_store: dict[str, "InterviewSession"] = {}
+
 
 # FastAPI 이벤트: 서버 시작 시 자원 로딩
 @app.on_event("startup")
@@ -62,9 +63,10 @@ async def health_check():
             "sentence_transformer": st_model is not None,
             "qdrant": qdrant_client is not None,
             "openai": openai_client is not None,
-            "uptime_seconds": int(time.time() - start_time)
+            "uptime_seconds": int(time.time() - start_time),
         }
     }
+
 
 # ------ 미들웨어/정적 파일/라우터 등록 ------
 app.add_middleware(
@@ -74,6 +76,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 class Question(BaseModel):
     text: str

@@ -1,7 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form
 import os
 from services.ocr_service import extract_text_from_pdf
+
 router = APIRouter()
+
 
 @router.post("/upload")
 async def upload_jd(jd_text: str = Form(""), file: UploadFile = File(None)):
@@ -29,5 +31,5 @@ async def upload_jd(jd_text: str = Form(""), file: UploadFile = File(None)):
         "message": "JD 업로드 및 OCR 파싱 성공",
         "jd_text": jd_text,
         "file_saved": saved_path,
-        "pdf_ocr_text": pdf_ocr_text,   # OCR로 추출한 텍스트 바로 반환
+        "pdf_ocr_text": pdf_ocr_text,  # OCR로 추출한 텍스트 바로 반환
     }
