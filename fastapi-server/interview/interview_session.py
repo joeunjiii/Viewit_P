@@ -98,39 +98,54 @@ class InterviewSession:
         return torch.max(sim).item() > threshold
 
     def decide_next_question(self, last_answer: str) -> str:
+        
+        # history_text를 항상 준비
+        history_text = "\n".join(
+            f"{i+1}) Q: {h['question']} / A: {h['answer']}"
+            for i, h in enumerate(self.state["history"])
+        )
         # 30% 확률로 공통 질문 섞기
         if self.job_role != "common" and random.random() < 0.3:
             common_q = self.get_random_common_question()
             if common_q and not self.is_too_similar_to_previous(common_q):
                 return common_q
-
+            
+        if not last_answer or last_answer.strip() == "" or last_answer.strip() == "소리없음":
+            answer_desc = "(지원자가 아직 답변을 하지 않았음)"
+        else:
+            answer_desc = last_answer
+            
         # 1. 개인화 질문 분기
         if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
             prompt = f"""
-당신은 AI 면접관입니다. 아래 지원자의 자기소개서, JD(직무기술서), 답변을 참고해, 개인화된 다음 면접 질문을 생성하세요.
-[자기소개서/이력서]
+당신은 기업의 인사 담당자(면접관) 역할을 맡은 AI 에이전트입니다.
+저희 회사는 아래와 같은 역량과 경험을 갖춘 인재를 찾고 있습니다.
+
+아래 자료를 참고해, 지원자가 기업 요구 직무에 실제로 적합한지 ‘검증’하기 위한 심층 질문을 생성하세요.
+
+1번은 지원자의 포트폴리오 및 자기소개서이고, 2번은 저희가 공고로 올린 요구 직무와 주요 업무, 자격요건입니다.
+
+[1번 지원자 포트폴리오/자기소개서]
 {getattr(self, 'pdfText', '')}
 
-[직무기술서]
+[2번 직무 및 주요 업무, 필요 역량 안내]
 {getattr(self, 'jdText', '')}
 
-[지원직무] {self.job_role}
-[응답 내용] {last_answer}
+[응답 내용] {answer_desc}
 
 [이전 질문/답변 기록]
 {history_text}
 
-조건:
-    - 지원자의 경험·프로젝트·직무 연관성을 구체적으로 묻는 질문이어야 합니다.
-    - 기존 질문과 유사한 내용은 피하세요.
-    - 답변이 짧거나 모호할 경우 확장 유도 문구를 포함하세요.
-    - 친근하고 부드러운 말투를 사용하세요.
-    
 
+질문 생성 가이드:
+- 우리 회사가 찾는 인재상(아래 JD 참고)에 맞게, 지원자가 실제로 그런 역량이나 경험을 갖추었는지 확인할 수 있는 질문을 만드세요.
+- 회사에서 중요하게 여기는 역량/경험이 실제로 있는지, 있다면 구체적으로 어떤 역할을 했는지, 사례를 묻는 질문이 좋습니다.
+- JD 내용은 회사가 지원자에게 요구하는 것이므로, 면접관이 외부 정보처럼 다시 소개하지 말고 자연스럽게 언급하세요.
+- 지원자의 답변이 모호하거나 부족할 때는, 더 구체적인 사례나 설명을 유도하는 추가 질문을 하세요.
+- 이전 질문들과 동일한 질문은 하지마세요
+- 지원자가 못들었다고 다시 질문해달라고하면 질문을 이전 질문을 한번하거나 다른 주제로 넘어가세요.
     
-예시:
-“해당 프로젝트에서 직면했던 가장 큰 기술적 난관과 이를 어떻게 해결하셨는지 구체적으로 말씀해 주시겠어요?”
-→ 다음 질문:
+→ 다음 질문:    
 """.strip()
         else:
             topic = self.state.get("current_topic")
@@ -144,12 +159,12 @@ class InterviewSession:
             )
 
             prompt = f"""
-    당신은 AI 면접관입니다. 사용자의 답변과 이전 면접 기록을 참고하여 다음 질문을 생성해주세요.
+    사용자의 답변과 이전 면접 기록을 참고하여 다음 질문을 생성해주세요.
 
     [지원직무] {self.job_role}
     [현재 주제] {topic}
     [동일 주제 연속 질문 수] {count}
-    [응답 내용] {last_answer}
+    [응답 내용] {answer_desc}
 
     [기존 질문/답변]
     {history_text}

@@ -71,8 +71,14 @@ async def next_question(data: AnswerRequest, request: Request):
         return {"question": final_q, "audio_url": audio_url, "done": True}
 
     next_q = session.decide_next_question(data.answer)
+    # if not next_q or not next_q.strip():
+    #     next_q = "아직 답변을 듣지 못했습니다. 편하게 다시 말씀해주셔도 괜찮습니다."
     session.store_answer(next_q, "")
-    audio_url = generate_tts_audio(next_q)
+    try:
+        audio_url = generate_tts_audio(next_q)
+    except Exception as e:
+        next_q = "질문 음성 생성에 문제가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        audio_url = generate_tts_audio(next_q)
     return {"question": next_q, "audio_url": audio_url, "done": False}
 
 
