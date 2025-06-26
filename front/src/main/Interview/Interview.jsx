@@ -140,6 +140,7 @@ function Interview() {
       <ScreenSizeGuard />
       <LoadingModal
         open={showLoadingModal}
+        type="interview"
         text="면접 세션을 불러오는 중입니다..."
       />
       <ErrorModal

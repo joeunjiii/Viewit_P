@@ -52,7 +52,7 @@ export default function InterviewTypeSelect({ onClose }) {
             <div className="interview-type-card-title">IT 공통 모의면접</div>
             <div className="interview-type-card-desc">
               대표 IT 직군 중심 <br />
-              실전 면접 질문을 연습할 수 있어요.
+              실전 면접 질문을  연습할 수 <br />있어요.
             </div>
           </div>
           <div
@@ -66,7 +66,7 @@ export default function InterviewTypeSelect({ onClose }) {
               개인화 맞춤형 모의면접
             </div>
             <div className="interview-type-card-desc">
-              내 이력서, JD(채용공고) 등 <br />
+              내 포트폴리오, JD(채용공고)를 통해 
               나만의 자료로 질문을 생성해 연습할 수 있어요.
             </div>
           </div>

@@ -13,7 +13,7 @@
 .modal-box {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 6px 28px rgba(0,0,0,0.14);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
   padding: 40px 36px 32px 36px;
   display: flex;
   flex-direction: column;
@@ -121,4 +121,42 @@
 .modal-btn:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+/* modal.css */
+.interview-loading {
+  border: 2.5px solid #36b37e;
+  background: #f8fff6;
+  width: 300px; /* ← 기본보다 크게! */
+  min-height: 200px; /* ← 높이도 더 */
+  padding: 56px 36px 44px 36px; /* ← padding 넉넉하게 */
+  border-radius: 24px; /* ← 좀 더 부드러운 라운드 */
+  box-shadow: 0 8px 40px rgba(80, 200, 120, 0.15),
+    0 2px 8px rgba(60, 180, 110, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.interview-spinner {
+  width: 54px; /* ← 크기 키움 */
+  height: 54px;
+  border-top: 6px solid #36b37e;
+  border-right: 6px solid #c0eec6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.interview-loading .modal-message,
+.interview-loading div {
+  font-size: 1.18rem;
+  color: #21885e;
+  text-align: center;
+  margin-top: 22px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
 }
