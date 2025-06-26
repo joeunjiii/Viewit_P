@@ -102,6 +102,8 @@ function Interview() {
           session_id: sessionId,
           user_id: safeUserId,
           job_role: jobRole,
+          jdText: personalData?.jd_text || "",
+          pdfText: personalData?.pdf_ocr_text || ""
         }),
         delay,
       ]);
@@ -200,7 +202,7 @@ function Interview() {
                   onTimeUpdate={setRemainingTime}
                   onNewQuestion={handleNewQuestion}
                   onCaptionUpdate={handleCaptionUpdate}
-                  // onAnswerComplete={handleAnswerComplete}
+                // onAnswerComplete={handleAnswerComplete}
                 />
               )}
             </div>

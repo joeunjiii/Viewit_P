@@ -26,6 +26,7 @@ class AnswerRequest(BaseModel):
 
 @router.post("/init_session")
 async def init_session(data: InitRequest, request: Request):
+    print("init_session 받은 값:", data.jdText, data.pdfText)
     st_model = request.app.state.st_model
     qdrant_client = request.app.state.qdrant_client
     openai_client = request.app.state.openai_client
@@ -39,6 +40,8 @@ async def init_session(data: InitRequest, request: Request):
         collection_name="interview_questions",
         job_role=data.job_role,
         softskill_label=data.softskill_label,
+        jdText=data.jdText,
+        pdfText=data.pdfText,
     )
     first_q = session.ask_fixed_question("intro")
     session.store_answer(first_q, "")

@@ -4,7 +4,7 @@ from sentence_transformers import util
 import random
 
 class InterviewSession:
-    def __init__(self, session_id: str, qdrant_client, openai_client, st_model, collection_name: str, job_role: str, softskill_label: str | None = None,jdText: str | None = None,Text: str | None = None):
+    def __init__(self, session_id: str, qdrant_client, openai_client, st_model, collection_name: str, job_role: str, softskill_label: str | None = None,jdText: str | None = None,pdfText: str | None = None):
         self.session_id = session_id
         self.qdrant_client = qdrant_client
         self.openai = openai_client
@@ -14,6 +14,8 @@ class InterviewSession:
         self.job_role = job_role
         self.softskill_label = softskill_label
         self.state = {"step": 0, "current_topic": None, "topic_count": 0, "history": [], "completed": False}
+        self.jdText = jdText
+        self.pdfText = pdfText
 
     def get_random_common_question(self) -> str | None:
         results = self.qdrant_client.search(

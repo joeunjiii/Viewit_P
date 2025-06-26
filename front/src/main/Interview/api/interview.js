@@ -5,8 +5,8 @@ export function createInterviewSession({ session_id, user_id, job_role }) {
     return api.post("/api/interview/init", { session_id, user_id, job_role });
 }
 
-export function initSession({ session_id, user_id, job_role }) {
-    return api.post("/api/interview/init_session", { session_id, user_id, job_role });
+export function initSession({ session_id, user_id, job_role ,jdText, pdfText}) {
+    return api.post("/api/interview/init_session", { session_id, user_id, job_role ,jdText, pdfText});
 }
 
 export function nextQuestion(sessionId, answer,jdText, pdfText) {
