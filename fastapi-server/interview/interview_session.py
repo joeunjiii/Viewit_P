@@ -4,7 +4,7 @@ from sentence_transformers import util
 import random
 
 class InterviewSession:
-    def __init__(self, session_id: str, qdrant_client, openai_client, st_model, collection_name: str, job_role: str, softskill_label: str | None = None):
+    def __init__(self, session_id: str, qdrant_client, openai_client, st_model, collection_name: str, job_role: str, softskill_label: str | None = None,jdText: str | None = None,Text: str | None = None):
         self.session_id = session_id
         self.qdrant_client = qdrant_client
         self.openai = openai_client
@@ -71,35 +71,54 @@ class InterviewSession:
             common_q = self.get_random_common_question()
             if common_q and not self.is_too_similar_to_previous(common_q):
                 return common_q
+        
+        # 1. 개인화 질문 분기
+        if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
+            prompt = f"""
+당신은 AI 면접관입니다. 아래 지원자의 자기소개서, JD(직무기술서), 답변을 참고해, 개인화된 다음 면접 질문을 생성하세요.
+[자기소개서/이력서]
+{getattr(self, 'pdfText', '')}
 
-        topic = self.state.get("current_topic")
-        count = self.state.get("topic_count", 0)
-        history_text = "\n".join(f"{i+1}) Q: {h['question']} / A: {h['answer']}" for i, h in enumerate(self.state["history"]))
-        context = "\n".join(f"- {q}" for q, _ in self.search_similar_questions(last_answer))
-
-        prompt = f"""
-당신은 AI 면접관입니다. 사용자의 답변과 이전 면접 기록을 참고하여 다음 질문을 생성해주세요.
+[직무기술서]
+{getattr(self, 'jdText', '')}
 
 [지원직무] {self.job_role}
-[현재 주제] {topic}
-[동일 주제 연속 질문 수] {count}
 [응답 내용] {last_answer}
 
-[기존 질문/답변]
-{history_text}
-
-[참고 유사 질문들]
-{context}
-
-조건:
-- 반드시 직무({self.job_role})에 맞는 내용으로 질문하세요.
-- 사용자가 부담없이 이야기할 수 있도록 부드럽고 친근한 말투로 질문하세요
-- 동일 주제에 대하여 3번 이상 묻지 말고, 새로운 주제로 자연스럽게 넘어가세요
-- 유사한 질문을 반복하지 마세요.
-- 사용자의 답변이 짧거나 모호하다면, 그 내용을 확장할 수 있도록 유도 질문을 하세요
+- 지원자의 경험과 직무 연관성을 평가할 수 있도록 구체적으로 질문하세요.
+- 반복된 질문을 피하고, 사용자가 더 깊이 이야기할 수 있도록 질문하세요.
 
 → 다음 질문:
 """.strip()
+        else:
+            topic = self.state.get("current_topic")
+            count = self.state.get("topic_count", 0)
+            history_text = "\n".join(f"{i+1}) Q: {h['question']} / A: {h['answer']}" for i, h in enumerate(self.state["history"]))
+            context = "\n".join(f"- {q}" for q, _ in self.search_similar_questions(last_answer))
+
+            prompt = f"""
+    당신은 AI 면접관입니다. 사용자의 답변과 이전 면접 기록을 참고하여 다음 질문을 생성해주세요.
+
+    [지원직무] {self.job_role}
+    [현재 주제] {topic}
+    [동일 주제 연속 질문 수] {count}
+    [응답 내용] {last_answer}
+
+    [기존 질문/답변]
+    {history_text}
+
+    [참고 유사 질문들]
+    {context}
+
+    조건:
+    - 반드시 직무({self.job_role})에 맞는 내용으로 질문하세요.
+    - 사용자가 부담없이 이야기할 수 있도록 부드럽고 친근한 말투로 질문하세요
+    - 동일 주제에 대하여 3번 이상 묻지 말고, 새로운 주제로 자연스럽게 넘어가세요
+    - 유사한 질문을 반복하지 마세요.
+    - 사용자의 답변이 짧거나 모호하다면, 그 내용을 확장할 수 있도록 유도 질문을 하세요
+
+    → 다음 질문:
+    """.strip()
 
         # 최대 3회 생성 시도
         for _ in range(3):
@@ -117,3 +136,4 @@ class InterviewSession:
                 return nxt
 
         return nxt  # fallback
+    
