@@ -9,6 +9,7 @@ import time
 
 router = APIRouter()
 
+
 # Spring 서버 주소 (환경변수 또는 기본값)
 SPRING_URL = os.getenv("SPRING_URL", "http://localhost:8083")
 
@@ -17,6 +18,9 @@ class InitRequest(BaseModel):
     session_id: str
     job_role: str
     softskill_label: str | None = None
+    jdText: str | None = None
+    pdfText: str | None = None
+
 
 # 답변 요청 바디 모델
 class AnswerRequest(BaseModel):
@@ -26,6 +30,12 @@ class AnswerRequest(BaseModel):
 # 인터뷰 세션 초기화 엔드포인트
 @router.post("/init_session")
 async def init_session(data: InitRequest, request: Request):
+    print("init_session 받은 값:", data.jdText, data.pdfText)
+    st_model = request.app.state.st_model
+    qdrant_client = request.app.state.qdrant_client
+    openai_client = request.app.state.openai_client
+    session_store = request.app.state.session_store
+
     # FastAPI 앱 상태에서 AI 관련 객체 꺼내기
     st_model       = request.app.state.st_model
     qdrant_client  = request.app.state.qdrant_client
@@ -40,7 +50,9 @@ async def init_session(data: InitRequest, request: Request):
         st_model=st_model,
         collection_name="interview_questions",
         job_role=data.job_role,
-        softskill_label=data.softskill_label
+        softskill_label=data.softskill_label,
+        jdText=data.jdText,
+        pdfText=data.pdfText,
     )
     # 초기 질문 생성 및 빈 답변 저장
     first_q = session.ask_fixed_question("intro")
@@ -97,8 +109,14 @@ async def next_question(
 
     # 5) 다음 질문 생성 및 반환
     next_q = session.decide_next_question(data.answer)
+    # if not next_q or not next_q.strip():
+    #     next_q = "아직 답변을 듣지 못했습니다. 편하게 다시 말씀해주셔도 괜찮습니다."
     session.store_answer(next_q, "")
-    audio_url = generate_tts_audio(next_q)
+    try:
+        audio_url = generate_tts_audio(next_q)
+    except Exception as e:
+        next_q = "질문 음성 생성에 문제가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        audio_url = generate_tts_audio(next_q)
     return {"question": next_q, "audio_url": audio_url, "done": False}
 
 # 최종 답변 및 전체 피드백 생성 엔드포인트
@@ -107,35 +125,6 @@ async def final_answer(data: AnswerRequest, request: Request):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    # 마지막 답변 저장
-    session.store_answer("면접을 마무리 하기 전에 마지막으로 하실 말 있나요?", data.answer)
-
-    # 지금까지 질문/답변 리스트
-    qa_list = [
-        {"questionText": h["question"], "answerText": h["answer"]}
-        for h in session.state["history"]
-    ]
-
-    openai_client = request.app.state.openai_client
-
-    # 전체 피드백 생성
-    summary, strengths, weaknesses = feedback_service.generate_final_feedback(openai_client, qa_list)
-
-    # Spring 서버에 최종 피드백 저장 호출
-    try:
-        feedback_service.save_final_feedback_to_spring(
-            data.session_id, summary, strengths, weaknesses, SPRING_URL
-        )
-    except Exception as e:
-        print(f"[WARN] 최종 피드백 저장 실패: {e}")
-
-    # 결과 반환
-    return {
-        "message": "면접 종료",
-        "history": session.state["history"],
-        "summary": summary,
-        "strengths": strengths,
-        "weaknesses": weaknesses,
-    }
+        raise HTTPException(404, "Session not found")
+    session.store_answer("마지막으로 하실 말 있나요?", data.answer)
+    return {"message": "면접 종료", "history": session.state["history"]}

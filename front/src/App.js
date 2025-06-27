@@ -27,7 +27,7 @@ function App() {
         </Route>
 
         <Route path="/interview" element={<InterviewLayout />} />
-
+      
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
         <Route path="AssessmentIntro" element={<AssessmentIntro />} />
         <Route path="feedbackresult" element={<FeedbackResult />} />

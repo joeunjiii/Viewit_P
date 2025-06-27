@@ -1,0 +1,150 @@
+.personal-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44, 62, 80, 0.22);
+  z-index: 3000; /* 기존 InterviewSettingModal보다 확실히 크게! */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.personal-modal-content {
+  width: 800px;
+  background: #fafffb; /* 불투명 밝은 흰-민트 */
+  border-radius: 18px;
+  border: 2px solid #e4f4ec;
+  box-shadow: 0 8px 36px rgba(90, 170, 143, 0.1);
+  padding: 48px 40px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+.personal-modal-title {
+  font-size: 32px; /* 또는 1.5rem ~ 1.8rem도 OK */
+  font-weight: 700;
+  color: #000000; /* 브랜드 민트/그린계열, 필요시 #222 등 무채색도 가능 */
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+
+.personal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 18px;
+}
+.personal-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.personal-textarea {
+  width: 100%; /* 가로폭 100% */
+  min-height: 100px; /* 최소 세로 100px */
+  height: 350px; /* 기본 세로 크기 (원하면 더 늘려도 됨) */
+  padding: 9px 12px;
+  border-radius: 7px;
+  border: 1.5px solid #bde8d5;
+  background: #fff;
+  font-size: 15px;
+  color: #333;
+  transition: border 0.18s;
+  resize: vertical;
+}
+.personal-textarea:focus {
+  border: 1.5px solid #2fb187;
+  outline: none;
+}
+.personal-modal-desc {
+  font-size: 16px; /* 본문보다는 살짝 작게, 15~16px이 가장 무난 */
+  color: #444444; /* 너무 연하지 않으면서도 제목보다 한톤 낮게 */
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.personal-file-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.personal-upload-btn {
+  background: #269870;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.personal-upload-btn:hover {
+  background: #1c7a59;
+}
+.personal-file-name {
+  font-size: 13px;
+  color: #388e3c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.personal-modal-actions {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 20px; /* 버튼 사이 간격 */
+  width: 100%;
+  margin-top: 10px;
+}
+.personal-confirm-btn {
+  display: flex;
+  background-color: rgb(38, 152, 112);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  font-weight: 600;
+  justify-content: flex-end;
+}
+
+.personal-confirm-btn:hover {
+  transform: translateY(-1px);
+}
+.personal-confirm-btn:active {
+  transform: scale(0.96);
+}
+.personal-cancel-btn {
+  display: flex;
+  background-color: rgb(38, 152, 112);
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid #999;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  font-weight: 500;
+}
+
+.personal-cancel-btn:hover {
+  border-color: #777;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.personal-cancel-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
