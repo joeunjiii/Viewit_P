@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaRegFileAlt } from "react-icons/fa";
 import "./css/Recentsection.css";
 
 function RecentSection() {
   const [showAll, setShowAll] = useState(false);
   const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
-
+  const navigate = useNavigate();
   // 화면 크기 변화 감지
   useEffect(() => {
     const handleResize = () => {
@@ -42,8 +43,11 @@ function RecentSection() {
       summary: "속도 약간 빠름, 결론 명확함",
     },
   ];
+
   const visibleResults =
     isTablet && !showAll ? mockResults.slice(0, 3) : mockResults;
+
+
   return (
     <div className="Recent-section">
       <div className="Recent-header">
@@ -52,10 +56,16 @@ function RecentSection() {
       </div>
 
       <div className="Recent-list">
-        {visibleResults.map((item, index) => {
+      {visibleResults.map((item, index) => {
           const [year, month, day] = item.date.split("-");
           return (
-            <div className="Recent-card" key={item.id}>
+            <div
+              className="Recent-card"
+              key={item.id}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(`/feedback/${item.id}`)}
+              title="분석 결과 보기"
+            >
               <div className="Recent-date">{`${year}년 ${month}월 ${day}일`}</div>
               <div className="Recent-label">결과 {index + 1}</div>
             </div>

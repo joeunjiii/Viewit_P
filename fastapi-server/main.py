@@ -22,7 +22,7 @@ from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
 from interview.routers.interview import router as interview_router
 from interview.routers.jd_upload import router as jd_router
-
+from interview.routers.user import router as user_router
 
 from interview.uploads.database import SessionLocal
 from interview.services.feedback_service import save_final_feedback
@@ -90,6 +90,7 @@ app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
 app.include_router(jd_router, prefix="/api/jd")
 app.include_router(feedback_router)
+app.include_router(user_router)
 def get_db():
     db = SessionLocal()
     try:

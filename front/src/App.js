@@ -30,7 +30,7 @@ function App() {
       
         <Route path="AnalyzingModal" element={<AnalyzingModal />} />
         <Route path="AssessmentIntro" element={<AssessmentIntro />} />
-        <Route path="feedbackresult" element={<FeedbackResult />} />
+        <Route path="/feedback/:sessionId" element={<FeedbackResult />} />
       </Routes>
     </Router>
   );
