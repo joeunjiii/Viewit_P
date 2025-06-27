@@ -66,8 +66,8 @@ class InterviewSession:
         return torch.max(sim).item() > threshold
 
     def decide_next_question(self, last_answer: str) -> str:
-        # 30% 확률로 공통 질문 섞기
-        if self.job_role != "common" and random.random() < 0.3:
+        # 30% 확률로 공통 질문 섞기 -> 강점/약점 강화하기 위해서 35% 올리고 테스트
+        if self.job_role != "common" and random.random() < 0.35:
             common_q = self.get_random_common_question()
             if common_q and not self.is_too_similar_to_previous(common_q):
                 return common_q
@@ -104,7 +104,7 @@ class InterviewSession:
         # 최대 3회 생성 시도
         for _ in range(3):
             resp = self.openai.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "당신은 AI 면접관입니다."},
                     {"role": "user", "content": prompt}
@@ -113,7 +113,9 @@ class InterviewSession:
                 max_tokens=512
             )
             nxt = resp.choices[0].message.content.strip()
+            if not nxt or not nxt.strip():
+                continue
             if not self.is_too_similar_to_previous(nxt):
                 return nxt
 
-        return nxt  # fallback
+        return "답변 감사합니다. 다른 경험이나 프로젝트에 대해 이야기해주실 수 있나요?" # fallback
