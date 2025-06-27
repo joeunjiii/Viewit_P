@@ -23,7 +23,7 @@ from interview.routers.tts import router as tts_router
 from interview.routers.interview import router as interview_router
 
 from interview.uploads.database import SessionLocal
-from interview.services.feedback_service import save_answer_feedback, save_final_feedback
+from interview.services.feedback_service import save_final_feedback
 from interview.services.llm_feedback import generate_answer_feedback, generate_final_feedback
 from interview.services.feedback_service import save_answer_feedback_to_spring, save_final_feedback_to_spring
 from interview.routers.feedback import router as feedback_router
