@@ -29,7 +29,7 @@ public class SecurityConfig {
                                 "/", "/login", "/main", "/interview", "/AnalyzingModal",
                                 "/css/**", "/js/**", "/assets/**",
                                 "/oauth2/**", "/error", "/naver/callback.html", "/naver/**",
-                                "/api/interview/save", "/api/interview/init"
+                                "/api/interview/save", "/api/interview/init", "/api/interview/feedbacks/**"
                         ).permitAll()
                         .requestMatchers("/oauth2/authorization/naver").permitAll()
 
