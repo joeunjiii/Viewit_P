@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from interview.uploads.models import InterviewAnswer, InterviewFeedback,InterviewSession,User  # SQLAlchemy 모델 예시
+from interview.uploads.models import  InterviewFeedback,InterviewSession,User  # SQLAlchemy 모델 예시
 from interview.uploads.database import get_db  # DB 세션 의존성
 from interview.routers.auth import get_current_user      # 인증 유저 추출 함수
 

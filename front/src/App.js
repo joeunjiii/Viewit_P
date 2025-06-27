@@ -23,7 +23,7 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
-          <Route path="feedbackresult" element={<FeedbackResult />} />
+          
         </Route>
 
         <Route path="/interview" element={<InterviewLayout />} />
