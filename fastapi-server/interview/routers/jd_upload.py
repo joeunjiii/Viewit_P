@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form
 import os
-from services.ocr_service import extract_text_from_pdf
+from interview.services.ocr_service import extract_text_from_pdf
 
 router = APIRouter()
 
