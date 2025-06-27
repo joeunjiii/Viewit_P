@@ -185,7 +185,7 @@ class InterviewSession:
         # 최대 3회 생성 시도
         for _ in range(3):
             resp = self.openai.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "당신은 AI 면접관입니다."},
                     {"role": "user", "content": prompt},
@@ -194,7 +194,9 @@ class InterviewSession:
                 max_tokens=512,
             )
             nxt = resp.choices[0].message.content.strip()
+            if not nxt or not nxt.strip():
+                continue
             if not self.is_too_similar_to_previous(nxt):
                 return nxt
 
-        return nxt  # fallback
+        return "답변 감사합니다. 다른 경험이나 프로젝트에 대해 이야기해주실 수 있나요?" # fallback

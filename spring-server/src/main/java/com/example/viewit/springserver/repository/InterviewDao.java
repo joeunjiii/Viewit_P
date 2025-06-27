@@ -14,6 +14,7 @@ public class InterviewDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // 질문/답변 저장 (answer_feedback은 null로 시작)
     public void saveInterview(Interview interview) {
         String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, filter_word, answer_feedback) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
@@ -21,15 +22,23 @@ public class InterviewDao {
                 interview.getQuestionText(),
                 interview.getAnswerText(),
                 interview.getFilterWord(),
-                interview.getAnswerFeedback()
+                interview.getAnswerFeedback()  // 초기에는 null
         );
     }
 
+    // session_id로 질문/답변 목록 조회
     public List<Interview> findBySessionId(String sessionId) {
         String sql = "SELECT * FROM INTERVIEW WHERE session_id = ?";
         return jdbcTemplate.query(sql, interviewRowMapper(), sessionId);
     }
 
+    // answer_feedback 업데이트
+    public void updateAnswerFeedbackBySessionAndQuestion(String sessionId, String questionText, String answerFeedback) {
+        String sql = "UPDATE INTERVIEW SET answer_feedback = ? WHERE session_id = ? AND question_text = ?";
+        jdbcTemplate.update(sql, answerFeedback, sessionId, questionText);
+    }
+
+    // RowMapper 정의
     private RowMapper<Interview> interviewRowMapper() {
         return (rs, rowNum) -> {
             Interview iv = new Interview();
@@ -43,3 +52,4 @@ public class InterviewDao {
         };
     }
 }
+

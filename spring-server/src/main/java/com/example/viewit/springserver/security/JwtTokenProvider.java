@@ -1,3 +1,4 @@
+// spring-server/src/main/java/com/example/viewit/springserver/security/JwtTokenProvider.java
 package com.example.viewit.springserver.security;
 
 import io.jsonwebtoken.*;
@@ -5,7 +6,6 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 
 import java.security.Key;
 import java.util.Date;
@@ -24,14 +24,12 @@ public class JwtTokenProvider {
     @PostConstruct
     public void init() {
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        System.out.println("JWT key length: " + key.getEncoded().length);
     }
 
-    /** JWT 생성 */
-    public String createToken(String subject,String name) {
-        Date now = new Date();
+    // JWT 생성
+    public String createToken(String subject, String name) {
+        Date now    = new Date();
         Date expiry = new Date(now.getTime() + validityInMilliseconds);
-
         return Jwts.builder()
                 .setSubject(subject)
                 .claim("name", name)
@@ -41,7 +39,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /** 토큰에서 subject 추출 */
+    // subject 추출
     public String getSubject(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -51,7 +49,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    /** 토큰 유효성 검사 */
+    // 유효성 검사
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -60,7 +58,6 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            // 필요 시 로깅
             return false;
         }
     }

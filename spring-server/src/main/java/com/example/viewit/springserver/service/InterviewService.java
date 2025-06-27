@@ -26,14 +26,17 @@ public class InterviewService {
         if (!exists) {
             InterviewSession newSession = new InterviewSession();
             newSession.setSessionId(sessionId);
-            // 필요한 필드 세팅 가능
             sessionDao.insertSession(newSession);
         }
-
         interviewDao.saveInterview(interview);
     }
 
     public List<Interview> getInterviewsBySessionId(String sessionId) {
         return interviewDao.findBySessionId(sessionId);
     }
+
+    public void updateAnswerFeedbackBySessionAndQuestion(String sessionId, String questionText, String answerFeedback) {
+        interviewDao.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
+    }
 }
+

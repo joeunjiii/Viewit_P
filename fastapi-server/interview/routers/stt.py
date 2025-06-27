@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-from services.whisper_service import stt_from_webm
+from interview.services.whisper_service import stt_from_webm
 
 router = APIRouter()
 UPLOAD_DIR = "./interview/uploads/webm"

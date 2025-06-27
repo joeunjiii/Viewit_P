@@ -2,15 +2,21 @@ import os
 import time
 import logging
 from pathlib import Path
+
+
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import List, Dict
 
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from openai import OpenAI
-from pydantic import BaseModel
 
 from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
@@ -18,23 +24,24 @@ from interview.routers.interview import router as interview_router
 from interview.routers.jd_upload import router as jd_router
 
 
-# — .env 파일 로드 —
+from interview.uploads.database import SessionLocal
+from interview.services.feedback_service import save_final_feedback
+from interview.services.llm_feedback import generate_answer_feedback, generate_final_feedback
+from interview.services.feedback_service import save_answer_feedback_to_spring
+from interview.routers.feedback import router as feedback_router
+
+
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-# — 로거 설정 —
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn")
-
 
 app = FastAPI()
 start_time = time.time()
 
-# 메모리 세션 스토어
-session_store: dict[str, "InterviewSession"] = {}
+session_store: dict[str, 'InterviewSession'] = {}
 
-
-# FastAPI 이벤트: 서버 시작 시 자원 로딩
 @app.on_event("startup")
 async def load_resources():
     global st_model, qdrant_client, openai_client
@@ -54,21 +61,17 @@ async def load_resources():
     app.state.openai_client = openai_client
     app.state.session_store = session_store
 
-
-# 헬스체크 (기본 유지)
 @app.get("/health")
 async def health_check():
     return {
         "status": {
-            "sentence_transformer": st_model is not None,
-            "qdrant": qdrant_client is not None,
-            "openai": openai_client is not None,
-            "uptime_seconds": int(time.time() - start_time),
+            "sentence_transformer": app.state.st_model is not None,
+            "qdrant": app.state.qdrant_client is not None,
+            "openai": app.state.openai_client is not None,
+            "uptime_seconds": int(time.time() - start_time)
         }
     }
 
-
-# ------ 미들웨어/정적 파일/라우터 등록 ------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -86,3 +89,43 @@ app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
 app.include_router(jd_router, prefix="/api/jd")
+app.include_router(feedback_router)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+class AnswerInput(BaseModel):
+    session_id: str
+    question_text: str
+    answer_text: str
+
+class FinalFeedbackInput(BaseModel):
+    session_id: str
+    answers: List[Dict[str, str]]
+
+@app.post("/api/feedback/answer")
+def feedback_answer(
+        input: AnswerInput,
+        db: Session = Depends(get_db)
+):
+    llm = app.state.openai_client
+    feedback = generate_answer_feedback(llm, input.question_text, input.answer_text)
+    save_answer_feedback_to_spring(db, input.session_id, input.question_text, feedback)
+    return {"feedback": feedback}
+
+@app.post("/api/feedback/final")
+def feedback_final(
+        input: FinalFeedbackInput,
+        db: Session = Depends(get_db)
+):
+    llm = app.state.openai_client
+    summary, strengths, weaknesses = generate_final_feedback(llm, input.answers)
+    save_final_feedback(db, input.session_id, strengths, weaknesses, summary)
+    return {
+        "summary": summary,
+        "strengths": strengths,
+        "weaknesses": weaknesses
+    }

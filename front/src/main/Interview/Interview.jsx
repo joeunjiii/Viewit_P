@@ -59,11 +59,11 @@ function Interview() {
     console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
   const handleStartSettings = ({
-    jobRole,
-    autoQuestion,
-    allowRetry,
-    waitTime,
-  }) => {
+                                 jobRole,
+                                 autoQuestion,
+                                 allowRetry,
+                                 waitTime,
+                               }) => {
     setJobRole(jobRole);
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
@@ -82,13 +82,16 @@ function Interview() {
       return;
     }
 
+
     setStep("interview");
     setInitialQuestion(null);
     setShowLoadingModal(true); // 로딩모달 on
 
+
     try {
       // 2초 대기 + 세션 초기화 병렬 실행
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
+
 
       // 면접 세션(백엔드/DB) 생성 -> 성공 후 initSession 호출
       await createInterviewSession({
@@ -96,6 +99,7 @@ function Interview() {
         user_id: safeUserId,
         job_role: jobRole,
       });
+
 
       const [res] = await Promise.all([
         initSession({
@@ -107,6 +111,7 @@ function Interview() {
         }),
         delay,
       ]);
+
 
       setInitialQuestion({
         question: res.data.question,
@@ -209,10 +214,10 @@ function Interview() {
             </div>
           </div>
 
-          <CaptionBox text={captionText} />
-        </div>
-      )}
-    </>
+              <CaptionBox text={captionText} />
+            </div>
+        )}
+      </>
   );
 }
 
