@@ -1,0 +1,62 @@
+.feedback-summary-card {
+  background: #f7faf8;
+  border: 1px solid #c8dcc4;
+  border-radius: 12px;
+  padding: 24px 32px;
+  margin: 0 80px 40px 80px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.summary-block,
+.softskills-block {
+  margin-bottom: 24px;
+}
+
+.summary-title,
+.softskills-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #355944;
+  margin-bottom: 10px;
+}
+
+.summary-text-display {
+  background: white;
+  border: 1px solid #c8dcc4;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-line; /* 줄바꿈 반영 */
+  min-height: 110px;
+  box-sizing: border-box;
+}
+
+.softskills-table {
+  width: 100%;
+  border: 1px solid #c8dcc2;
+  border-radius: 10px;
+  background: white;
+  border-collapse: separate;
+  box-sizing: border-box;
+}
+
+.softskills-table th {
+  background: #e3f3de;
+  color: #486e43;
+  font-weight: 700;
+  font-size: 1.04rem;
+  padding: 10px 0;
+}
+
+.softskills-table td {
+  padding: 12px 10px;
+  vertical-align: top;
+  font-size: 1rem;
+  min-width: 120px;
+}
+
+.softskills-list {
+  margin: 0;
+  padding-left: 18px;
+}
