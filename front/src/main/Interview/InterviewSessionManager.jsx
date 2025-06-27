@@ -15,17 +15,19 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
-                                   sessionId,
-                                   jobRole,
-                                   waitTime = 3,
-                                   allowRetry = true,
-                                   initialQuestion,
-                                   onStatusChange,
-                                   onTimeUpdate,
-                                   onNewQuestion,
-                                   onAnswerComplete,
-                                   onCaptionUpdate,  // 추가
-                                 }) {
+  sessionId,
+  jobRole,
+  waitTime = 3,
+  allowRetry = true,
+  initialQuestion,
+  onStatusChange,
+  onTimeUpdate,
+  onNewQuestion,
+  onAnswerComplete,
+  onCaptionUpdate, // 추가
+  jdText, // optional
+  pdfText, // optional
+}) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -56,8 +58,8 @@ function InterviewSessionManager({
         audioRef.current = null;
       }
       const url = question.audio_url.startsWith("http")
-          ? question.audio_url
-          : "http://localhost:8000" + question.audio_url;
+        ? question.audio_url
+        : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
       audio.onended = () => setPhase(PHASE.WAITING);
@@ -119,14 +121,14 @@ function InterviewSessionManager({
             questionText: question?.question || "",
             answerText: sttResult,
             filterWord: "",
-            answerFeedback: ""
+            answerFeedback: "",
           });
         } catch (e) {
           alert("저장 실패: " + e.message);
         }
         // 2. 후속 질문 요청
         try {
-          const res = await nextQuestion(sessionId, sttResult);
+          const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
           const { question: q, audio_url, done } = res.data;
           if (done) {
             setQuestion({ question: q, audio_url, done: true });
@@ -142,7 +144,16 @@ function InterviewSessionManager({
         onAnswerComplete?.(sttResult);
       })();
     }
-  }, [phase, sttResult, sessionId, question, onAnswerComplete, onNewQuestion]);
+  }, [
+    phase,
+    sttResult,
+    sessionId,
+    question,
+    onAnswerComplete,
+    onNewQuestion,
+    jdText,
+    pdfText,
+  ]);
 
   // 다시 답변하기
   const handleRetry = () => {
@@ -151,23 +162,23 @@ function InterviewSessionManager({
   };
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-        {phase === PHASE.WAITING && (
-            <div className="timer-area">
-              <Timer duration={remainingTime} autoStart label="대기시간" />
-              {allowRetry && (
-                  <button className="replay-button" onClick={handleRetry}>
-                    다시 답변하기
-                  </button>
-              )}
-            </div>
-        )}
-      </div>
+    <div className="interview-session">
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+      {phase === PHASE.WAITING && (
+        <div className="timer-area">
+          <Timer duration={remainingTime} autoStart label="대기시간" />
+          {allowRetry && (
+            <button className="replay-button" onClick={handleRetry}>
+              다시 답변하기
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -1,79 +1,162 @@
 /* ErrorModal이랑 LoadingModal같이 사용 */
 .modal-bg {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(34, 40, 49, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-  
-  /* 모달 박스: 연한 그린 테두리 + 소프트 그림자 */
-  .modal-box {
-    background: #ffffff;
-    border: 2px solid #99bf96;    /* 포인트 그린 */
-    border-radius: 16px;
-    padding: 32px 28px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    max-width: 340px;
-    width: 90%;
-    text-align: center;
-  }
-  
-  /* 로딩 스피너: 포인트 컬러 강화 */
-  .loader {
-    border: 4px solid #e0e4e8;
-    border-top: 4px solid #639f86;  /* 서비스 메인 그린 */
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 18px;
-    animation: spin 0.8s linear infinite;
-  }
-  
-  /* 키프레임 */
-  @keyframes spin {
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* 모달 텍스트: 깔끔한 다크 그레이 */
-  .modal-text {
-    font-size: 1rem;
-    color: #222831;
-    margin-bottom: 24px;
-    line-height: 1.4;
-  }
-  
-  /* 에러 타이틀: 강조된 레드와 약간의 여백 */
-  .modal-title {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: #d32f2f;
-    margin-bottom: 16px;
-  }
-  
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .modal-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45em;
-    background: linear-gradient(90deg, #6dc7a8 0%, #99bf96 100%);
-    color: #fff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 999px;          /* pill 모양 */
-    font-size: 1.05rem;
-    font-weight: 600;
-    box-shadow: 0 4px 14px rgba(99,159,134,0.10), 0 1.5px 6px rgba(34,40,49,0.05);
-    cursor: pointer;
-    outline: none;
-    transition: background 0.18s, box-shadow 0.18s, transform 0.13s;
+/* 모달 박스: 연한 그린 테두리 + 소프트 그림자 */
+.modal-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
+  padding: 40px 36px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 로딩 스피너: 포인트 컬러 강화 */
+.loader {
+  border: 4px solid #e0e4e8;
+  border-top: 4px solid #639f86; /* 서비스 메인 그린 */
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 18px;
+  animation: spin 0.8s linear infinite;
+}
+.loading-modal-bg {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.27);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-modal-box {
+  background: #fff;
+  padding: 40px 28px 24px 28px;
+  border-radius: 18px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #3cb371; /* 메인 컬러 */
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  animation: spin 1.05s linear infinite;
+  margin-bottom: 18px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  .modal-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+  100% {
+    transform: rotate(360deg);
   }
-  
+}
+
+.loading-modal-message {
+  font-size: 1.14rem;
+  color: #222;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 키프레임 */
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 모달 텍스트: 깔끔한 다크 그레이 */
+.modal-text {
+  font-size: 1rem;
+  color: #222831;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+/* 에러 타이틀: 강조된 레드와 약간의 여백 */
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #d32f2f;
+  margin-bottom: 16px;
+}
+
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  background: linear-gradient(90deg, #6dc7a8 0%, #99bf96 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 999px; /* pill 모양 */
+  font-size: 1.05rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(99, 159, 134, 0.1),
+    0 1.5px 6px rgba(34, 40, 49, 0.05);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.13s;
+}
+
+.modal-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+/* modal.css */
+.interview-loading {
+  border: 2.5px solid #36b37e;
+  background: #f8fff6;
+  width: 300px; /* ← 기본보다 크게! */
+  min-height: 200px; /* ← 높이도 더 */
+  padding: 56px 36px 44px 36px; /* ← padding 넉넉하게 */
+  border-radius: 24px; /* ← 좀 더 부드러운 라운드 */
+  box-shadow: 0 8px 40px rgba(80, 200, 120, 0.15),
+    0 2px 8px rgba(60, 180, 110, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.interview-spinner {
+  width: 54px; /* ← 크기 키움 */
+  height: 54px;
+  border-top: 6px solid #36b37e;
+  border-right: 6px solid #c0eec6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.interview-loading .modal-message,
+.interview-loading div {
+  font-size: 1.18rem;
+  color: #21885e;
+  text-align: center;
+  margin-top: 22px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}

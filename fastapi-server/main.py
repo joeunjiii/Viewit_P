@@ -15,6 +15,8 @@ from pydantic import BaseModel
 from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
 from interview.routers.interview import router as interview_router
+from interview.routers.jd_upload import router as jd_router
+
 
 # — .env 파일 로드 —
 env_path = Path(__file__).parent / ".env"
@@ -29,7 +31,8 @@ app = FastAPI()
 start_time = time.time()
 
 # 메모리 세션 스토어
-session_store: dict[str, 'InterviewSession'] = {}
+session_store: dict[str, "InterviewSession"] = {}
+
 
 # FastAPI 이벤트: 서버 시작 시 자원 로딩
 @app.on_event("startup")
@@ -60,9 +63,10 @@ async def health_check():
             "sentence_transformer": st_model is not None,
             "qdrant": qdrant_client is not None,
             "openai": openai_client is not None,
-            "uptime_seconds": int(time.time() - start_time)
+            "uptime_seconds": int(time.time() - start_time),
         }
     }
+
 
 # ------ 미들웨어/정적 파일/라우터 등록 ------
 app.add_middleware(
@@ -73,6 +77,7 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 class Question(BaseModel):
     text: str
 
@@ -80,3 +85,4 @@ class Question(BaseModel):
 app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
+app.include_router(jd_router, prefix="/api/jd")

@@ -9,18 +9,24 @@ from interview.interview_session import InterviewSession
 
 router = APIRouter()
 
+
 # 요청 모델
 class InitRequest(BaseModel):
     session_id: str
     job_role: str
     softskill_label: str | None = None
+    jdText: str | None = None
+    pdfText: str | None = None
+
 
 class AnswerRequest(BaseModel):
     session_id: str
     answer: str
 
+
 @router.post("/init_session")
 async def init_session(data: InitRequest, request: Request):
+    print("init_session 받은 값:", data.jdText, data.pdfText)
     st_model = request.app.state.st_model
     qdrant_client = request.app.state.qdrant_client
     openai_client = request.app.state.openai_client
@@ -33,7 +39,9 @@ async def init_session(data: InitRequest, request: Request):
         st_model=st_model,
         collection_name="interview_questions",
         job_role=data.job_role,
-        softskill_label=data.softskill_label
+        softskill_label=data.softskill_label,
+        jdText=data.jdText,
+        pdfText=data.pdfText,
     )
     first_q = session.ask_fixed_question("intro")
     session.store_answer(first_q, "")
@@ -41,6 +49,7 @@ async def init_session(data: InitRequest, request: Request):
 
     audio_url = generate_tts_audio(first_q)
     return {"question": first_q, "audio_url": audio_url}
+
 
 @router.post("/next_question")
 async def next_question(data: AnswerRequest, request: Request):
@@ -54,6 +63,7 @@ async def next_question(data: AnswerRequest, request: Request):
 
     # 종료 조건 체크
     import time
+
     if time.time() - session.start_time >= 600:
         final_q = session.ask_fixed_question("final")
         session.store_answer(final_q, "")
@@ -61,15 +71,32 @@ async def next_question(data: AnswerRequest, request: Request):
         return {"question": final_q, "audio_url": audio_url, "done": True}
 
     next_q = session.decide_next_question(data.answer)
+    # if not next_q or not next_q.strip():
+    #     next_q = "아직 답변을 듣지 못했습니다. 편하게 다시 말씀해주셔도 괜찮습니다."
     session.store_answer(next_q, "")
-    audio_url = generate_tts_audio(next_q)
+    try:
+        audio_url = generate_tts_audio(next_q)
+    except Exception as e:
+        next_q = "질문 음성 생성에 문제가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        audio_url = generate_tts_audio(next_q)
     return {"question": next_q, "audio_url": audio_url, "done": False}
 
+
 @router.post("/final_answer")
-async def final_answer(data: AnswerRequest,  request: Request):
+async def final_answer(data: AnswerRequest, request: Request):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
     if not session:
         raise HTTPException(404, "Session not found")
     session.store_answer("마지막으로 하실 말 있나요?", data.answer)
     return {"message": "면접 종료", "history": session.state["history"]}
+
+
+# 개인 맞춤 면접
+class PersonalQuestionRequest(BaseModel):
+    jd_text: str | None = None
+    pdf_text: str | None = None
+
+
+class PersonalQuestionResponse(BaseModel):
+    questions: list[str]

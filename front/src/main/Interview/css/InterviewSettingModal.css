@@ -1,29 +1,47 @@
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.18);   /* 조금 더 연하게 */
-  display: flex; align-items: center; justify-content: center; z-index: 999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.18); /* 조금 더 연하게 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
 
 .modal-content {
-  background-color: #fcfefd;    /* 화이트 + 아주 은은한 민트톤 */
+  background-color: #fcfefd; /* 화이트 + 아주 은은한 민트톤 */
   padding: 30px 28px;
   border-radius: 16px;
-  width: 600px;
-  display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   gap: 20px;
   font-size: 15px;
-  box-shadow: 0 4px 24px rgba(70, 140, 120, 0.08), 0 2px 4px rgba(80, 100, 140, 0.10);
-  border: 1.5px solid #e0f1ea;  /* 연민트 테두리 추가 */
+  box-shadow: 0 4px 24px rgba(70, 140, 120, 0.08),
+    0 2px 4px rgba(80, 100, 140, 0.1);
+  border: 1.5px solid #e0f1ea; /* 연민트 테두리 추가 */
+  display: flex;
+  flex-direction: column;
 }
-
+div.modal-content .modal-title {
+  font-size: 30px;
+  color: black;
+}
 .modal-actions {
-  display: flex; width: 100%; justify-content: space-between; align-items: center;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }
 .mic-check-button {
   margin-top: 8px;
   padding: 8px 16px;
-  background-color:rgb(107, 170, 127);
+  background-color: rgb(107, 170, 127);
   color: white;
   font-size: 14px;
   border: none;
@@ -31,15 +49,21 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
 .mic-check-button:hover {
-  background-color: rgb(107, 170, 127);
+  transform: translateY(-1px); /* 약간 위로 튕기는 느낌 */
 }
 
+/* 섹션마다 간격을 일정하게 */
 .section {
+  width: 100%;
+  min-height: 64px; /* 너무 작지 않게 */
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: column; /* 세로 정렬 */
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  /* 내부 요소 간격 */
+  background: none; /* 배경은 기본 투명 */
 }
 
 .section p,
@@ -219,4 +243,57 @@ button.start:active {
   transform: scale(0.96);
   background-color: #388e3c;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 맞춤형 질문 생성 섹션 스타일 */
+.setting-section {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.setting-section .setting-label {
+  font-size: 14px;
+  color: #000000;
+  min-width: 140px;
+}
+
+.setting-section .customize-btn {
+  padding: 7px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #d6f5e4;
+  color: #388e3c;
+  border: 1.5px solid #aee1c9;
+  transition: all 0.18s;
+  box-shadow: 0 2px 8px rgba(65, 185, 140, 0.06);
+  cursor: pointer;
+}
+
+.setting-section .customize-btn:hover {
+  background: #b1eccc;
+  color: #246644;
+  border-color: #64d3a2;
+  transform: translateY(-1px);
+}
+
+.setting-section .customize-btn:active {
+  background: #99d8ba;
+  transform: scale(0.96);
+}
+
+.setting-section.column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.setting-section.column .setting-label {
+  margin-bottom: 1px;
+}
+.setting-section.column .customize-btn {
+  margin-top: 0;
 }

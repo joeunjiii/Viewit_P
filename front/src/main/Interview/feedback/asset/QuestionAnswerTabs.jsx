@@ -2,20 +2,41 @@ import React from "react";
 import "../css/Questionanswertabs.css";
 
 export default function QuestionAnswerTabs({ questions, selectedTab, setSelectedTab }) {
+  const handlePrev = () => {
+    if (selectedTab > 0) setSelectedTab(selectedTab - 1);
+  };
+
+  const handleNext = () => {
+    if (selectedTab < questions.length - 1) setSelectedTab(selectedTab + 1);
+  };
+
   return (
     <div className="qa-tabs-container">
-      {/* 질문 탭 */}
-      <div className="question-tabs">
-        {questions.map((q, idx) => (
-          <button
-            key={idx}
-            className={selectedTab === idx ? "active" : ""}
-            onClick={() => setSelectedTab(idx)}
-          >
-            Question {idx + 1}
-          </button>
-        ))}
+      {/* 상단 탭 & 버튼 */}
+      <div className="qa-tabs-header">
+        <button onClick={handlePrev} className="nav-btn" disabled={selectedTab === 0}>
+          ← 이전
+        </button>
+        <div className="question-tabs">
+          {questions.map((q, idx) => (
+            <button
+              key={idx}
+              className={selectedTab === idx ? "active" : ""}
+              onClick={() => setSelectedTab(idx)}
+            >
+              Question {idx + 1}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={handleNext}
+          className="nav-btn"
+          disabled={selectedTab === questions.length - 1}
+        >
+          다음 →
+        </button>
       </div>
+
       {/* 답변 박스 */}
       <div className="question-box">
         <div className="q-label">Q</div>
