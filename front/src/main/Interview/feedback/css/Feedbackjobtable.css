@@ -1,42 +1,31 @@
-.job-filler-table {
-    width: 100%;
-    border: 2px solid #d6e8d0;  
-    font-size: 1rem;
-    border-collapse: separate;
-    margin-bottom: 24px;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    overflow: hidden;
-  }
-  
-  .job-filler-table th, .job-filler-table td {
-    border: 1px solid #c5dcc2;
-    padding: 14px 18px;
-    text-align: left;
-    vertical-align: top;
-    font-size: 1rem;
-  }
-  
-  .job-filler-table th {
-    background: #e3f3de;
-    color: rgb(3, 3, 3);
-    font-weight: 500;
-    font-size: 1.05rem;
-  }
-  
-  .job-filler-table td.filler-words {
-    /* 불필요한 단어 내용이 길면 자동 줄바꿈 */
-    word-break: break-all;
-    color: #b27248;
-    font-weight: 500;
-    font-size: 0.98rem;
-  }
-  .job-th {
-    color: #5e9c76;
-    font-weight: 700;
-  }
-  .filler-th {
-    color: #b27248;
-    font-weight: 700;
-  }
-  
+.feedback-info-card {
+  background-color: #f7faf8;
+  border: 1px solid #c8dcc4;
+  border-radius: 12px;
+  padding: 20px 24px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  font-size: 1rem;
+  color: #333;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0eae3;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #4d6f63;
+}
+
+.info-value {
+  font-weight: 400;
+}

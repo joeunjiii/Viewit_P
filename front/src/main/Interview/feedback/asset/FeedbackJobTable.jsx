@@ -2,21 +2,21 @@
 import React from "react";
 import "../css/Feedbackjobtable.css";
 
-export default function FeedbackJobTable({ job, fillerWords }) {
+export default function FeedbackJobTable({ name, date, job }) {
   return (
-    <table className="job-filler-table">
-      <thead>
-        <tr>
-          <th className="job-th">직무</th>
-          <th className="filler-th">불필요한 단어</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{job}</td>
-          <td className="filler-words">{fillerWords}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div className="feedback-info-card">
+      <div className="info-row">
+        <span className="info-label">이름</span>
+        <span className="info-value">{name}</span>
+      </div>
+      <div className="info-row">
+        <span className="info-label">면접 날짜</span>
+        <span className="info-value">{date}</span>
+      </div>
+      <div className="info-row">
+        <span className="info-label">지원 직무</span>
+        <span className="info-value">{job}</span>
+      </div>
+    </div>
   );
 }
