@@ -1,4 +1,8 @@
+# LLM 기반 피드백 생성 함수
 def generate_answer_feedback(llm, question, answer):
+    """
+    단일 답변 피드백 생성
+    """
     prompt = f"""
     [면접 질문] {question}
     [지원자 답변] {answer}
@@ -18,8 +22,12 @@ def generate_answer_feedback(llm, question, answer):
     return resp.choices[0].message.content.strip()
 
 def generate_final_feedback(llm, answers):
+    """
+    전체 면접(한 세션) 답변/피드백으로 총평·강점·약점 생성
+    answers: [{question_text, answer_text, answer_feedback}, ...]
+    """
     qas = "\n".join([
-        f"{i+1}) Q: {item['questionText']} / A: {item['answerText']}"
+        f"{i+1}) Q: {item['question_text']} / A: {item['answer_text']} / F: {item['answer_feedback']}"
         for i, item in enumerate(answers)
     ])
     prompt = f"""
@@ -37,7 +45,7 @@ def generate_final_feedback(llm, answers):
     약점: …
     """
     resp = llm.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",   # 최신 모델명
         messages=[
             {"role": "system", "content": "당신은 인사담당자입니다."},
             {"role": "user",   "content": prompt}

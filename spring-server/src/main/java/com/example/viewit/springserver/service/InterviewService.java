@@ -8,11 +8,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InterviewService {
     private final InterviewSessionDao sessionDao;
     private final InterviewDao interviewDao;
+
 
     public InterviewService(InterviewSessionDao sessionDao, InterviewDao interviewDao) {
         this.sessionDao = sessionDao;
@@ -37,6 +39,10 @@ public class InterviewService {
 
     public void updateAnswerFeedbackBySessionAndQuestion(String sessionId, String questionText, String answerFeedback) {
         interviewDao.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
+    }
+
+    public List<Map<String, Object>> getAllFeedbacks(String sessionId) {
+        return interviewDao.selectAllFeedbacksBySessionId(sessionId);
     }
 }
 

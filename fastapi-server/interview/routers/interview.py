@@ -96,7 +96,7 @@ async def next_question(
         print(f"[WARN] 피드백 저장 실패: {e}")
 
     # 3) 종료 조건: 10분 경과, 최종 질문 미출력 시 최종 질문 생성
-    if time.time() - session.start_time >= 600 and not session.state.get("final_question_given", False):
+    if time.time() - session.start_time >= 300 and not session.state.get("final_question_given", False):
         final_q = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.store_answer(final_q, "")

@@ -91,4 +91,9 @@ public class InterviewController {
         interviewService.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
         return "피드백 저장 완료";
     }
+
+    @GetMapping("/feedbacks/{sessionId}")
+    public List<Map<String, Object>> getAllFeedbacks(@PathVariable String sessionId) {
+        return interviewService.getAllFeedbacks(sessionId);
+    }
 }

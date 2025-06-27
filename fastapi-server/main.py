@@ -3,34 +3,28 @@ import time
 import logging
 from pathlib import Path
 
-
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from typing import List, Dict
 
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from openai import OpenAI
 
+# ======= 라우터 임포트 =======
 from interview.routers.stt import router as stt_router
 from interview.routers.tts import router as tts_router
 from interview.routers.interview import router as interview_router
 from interview.routers.jd_upload import router as jd_router
-
+from interview.routers.feedback import router as feedback_router
+from interview.routers.finalfeedback import router as finalfeedback_router
+# ===========================
 
 from interview.uploads.database import SessionLocal
-from interview.services.feedback_service import save_final_feedback
-from interview.services.llm_feedback import generate_answer_feedback, generate_final_feedback
-from interview.services.feedback_service import save_answer_feedback_to_spring
-from interview.routers.feedback import router as feedback_router
 
-
+# .env 설정
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
@@ -42,6 +36,9 @@ start_time = time.time()
 
 session_store: dict[str, 'InterviewSession'] = {}
 
+# =====================
+# 모델 및 클라이언트 초기화
+# =====================
 @app.on_event("startup")
 async def load_resources():
     global st_model, qdrant_client, openai_client
@@ -61,6 +58,9 @@ async def load_resources():
     app.state.openai_client = openai_client
     app.state.session_store = session_store
 
+# =====================
+# 헬스체크
+# =====================
 @app.get("/health")
 async def health_check():
     return {
@@ -72,6 +72,9 @@ async def health_check():
         }
     }
 
+# =====================
+# 미들웨어/정적파일
+# =====================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -80,52 +83,25 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
-class Question(BaseModel):
-    text: str
-
-
-app.include_router(stt_router, prefix="/api/stt")
-app.include_router(tts_router, prefix="/api/tts")
+# =====================
+# 라우터 등록 (실제 API 구현은 각 라우터에서만)
+# =====================
+app.include_router(stt_router,      prefix="/api/stt")
+app.include_router(tts_router,      prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
-app.include_router(jd_router, prefix="/api/jd")
-app.include_router(feedback_router)
+app.include_router(jd_router,       prefix="/api/jd")
+app.include_router(feedback_router)                     # 개별 피드백
+app.include_router(finalfeedback_router)                # 총평 피드백
+
+# ========== (★중요) main.py에서 직접 API를 선언하지 않는다! ==========
+# 모든 API 엔드포인트(POST/GET)는 routers/폴더 내 파일에서만 정의
+# main.py에서는 include_router()만 한다.
+# ===============================================================
+
+# DB 세션 팩토리 함수 (필요시 라우터에서 import 해서 사용)
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
-class AnswerInput(BaseModel):
-    session_id: str
-    question_text: str
-    answer_text: str
-
-class FinalFeedbackInput(BaseModel):
-    session_id: str
-    answers: List[Dict[str, str]]
-
-@app.post("/api/feedback/answer")
-def feedback_answer(
-        input: AnswerInput,
-        db: Session = Depends(get_db)
-):
-    llm = app.state.openai_client
-    feedback = generate_answer_feedback(llm, input.question_text, input.answer_text)
-    save_answer_feedback_to_spring(db, input.session_id, input.question_text, feedback)
-    return {"feedback": feedback}
-
-@app.post("/api/feedback/final")
-def feedback_final(
-        input: FinalFeedbackInput,
-        db: Session = Depends(get_db)
-):
-    llm = app.state.openai_client
-    summary, strengths, weaknesses = generate_final_feedback(llm, input.answers)
-    save_final_feedback(db, input.session_id, strengths, weaknesses, summary)
-    return {
-        "summary": summary,
-        "strengths": strengths,
-        "weaknesses": weaknesses
-    }
