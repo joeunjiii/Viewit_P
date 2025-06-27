@@ -12,7 +12,6 @@ git rm --cached fastapi-server/services/*.pyc
 .DS_Store
 
 # uploads, 음성 파일(원하면)
-interview/uploads/*
 !interview/uploads/.gitkeep   # 폴더만 유지하려면(옵션)
 
 .mp3
