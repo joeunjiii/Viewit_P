@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegFileAlt } from "react-icons/fa";
+import LoadingSpinner from "./asset/LoadingSpinner";
 import "./css/Recentsection.css";
 
-function RecentSection() {
+function RecentSection({ sessions = [] ,loading}) {
   const [showAll, setShowAll] = useState(false);
   const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
+  
   const navigate = useNavigate();
+  const visibleResults =
+  isTablet && !showAll ? sessions.slice(0, 3) : sessions;
+
+  
   // 화면 크기 변화 감지
   useEffect(() => {
     const handleResize = () => {
@@ -16,38 +22,10 @@ function RecentSection() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  //임시데이터
-  const mockResults = [
-    {
-      id: 1,
-      date: "2025-06-03",
-      score: 85,
-      summary: "톤 안정적이고 전달력 좋음",
-    },
-    {
-      id: 2,
-      date: "2025-06-02",
-      score: 78,
-      summary: "속도 약간 빠름, 결론 명확함",
-    },
-    {
-      id: 3,
-      date: "2025-06-02",
-      score: 78,
-      summary: "속도 약간 빠름, 결론 명확함",
-    },
-    {
-      id: 4,
-      date: "2025-06-02",
-      score: 78,
-      summary: "속도 약간 빠름, 결론 명확함",
-    },
-  ];
-
-  const visibleResults =
-    isTablet && !showAll ? mockResults.slice(0, 3) : mockResults;
-
-
+  // 로딩 중이면 스피너 표시
+  if (loading) {
+    return <LoadingSpinner message="데이터를 불러오는 중입니다" />;
+  }
   return (
     <div className="Recent-section">
       <div className="Recent-header">
@@ -56,24 +34,32 @@ function RecentSection() {
       </div>
 
       <div className="Recent-list">
-      {visibleResults.map((item, index) => {
-          const [year, month, day] = item.date.split("-");
-          return (
-            <div
-              className="Recent-card"
-              key={item.id}
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/feedback/${item.id}`)}
-              title="분석 결과 보기"
-            >
-              <div className="Recent-date">{`${year}년 ${month}월 ${day}일`}</div>
-              <div className="Recent-label">결과 {index + 1}</div>
-            </div>
-          );
-        })}
+      {visibleResults.length === 0 ? (
+          <div className="Recent-card" style={{ color: "#bbb", padding: "24px" }}>
+            기록이 없습니다.
+          </div>
+        ) : (
+          visibleResults.map((item, index) => {
+            // 날짜 가공
+            const dateStr = item.started_at || item.date;
+            const [year, month, day] = dateStr ? dateStr.split("T")[0].split("-") : ["-", "-", "-"];
+            return (
+              <div
+                className="Recent-card"
+                key={item.session_id}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate(`/feedback/${item.session_id}`)}
+                title="분석 결과 보기"
+              >
+                <div className="Recent-date">{`${year}년 ${month}월 ${day}일`}</div>
+                <div className="Recent-label">직무: {item.job_role || "-"}</div>
+              </div>
+            );
+          })
+        )}
       </div>
       {/* 더보기 버튼 */}
-      {isTablet && mockResults.length > 3 && (
+      {isTablet && sessions.length > 3 && (
         <button
           className="recent-toggle-btn"
           onClick={() => setShowAll(!showAll)}

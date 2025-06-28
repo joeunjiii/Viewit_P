@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RecentSection from "./RecentSection";
 import SpeechAlertModal from "../ex/SpeechAlertModal";
 import InterviewTypeSelect from "../Interview/InterviewTypeSelect";
@@ -7,9 +7,27 @@ import { Link } from "react-router-dom";
 import "./css/Maincontent.css";
 import feedbackImg3x from "./css/img/images1.jpg";
 import feedbackImg1x from "./css/img/images3.jpg";
+import { fetchLatestUserSessions } from "./asset/user";
 function MainContent() {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [showModal, setShowModal] = useState(false);
   const [showTypeModal, setShowTypeModal] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // 토큰 없으면 로그인 처리 등
+      setLoading(false);
+      return;
+    }
+    // fetch 함수 예시
+    fetchLatestUserSessions(token).then(data => {
+      setSessions(data || []);
+      setLoading(false);
+    });
+  }, []);
   return (
     <div className="main-content">
       <div className="content-section">
@@ -30,7 +48,7 @@ function MainContent() {
           </Link>
         </div>
 
-        <RecentSection />
+        <RecentSection sessions={sessions} loading={loading} />
         <div className="feedback-group">
           <div className="feedback-section">
             <div className="feedback-icon">
@@ -40,27 +58,27 @@ function MainContent() {
           </div>
 
           <div className="feedback-list">
-            
-              {/* 첫 번째 이미지 */}
-              <div>
-                <img  
-                  src={feedbackImg3x}
-                  alt="피드백 1"
-                  className="feedback-image"
-                />
-                <div className="feedback-semitext">면접 어떻게해야할까요?</div>
-              </div>
 
-              <div>
-                <img
-                  src={feedbackImg1x}
-                  alt="피드백 3"
-                  className="feedback-image"
-                />
-                <div className="feedback-semitext">멋지게 인사하는법</div>
-              </div>
+            {/* 첫 번째 이미지 */}
+            <div>
+              <img
+                src={feedbackImg3x}
+                alt="피드백 1"
+                className="feedback-image"
+              />
+              <div className="feedback-semitext">면접 어떻게해야할까요?</div>
             </div>
-         
+
+            <div>
+              <img
+                src={feedbackImg1x}
+                alt="피드백 3"
+                className="feedback-image"
+              />
+              <div className="feedback-semitext">멋지게 인사하는법</div>
+            </div>
+          </div>
+
         </div>
       </div>
       {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}

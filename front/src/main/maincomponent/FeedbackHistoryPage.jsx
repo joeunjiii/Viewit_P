@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserSessions } from "./asset/user.js";
+import { fetchInterviewHistory } from "./asset/user.js";
 import "./css/FeedbackHistoryPage.css";
 
 function FeedbackHistoryPage() {
     const [sessions, setSessions] = useState([]);
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const loaderRef = useRef(null);
     const navigate = useNavigate();
+    const limit = 5;
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -13,15 +18,39 @@ function FeedbackHistoryPage() {
             navigate("/login");
             return;
         }
-        fetchUserSessions(token).then(data => {
-            if (data) {
-                const sorted = [...data].sort(
-                    (a, b) => new Date(b.started_at) - new Date(a.started_at)
-                );
-                setSessions(sorted);
-            } else setSessions([]);
+
+        const loadSessions = async () => {
+            setLoading(true);
+            const data = await fetchInterviewHistory(token, limit, offset);
+            if (Array.isArray(data)) {
+                setSessions(prev => {
+                    const combined = [...prev, ...data];
+                    const unique = Array.from(new Map(combined.map(item => [item.session_id, item])).values());
+                    return unique;
+                });
+                if (data.length < limit) setHasMore(false);
+            } else {
+                setHasMore(false);
+            }
+            setLoading(false);
+        };
+
+        // offset이 바뀔 때마다 추가 데이터 요청
+        if (hasMore) loadSessions();
+        // eslint-disable-next-line
+    }, [offset]);
+
+    // 바닥 감지 → offset 증가
+    useEffect(() => {
+        if (!hasMore || loading) return;
+        const observer = new window.IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                setOffset(prev => prev + limit);
+            }
         });
-    }, [navigate]);
+        if (loaderRef.current) observer.observe(loaderRef.current);
+        return () => observer.disconnect();
+    }, [hasMore, loading]);
 
     function formatDate(isoString) {
         if (!isoString) return "-";
@@ -34,7 +63,7 @@ function FeedbackHistoryPage() {
                 <h2 className="feedback-history-title-inside">모의면접 피드백 결과</h2>
                 <hr className="feedback-history-divider" />
                 <ul className="feedback-history-list">
-                    {sessions.length === 0 ? (
+                    {sessions.length === 0 && !hasMore ? (
                         <li className="feedback-history-empty">
                             피드백 기록이 없습니다.
                         </li>
@@ -55,6 +84,12 @@ function FeedbackHistoryPage() {
                         ))
                     )}
                 </ul>
+                {/* 바닥 감지용 */}
+                {hasMore && (
+                    <div ref={loaderRef} style={{ height: 36, textAlign: "center" }}>
+                        {loading && <span style={{ color: "#bbb" }}>로딩 중...</span>}
+                    </div>
+                )}
             </div>
         </div>
     );
