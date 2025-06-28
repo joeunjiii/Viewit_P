@@ -4,7 +4,6 @@ import { nextQuestion, saveInterview } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
 import Timer from "./asset/Timer";
 import { endSession } from "./api/interview";
-import { useNavigate } from "react-router-dom";
 
 const PHASE = {
   READY: "ready",
@@ -37,7 +36,6 @@ function InterviewSessionManager({
   const timerRef = useRef(null);
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
-  const navigate = useNavigate();
 
   // initialQuestion 동기화
   useEffect(() => {
@@ -47,25 +45,37 @@ function InterviewSessionManager({
 
   // 오디오 재생 및 자막 업데이트
   useEffect(() => {
+    console.log("[useEffect] phase:", phase, "| question:", question);
     onStatusChange?.(phase);
 
     // phase가 TTS(질문 오디오)일 때 자막 "면접관: ..."
     if (phase === PHASE.TTS && question?.question) {
+      console.log("[TTS] 자막:", question.question);
       onCaptionUpdate?.(`면접관: ${question.question}`);
     }
 
     if (phase === PHASE.TTS && question?.audio_url) {
       if (audioRef.current) {
+        console.log("[TTS] 이전 오디오 중지");
         audioRef.current.pause();
         audioRef.current = null;
       }
       const url = question.audio_url.startsWith("http")
         ? question.audio_url
         : "http://localhost:8000" + question.audio_url;
-      const audio = new Audio(url);
+      console.log("[TTS] 오디오 재생 시도:", url);
+      const audio = new Audio(url + "?t=" + Date.now());
       audioRef.current = audio;
-      audio.onended = () => setPhase(PHASE.WAITING);
-      audio.play().catch(() => setPhase(PHASE.WAITING));
+      audio.onended = () => {
+        console.log("[TTS] 오디오 재생 종료, phase WAITING 전환");
+        setPhase(PHASE.WAITING);
+      };
+      audio.play()
+      .then(() => console.log("[TTS] 오디오 재생 시작!"))
+      .catch((err) => {
+        console.error("[TTS] 오디오 play 에러:", err);
+        setPhase(PHASE.WAITING);
+      });
     }
   }, [phase, question, onStatusChange, onCaptionUpdate]);
 
@@ -112,7 +122,7 @@ function InterviewSessionManager({
     }
   };
 
-  // 답변 끝나면 후속질문 or 마지막 질문
+  // 답변 끝나면 후속질문
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
@@ -128,18 +138,6 @@ function InterviewSessionManager({
         } catch (e) {
           alert("저장 실패: " + e.message);
         }
-        // 마지막 질문(고정질문) 체크
-        if (question?.done) {
-          try {
-            const res = await endSession(sessionId, sttResult)
-            //alert로 면정종료 알림
-            alert("면접이 종료되었습니다.\n" + (res.data.message || ""));
-            //결과 페이지로 이동 , 피드백 등 미구현상태
-            navigate("/feedback-result", { state: { feedback: res.data.feedback, history: res.data.history } });
-          } catch (err) {
-            alert("최종 제출에 실패했습니다.");
-          }
-        } else{
         // 2. 후속 질문 요청
         try {
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
@@ -153,7 +151,6 @@ function InterviewSessionManager({
           }
         } catch (err) {
           console.error("next_question 실패", err);
-          }
         }
         setSttResult(null);
         onAnswerComplete?.(sttResult);
@@ -165,15 +162,20 @@ function InterviewSessionManager({
     sessionId,
     question,
     onAnswerComplete,
-    onNewQuestion, navigate,
+    onNewQuestion,
     jdText,
     pdfText,
   ]);
 
   // 다시 답변하기
   const handleRetry = () => {
+    // 1) phase를 READY 같은 임시값으로 변경
+    setPhase(PHASE.READY);
+
+    // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
+    setTimeout(() => setPhase(PHASE.TTS), 20);
     setRemainingTime(waitTime);
-    setPhase(PHASE.WAITING);
+
   };
 
   return (

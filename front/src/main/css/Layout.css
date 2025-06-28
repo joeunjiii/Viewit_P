@@ -8,6 +8,6 @@
 .content-area {
   flex-grow: 1;
   display: flex;
-  background-color: #e5efe7;
+  background-color: #f6f8fb;
   overflow-y: auto;
 }

@@ -3,18 +3,24 @@ import whisper
 import os
 import subprocess
 from dotenv import load_dotenv
-
-
+import io
+import torch
+import torch
 # .env 파일 읽기
 load_dotenv()
 FFMPEG_BIN_PATH = os.getenv("FFMPEG_BIN_PATH")
 if not FFMPEG_BIN_PATH:
     raise RuntimeError("FFMPEG_BIN_PATH 환경변수가 설정되지 않았습니다.")
 
+# CUDA 사용 가능한 경우 GPU로 로드
+device = "cuda" if torch.cuda.is_available() else None
+if device is None:
+    raise RuntimeError("CUDA 환경이 아닙니다. GPU 서버에서 실행하세요.")
+print("🔊 Whisper 모델 불러오는 중... (GPU 사용)")
 
-print("🔊 Whisper 모델 불러오는 중...")
-model = whisper.load_model("medium")
-print("✅ Whisper 모델 로딩 완료")
+model = whisper.load_model("medium").to(device)
+print("✅ Whisper 모델 로딩 완료 (device:", device, ")")
+print(torch.cuda.memory_allocated() / 1024 ** 2, "MB")
 
 def convert_webm_to_wav(webm_path: str, wav_path: str):
     cmd = [

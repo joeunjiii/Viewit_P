@@ -40,10 +40,10 @@ function MainContent() {
           </div>
 
           <div className="feedback-list">
-            <div className="feedback-list">
+            
               {/* 첫 번째 이미지 */}
               <div>
-                <img
+                <img  
                   src={feedbackImg3x}
                   alt="피드백 1"
                   className="feedback-image"
@@ -60,7 +60,7 @@ function MainContent() {
                 <div className="feedback-semitext">멋지게 인사하는법</div>
               </div>
             </div>
-          </div>
+         
         </div>
       </div>
       {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}

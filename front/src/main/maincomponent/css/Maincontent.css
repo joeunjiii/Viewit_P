@@ -1,6 +1,6 @@
 .main-content {
   display: flex;
-  flex-direction: column; /* main-content 내부의 요소들도 세로로 쌓이도록 */
+  
   flex-grow: 1;
   background-color: #ffffff;
   padding-left: 50px;
@@ -74,8 +74,9 @@
 }
 .feedback-section {
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 32px;         /* 카드 사이 간격 */
+  align-items: flex-start;
+  
 }
 
 .feedback-icon {
@@ -92,7 +93,9 @@
 /* 피드백 리스트 카드 */
 .feedback-list {
   display: flex;
-  gap: 50px; /* 이미지 사이의 간격 */
+  gap: 50px;               /* 카드(이미지) 간격 */
+  justify-content: flex-start; /* 가로 정렬 (필요시 center로) */
+  align-items: flex-start;
 }
 
 .feedback-image {

@@ -10,6 +10,7 @@ import {
 import "./css/Sidebar.css";
 import { getUserInfoFromToken } from "./asset/getUserInfoFromToken";
 import FeedbackModal from "./FeedbackModal";
+import FeedbackHistoryPage from "./FeedbackHistoryPage";
 function Sidebar({ onSpeechClick }) {
   const location = useLocation();
   const currentPath = location.pathname;
@@ -24,7 +25,6 @@ function Sidebar({ onSpeechClick }) {
   const [email, setEmail] = useState("");
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  //더미데이터 추후에 삭제
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -84,9 +84,8 @@ function Sidebar({ onSpeechClick }) {
 
           <Link
             to="/interview"
-            className={`menu-link ${
-              currentPath === "/interview" ? "active" : ""
-            }`}
+            className={`menu-link ${currentPath === "/interview" ? "active" : ""
+              }`}
           >
             <div className="menu-icon">
               <FaUserTie />
@@ -94,49 +93,50 @@ function Sidebar({ onSpeechClick }) {
             {!isTablet && <span>모의면접</span>}
           </Link>
 
-          <div
-            className={`menu-link ${
-              currentPath === "/feedback" ? "active" : ""
-            }`}
-            onClick={() => setShowFeedbackModal(true)}
-            style={{ cursor: "pointer" }}
+          {/* 여기서부터 수정 */}
+          <Link
+            to="/feedbacklist"
+            className={`menu-link ${currentPath === "/feedback" ? "active" : ""}`}
           >
             <div className="menu-icon">
               <FaClipboardCheck />
             </div>
             {!isTablet && <span>피드백 결과</span>}
-          </div>
+          </Link>
         </div>
-      </nav>
+    
+      </nav >
 
-      <div className="settings-button" onClick={() => setShowLogoutModal(true)}>
-        <FaCog className="settings-icon" />
-        {!isTablet && <span>설정</span>}
-      </div>
-      {/* 로그아웃 모달 */}
-      {showLogoutModal && (
-        <div className="logout-modal-overlay">
-          <div className="logout-modal">
-            <h3 className="logout-title">로그아웃 하시겠습니까?</h3>
-            <div className="logout-actions">
-              <button
-                className="logout-cancel"
-                onClick={() => setShowLogoutModal(false)}
-              >
-                취소
-              </button>
-              <button className="logout-confirm" onClick={handleLogout}>
-                로그아웃
-              </button>
-            </div>
+    <div className="settings-button" onClick={() => setShowLogoutModal(true)}>
+      <FaCog className="settings-icon" />
+      {!isTablet && <span>설정</span>}
+    </div>
+  {/* 로그아웃 모달 */ }
+  {
+    showLogoutModal && (
+      <div className="logout-modal-overlay">
+        <div className="logout-modal">
+          <h3 className="logout-title">로그아웃 하시겠습니까?</h3>
+          <div className="logout-actions">
+            <button
+              className="logout-cancel"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              취소
+            </button>
+            <button className="logout-confirm" onClick={handleLogout}>
+              로그아웃
+            </button>
           </div>
         </div>
-      )}
-      <FeedbackModal
-        open={showFeedbackModal}
-        onClose={() => setShowFeedbackModal(false)}
-      />
-    </div>
+      </div>
+    )
+  }
+  <FeedbackModal
+    open={showFeedbackModal}
+    onClose={() => setShowFeedbackModal(false)}
+  />
+    </div >
   );
 }
 

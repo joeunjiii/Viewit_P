@@ -13,6 +13,7 @@ import AnalyzingModal from "./main/Interview/asset/AnalyzingModal";
 import AssessmentIntro from "./main/Interview/AssessmentIntro";
 import InterviewLayout from "./main/maincomponent/InterviewLayout";
 import FeedbackResult from "./main/Interview/feedback/FeedbackResult";
+import FeedbackHistoryPage from "./main/maincomponent/FeedbackHistoryPage";
 function App() {
   return (
     <Router>
@@ -23,7 +24,7 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route path="main" element={<Main />} />
-          
+          <Route path="feedbacklist" element={<FeedbackHistoryPage />} />
         </Route>
 
         <Route path="/interview" element={<InterviewLayout />} />
