@@ -56,17 +56,25 @@ export default function QuestionAnswerTabs({
       </div>
 
       {/* 답변 박스 */}
-      <div className="question-box">
-        <div className="q-label">Q</div>
-        <div className="q-text">{questions[selectedTab].question}</div>
+      <div className="qa-group-box">
+        <div className="qa-row-label">Q</div>
+        <div className="qa-row-content">{questions[selectedTab].question}</div>
+        <hr className="qa-divider" />
 
-        <div className="a-label">A</div>
-        <div className="a-text">{questions[selectedTab].answer}</div>
+        <div className="qa-row-label">A</div>
+        <div className="qa-row-content">{questions[selectedTab].answer}</div>
 
+        {questions[selectedTab].feedback && (
+          <>
+            <div className="qa-row-label">피드백</div>
+            <div className="qa-row-content">{questions[selectedTab].feedback}</div>
+          </>
+        )}
         {current.modelAnswer && (
           <>
-            <div className="model-label">수정/모범 답변</div>
-            <div className="model-text">{current.modelAnswer}</div>
+            <hr className="qa-divider" />
+            <div className="qa-row-label">수정/모범 답변</div>
+            <div className="qa-row-content">{current.modelAnswer}</div>
           </>
         )}
       </div>

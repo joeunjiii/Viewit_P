@@ -4,8 +4,8 @@
   margin-left: 80px;
   margin-right: 80px;
   min-width: 800px;
-  min-height: 400px;
-  max-height: 600px; /* ← 고정 */
+  min-height: 500px;
+  
 
   background: rgb(247, 250, 248);
   border-radius: 20px;
@@ -51,12 +51,9 @@
 .q-text,
 .a-text,
 .model-text {
-  background: #f8f8f8;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 6px;
-  font-size: 1rem;
-  border: 1px solid #c8dcc4;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #438e6d;
 }
 
 .qa-tabs-header {
@@ -134,4 +131,53 @@
   background: #6d6d6d;
   cursor: not-allowed;
   opacity: 0.6;
+}
+.feedback-section {
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 7px;
+  border-left: 4px solid #6baa7f;
+}
+.feedback-label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #438e6d;
+}
+.feedback-text {
+  color: #333;
+  font-size: 15px;
+}
+
+.qa-group-box {
+  margin-top: 14px;
+  padding: 18px 18px 14px 18px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border-left: 4px solid #6baa7f;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(80,160,130,0.07);
+}
+
+.qa-row-label {
+  font-weight: bold;
+  color: #438e6d;
+  margin-bottom: 4px;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+.qa-row-content {
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #c8dcc4;
+  margin-bottom: 3px;
+}
+
+.qa-divider {
+  height: 1px;
+  background: #e0f1ea;
+  border: none;
+  margin: 12px 0 8px 0;
 }
