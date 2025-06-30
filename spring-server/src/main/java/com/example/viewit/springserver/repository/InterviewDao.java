@@ -16,12 +16,11 @@ public class InterviewDao {
 
     // 질문/답변 저장 (answer_feedback은 null로 시작)
     public void saveInterview(Interview interview) {
-        String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, filter_word, answer_feedback) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, answer_feedback) VALUES ( ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 interview.getSessionId(),
                 interview.getQuestionText(),
                 interview.getAnswerText(),
-                interview.getFilterWord(),
                 interview.getAnswerFeedback()  // 초기에는 null
         );
     }
@@ -46,7 +45,6 @@ public class InterviewDao {
             iv.setSessionId(rs.getString("session_id"));
             iv.setQuestionText(rs.getString("question_text"));
             iv.setAnswerText(rs.getString("answer_text"));
-            iv.setFilterWord(rs.getString("filter_word"));
             iv.setAnswerFeedback(rs.getString("answer_feedback"));
             return iv;
         };

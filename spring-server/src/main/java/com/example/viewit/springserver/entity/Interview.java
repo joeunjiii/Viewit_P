@@ -33,8 +33,6 @@ public class Interview {
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
 
-    public String getFilterWord() { return filterWord; }
-    public void setFilterWord(String filterWord) { this.filterWord = filterWord; }
 
     public String getAnswerFeedback() { return answerFeedback; }
     public void setAnswerFeedback(String answerFeedback) { this.answerFeedback = answerFeedback; }
@@ -46,7 +44,6 @@ public class Interview {
                 ", sessionId=" + sessionId +
                 ", questionText='" + questionText + '\'' +
                 ", answerText='" + answerText + '\'' +
-                ", filterWord='" + filterWord + '\'' +
                 ", answerFeedback='" + answerFeedback + '\'' +
                 '}';
     }

@@ -1,12 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
 from interview.services.whisper_service import stt_from_webm
-
+from interview.utils.logger_utils import timing_logger
 router = APIRouter()
 UPLOAD_DIR = "./interview/uploads/webm"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/")
+@timing_logger("STT 전체 처리")
 async def speech_to_text(audio: UploadFile = File(...)):
     print("STT API 진입")
     # ( 호출 :: DB 저장 할 수 있는 코드  )

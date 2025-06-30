@@ -19,6 +19,7 @@ export function nextQuestion(sessionId, answer, jdText, pdfText) {
         pdfText
     });
 }
+
 export function saveInterview(payload) {
     return api.post("/api/interview/save", payload);
 }
