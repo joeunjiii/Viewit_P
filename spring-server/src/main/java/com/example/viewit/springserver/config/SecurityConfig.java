@@ -29,13 +29,17 @@ public class SecurityConfig {
                                 "/", "/login", "/main", "/interview", "/AnalyzingModal",
                                 "/css/**", "/js/**", "/assets/**",
                                 "/oauth2/**", "/error", "/naver/callback.html", "/naver/**",
-                                "/api/interview/save", "/api/interview/init"
+                                "/api/interview/save", "/api/interview/init", "/api/interview/feedbacks/**"
                         ).permitAll()
                         .requestMatchers("/oauth2/authorization/naver").permitAll()
 
                         // ------- 피드백 관련 무인증 ------
                         .requestMatchers("/api/interview/answer/feedback").permitAll()
                         .requestMatchers("/api/interview/feedback").permitAll()
+                        .requestMatchers("/api/interview/feedback/**").permitAll()
+                        .requestMatchers("/api/interview/**").permitAll()
+
+
 
                         // ------- FastAPI 연동 경로 무인증 ------
                         .requestMatchers("/api/interview/init_session").permitAll()

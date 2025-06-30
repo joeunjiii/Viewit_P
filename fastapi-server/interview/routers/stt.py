@@ -9,6 +9,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.post("/")
 async def speech_to_text(audio: UploadFile = File(...)):
     print("STT API 진입")
+    # ( 호출 :: DB 저장 할 수 있는 코드  )
     print("audio.filename:", audio.filename)
 
     # 1) 파일 읽기
