@@ -2,13 +2,11 @@ package com.example.viewit.springserver.repository;
 
 import com.example.viewit.springserver.entity.Interview;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class InterviewDao {
@@ -40,12 +38,6 @@ public class InterviewDao {
         jdbcTemplate.update(sql, answerFeedback, sessionId, questionText);
     }
 
-    public List<Map<String, Object>> selectAllFeedbacksBySessionId(String sessionId) {
-        // answer_feedback 포함해서 필요한 컬럼만 조회
-        String sql = "SELECT question_text, answer_text, answer_feedback FROM INTERVIEW WHERE session_id = ?";
-        return jdbcTemplate.queryForList(sql, sessionId);
-    }
-
     // RowMapper 정의
     private RowMapper<Interview> interviewRowMapper() {
         return (rs, rowNum) -> {
@@ -60,4 +52,3 @@ public class InterviewDao {
         };
     }
 }
-

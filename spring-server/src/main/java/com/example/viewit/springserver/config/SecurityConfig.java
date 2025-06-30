@@ -36,6 +36,10 @@ public class SecurityConfig {
                         // ------- 피드백 관련 무인증 ------
                         .requestMatchers("/api/interview/answer/feedback").permitAll()
                         .requestMatchers("/api/interview/feedback").permitAll()
+                        .requestMatchers("/api/interview/feedback/**").permitAll()
+                        .requestMatchers("/api/interview/**").permitAll()
+
+
 
                         // ------- FastAPI 연동 경로 무인증 ------
                         .requestMatchers("/api/interview/init_session").permitAll()

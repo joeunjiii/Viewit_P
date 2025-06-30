@@ -1,10 +1,4 @@
-import re
-
-# LLM 기반 피드백 생성 함수
 def generate_answer_feedback(llm, question, answer):
-    """
-    단일 답변 피드백 생성
-    """
     prompt = f"""
     [면접 질문] {question}
     [지원자 답변] {answer}
@@ -24,11 +18,8 @@ def generate_answer_feedback(llm, question, answer):
     return resp.choices[0].message.content.strip()
 
 def generate_final_feedback(llm, answers):
-    """
-    피드백 총평 생성
-    """
     qas = "\n".join([
-        f"{i+1}) Q: {item['question_text']} / A: {item['answer_text']} / F: {item['answer_feedback']}"
+        f"{i+1}) Q: {item['questionText']} / A: {item['answerText']}"
         for i, item in enumerate(answers)
     ])
     prompt = f"""
@@ -46,7 +37,7 @@ def generate_final_feedback(llm, answers):
     약점: …
     """
     resp = llm.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "당신은 인사담당자입니다."},
             {"role": "user",   "content": prompt}
@@ -55,21 +46,12 @@ def generate_final_feedback(llm, answers):
         max_tokens=600
     )
     text = resp.choices[0].message.content.strip()
-    print("=== [LLM 응답 원문] ===\n", text, "\n======================")
-
-    # 정규표현식으로 총평/강점/약점 robust 추출
     summary = strengths = weaknesses = ""
-    m = re.search(r"총평\s*[:\-]?\s*(.+?)(?:\n|$)", text)
-    if m:
-        summary = m.group(1).strip()
-    m = re.search(r"강점\s*[:\-]?\s*(.+?)(?:\n|$)", text)
-    if m:
-        strengths = m.group(1).strip()
-    m = re.search(r"약점\s*[:\-]?\s*(.+?)(?:\n|$)", text)
-    if m:
-        weaknesses = m.group(1).strip()
-
-    print(f"[PARSED] summary: {summary}")
-    print(f"[PARSED] strengths: {strengths}")
-    print(f"[PARSED] weaknesses: {weaknesses}")
+    for line in text.split("\n"):
+        if line.startswith("총평:"):
+            summary = line.replace("총평:", "").strip()
+        elif line.startswith("강점:"):
+            strengths = line.replace("강점:", "").strip()
+        elif line.startswith("약점:"):
+            weaknesses = line.replace("약점:", "").strip()
     return summary, strengths, weaknesses
