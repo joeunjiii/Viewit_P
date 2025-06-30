@@ -16,7 +16,7 @@ public class InterviewDao {
 
     // 질문/답변 저장 (answer_feedback은 null로 시작)
     public void saveInterview(Interview interview) {
-        String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, filter_word, answer_feedback) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO INTERVIEW (session_id, question_text, answer_text, answer_feedback) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 interview.getSessionId(),
                 interview.getQuestionText(),
