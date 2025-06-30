@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegFileAlt } from "react-icons/fa";
-import LoadingSpinner from "./asset/LoadingSpinner";
+import RecentSkeleton from "./asset/RecentSkeleton";
 import "./css/Recentsection.css";
 
 function RecentSection({ sessions = [], loading }) {
@@ -21,7 +21,7 @@ function RecentSection({ sessions = [], loading }) {
 
   // 로딩 중이면 스피너 표시
   if (loading) {
-    return <LoadingSpinner message="데이터를 불러오는 중입니다" />;
+    return <RecentSkeleton count={isTablet ? 3 : 5} />;
   }
   return (
     <div className="Recent-section">
