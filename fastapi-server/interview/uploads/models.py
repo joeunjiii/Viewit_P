@@ -21,7 +21,7 @@ class InterviewSession(Base):
     user_id = Column(BigInteger, nullable=False)
     job_role = Column(String(100), nullable=True)
     started_at = Column(DateTime, nullable=False)
-    ended_at = Column(DateTime, nullable=True)
+    
     
 class InterviewAnswer(Base):
     __tablename__ = "INTERVIEW"  # 반드시 실제 테이블 이름과 정확히 일치시켜야 합니다
@@ -30,7 +30,6 @@ class InterviewAnswer(Base):
     session_id = Column(String(36), nullable=True, index=True)
     question_text = Column(Text, nullable=False)
     answer_text = Column(Text, nullable=False)
-    filter_word = Column(String(50), nullable=True)
     answer_feedback = Column(Text, nullable=True)
 
 class InterviewFeedback(Base):

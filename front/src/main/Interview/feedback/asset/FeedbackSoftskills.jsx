@@ -2,7 +2,10 @@
 import React from "react";
 import "../css/FeedbackSummarySoftskills.css";
 
-export default function FeedbackSoftskills({ strengths, weaknesses }) {
+export default function FeedbackSoftskills({
+  strengths = [],
+  weaknesses = [],
+}) {
   return (
     <div className="softskills-block">
       <div className="softskills-title">요약된 피드백 포인트</div>
@@ -17,16 +20,16 @@ export default function FeedbackSoftskills({ strengths, weaknesses }) {
           <tr>
             <td>
               <ol className="softskills-list">
-                {strengths.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
+                {Array.isArray(strengths)
+                  ? strengths.map((s, i) => <li key={i}>{s}</li>)
+                  : null}
               </ol>
             </td>
             <td>
               <ol className="softskills-list">
-                {weaknesses.map((w, i) => (
-                  <li key={i}>{w}</li>
-                ))}
+                {Array.isArray(weaknesses)
+                  ? weaknesses.map((w, i) => <li key={i}>{w}</li>)
+                  : null}
               </ol>
             </td>
           </tr>

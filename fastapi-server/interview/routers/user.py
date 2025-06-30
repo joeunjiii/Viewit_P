@@ -83,7 +83,6 @@ def get_user_sessions(
                 "session_id": session.session_id,
                 "job_role": session.job_role,
                 "started_at": session.started_at,
-                "ended_at": session.ended_at,
                 "feedback": {
                     "interview_strengths": (
                         feedback.interview_strengths if feedback else None
@@ -120,22 +119,32 @@ def get_session_feedback(
         raise HTTPException(status_code=404, detail="세션을 찾을 수 없습니다.")
 
     feedback = db.query(InterviewFeedback).filter_by(session_id=session_id).first()
+    if feedback and feedback.interview_strengths:
+        print("interview_strengths 원본:", feedback.interview_strengths)
+    if feedback and feedback.interview_weaknesses:
+        print("interview_weaknesses 원본:", feedback.interview_weaknesses)
     answers = (
-        db.query(InterviewAnswer)
-        .filter_by(session_id=session_id)
+        db.query(InterviewAnswer).filter_by(session_id=session_id)
         # .order_by(InterviewAnswer.question_index)
         .all()
     )
 
     return {
-        
         "session_id": session.session_id,
         "name": current_user.get("name") or "",
         "date": session.started_at,
         "job": session.job_role,
         "summary": feedback.final_feedback if feedback else None,
-        "strengths": feedback.interview_strengths if feedback else [],
-        "weaknesses": feedback.interview_weaknesses if feedback else [],
+        "strengths": (
+            [s.strip() for s in feedback.interview_strengths.split(",")]
+            if feedback and feedback.interview_strengths
+            else []
+        ),
+        "weaknesses": (
+            [w.strip() for w in feedback.interview_weaknesses.split(",")]
+            if feedback and feedback.interview_weaknesses
+            else []
+        ),
         "questions": [
             {
                 "question": a.question_text,
