@@ -9,6 +9,7 @@ function FeedbackHistoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef(null);
+  const [initialLoading, setInitialLoading] = useState(true);
   const navigate = useNavigate();
   const limit = 5;
 
@@ -18,29 +19,43 @@ function FeedbackHistoryPage() {
       navigate("/login");
       return;
     }
-
     const loadSessions = async () => {
+      if (offset === 0) setInitialLoading(true);
       setLoading(true);
-      const data = await fetchInterviewHistory(token, limit, offset);
-      if (Array.isArray(data)) {
-        setSessions((prev) => {
-          const combined = [...prev, ...data];
-          const unique = Array.from(
-            new Map(combined.map((item) => [item.session_id, item])).values()
-          );
-          return unique;
-        });
-        if (data.length < limit) setHasMore(false);
-      } else {
+  
+      try {
+        const data = await fetchInterviewHistory(token, limit, offset);
+        if (Array.isArray(data)) {
+          // 1) sessions 추가 병합
+          setSessions((prev) => {
+            const combined = [...prev, ...data];
+            // 중복 제거
+            const unique = Array.from(
+              new Map(combined.map((item) => [item.session_id, item])).values()
+            );
+            return unique;
+          });
+          // 2) 더 불러올 게 있는지 판단
+          if (data.length < limit) {
+            setHasMore(false);
+          }
+        } else {
+          // API 에러 등으로 배열이 아니면 로딩 끝
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("피드백 기록 불러오기 오류:", error);
         setHasMore(false);
+      } finally {
+        setLoading(false);
+        if (offset === 0) setInitialLoading(false);
       }
-      setLoading(false);
     };
-
-    // offset이 바뀔 때마다 추가 데이터 요청
+  
     if (hasMore) loadSessions();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset]);
+  
 
   // 바닥 감지 → offset 증가
   useEffect(() => {
@@ -65,8 +80,7 @@ function FeedbackHistoryPage() {
         <h2 className="feedback-history-title-inside">모의면접 피드백 결과</h2>
         <hr className="feedback-history-divider" />
         <ul className="feedback-history-list">
-          {loading ? (
-            // 🔽 5개 회색 스켈레톤 미리 보여주기
+          {initialLoading ? (
             Array.from({ length: limit }).map((_, i) => (
               <li className="skeleton-item" key={i}>
                 <div className="skeleton-title" />
@@ -94,10 +108,11 @@ function FeedbackHistoryPage() {
             ))
           )}
         </ul>
+
         {/* 바닥 감지용 */}
         {hasMore && (
           <div ref={loaderRef} style={{ height: 36, textAlign: "center" }}>
-            {loading && <span style={{ color: "#bbb" }}>로딩 중...</span>}
+            {loading && !initialLoading && <span style={{ color: "#bbb" }}>로딩 중...</span>}
           </div>
         )}
       </div>
