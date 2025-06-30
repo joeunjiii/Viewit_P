@@ -1,7 +1,12 @@
 .feedback-question-row {
+  width: 700px;
   margin-top: 32px;
   margin-left: 80px;
   margin-right: 80px;
+  min-width: 700px;
+  min-height: 400px;
+  max-height: 600px; /* ← 고정 */
+
   background: rgb(247, 250, 248);
   border-radius: 20px;
   padding: 24px 28px;
@@ -61,6 +66,18 @@
   gap: 16px;
   margin-bottom: 24px;
 }
+.question-box {
+  height: 320px;
+  background: #f8f8f8;
+  overflow-y: auto;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 18px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
 .question-tabs button {
   padding: 8px 18px;
@@ -72,6 +89,17 @@
   transition: all 0.2s ease;
 }
 
+.qa-tabs-empty {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  font-size: 1.1rem;
+  background: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
 .question-tabs button:hover {
   background: #e3f3de;
   border-color: #a5caa4;
@@ -87,7 +115,7 @@
 /* 네비게이션 버튼 */
 .nav-btn {
   padding: 8px 12px;
-  background: #10ff9b;
+  background: #adadad;
   border: none;
   border-radius: 20px;
   font-weight: 500;
@@ -98,7 +126,7 @@
 }
 
 .nav-btn:hover {
-  background: #4d7f6b;
+  color: black;
   transform: scale(1.03);
 }
 

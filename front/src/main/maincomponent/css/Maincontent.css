@@ -1,6 +1,5 @@
 .main-content {
   display: flex;
-  
   flex-grow: 1;
   background-color: #ffffff;
   padding-left: 50px;
@@ -74,20 +73,20 @@
 }
 .feedback-section {
   display: flex;
-  gap: 32px;         /* 카드 사이 간격 */
+  gap: 16px;         /* 카드 사이 간격 */
   align-items: flex-start;
   
 }
 
 .feedback-icon {
   font-size: 48px;
-  margin-right: 8px;
   color: #555;
 }
 
 .feedback-text {
   font-size: 26px;
   color: #333;
+  margin-top:15px;
 }
 
 /* 피드백 리스트 카드 */

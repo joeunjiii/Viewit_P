@@ -3,13 +3,19 @@ from sqlalchemy.orm import Session
 from typing import List
 from sqlalchemy.orm import joinedload
 from fastapi import Query
-from interview.uploads.models import  InterviewFeedback,InterviewSession,User,InterviewAnswer  # SQLAlchemy 모델 예시
+from interview.uploads.models import (
+    InterviewFeedback,
+    InterviewSession,
+    User,
+    InterviewAnswer,
+)  # SQLAlchemy 모델 예시
 from interview.uploads.database import get_db  # DB 세션 의존성
-from interview.routers.auth import get_current_user      # 인증 유저 추출 함수
+from interview.routers.auth import get_current_user  # 인증 유저 추출 함수
 
 router = APIRouter()
 
-#메인화면 5개 받아오는 api
+
+# 메인화면 5개 받아오는 api
 @router.get("/api/user/sessions/latest")
 def get_latest_sessions(
     current_user: dict = Depends(get_current_user),
@@ -19,31 +25,34 @@ def get_latest_sessions(
         db.query(InterviewSession)
         .filter_by(user_id=current_user["user_id"])
         .order_by(InterviewSession.started_at.desc())
-        .limit(5)   # 최근 5개
+        .limit(5)  # 최근 5개
         .all()
     )
     user = db.query(User).filter_by(user_id=current_user["user_id"]).first()
 
     result = []
     for session in sessions:
-        feedback = db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
-        result.append({
-            "session_id": session.session_id,
-            "job_role": session.job_role,
-            "started_at": session.started_at,
-        })
+        feedback = (
+            db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
+        )
+        result.append(
+            {
+                "session_id": session.session_id,
+                "job_role": session.job_role,
+                "started_at": session.started_at,
+            }
+        )
 
     return result
 
 
-
-#feeebackhistory컴포넌트 5개씩 랜더링는 api
+# feeebackhistory컴포넌트 5개씩 랜더링는 api
 @router.get("/api/user/sessions/history")
 def get_user_sessions(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
     limit: int = Query(5, ge=1, le=50),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ):
     sessions = (
         db.query(InterviewSession)
@@ -57,19 +66,74 @@ def get_user_sessions(
 
     result = []
     for session in sessions:
-        feedback = db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
-        result.append({
-            "session_id": session.session_id,
-            "job_role": session.job_role,
-            "started_at": session.started_at,
-            "ended_at": session.ended_at,
-            
-            "feedback": {
-                "interview_strengths": feedback.interview_strengths if feedback else None,
-                "interview_weaknesses": feedback.interview_weaknesses if feedback else None,
+        feedback = (
+            db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
+        )
+        result.append(
+            {
+                "session_id": session.session_id,
+                "job_role": session.job_role,
+                "started_at": session.started_at,
+                "ended_at": session.ended_at,
+                "feedback": {
+                    "interview_strengths": (
+                        feedback.interview_strengths if feedback else None
+                    ),
+                    "interview_weaknesses": (
+                        feedback.interview_weaknesses if feedback else None
+                    ),
+                },
             }
-        })
+        )
 
     return result
 
 
+# 상세 세션 피드백 반환 API
+@router.get("/api/feedback/{session_id}")
+def get_session_feedback(
+    session_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    print("===== [API 호출됨] session_id:", session_id)
+    print("current_user:", current_user)
+    # 본인 소유 세션만 반환 (보안)
+    session = (
+        db.query(InterviewSession)
+        .filter_by(session_id=session_id, user_id=current_user["user_id"])
+        .first()
+    )
+    print("쿼리 결과 session:", session)
+    if not session:
+        print("[404] 세션을 찾을 수 없습니다!")
+
+        raise HTTPException(status_code=404, detail="세션을 찾을 수 없습니다.")
+
+    feedback = db.query(InterviewFeedback).filter_by(session_id=session_id).first()
+    answers = (
+        db.query(InterviewAnswer)
+        .filter_by(session_id=session_id)
+        # .order_by(InterviewAnswer.question_index)
+        .all()
+    )
+
+    return {
+        
+        "session_id": session.session_id,
+        "name": current_user.get("name") or "",
+        "date": session.started_at,
+        "job": session.job_role,
+        "summary": feedback.final_feedback if feedback else None,
+        "strengths": feedback.interview_strengths if feedback else [],
+        "weaknesses": feedback.interview_weaknesses if feedback else [],
+        "questions": [
+            {
+                "question": a.question_text,
+                "answer": a.answer_text,
+                "feedback": a.answer_feedback,
+            }
+            for a in answers
+        ],
+        # 필요하면 더 추가 (score, duration, etc)
+    }

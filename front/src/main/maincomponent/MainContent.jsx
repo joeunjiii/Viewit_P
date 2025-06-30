@@ -11,7 +11,6 @@ import { fetchLatestUserSessions } from "./asset/user";
 function MainContent() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showModal, setShowModal] = useState(false);
   const [showTypeModal, setShowTypeModal] = useState(false);
 

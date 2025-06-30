@@ -6,36 +6,46 @@ import FeedbackSoftskills from "./asset/FeedbackSoftskills";
 import FeedbackSummary from "./asset/FeedbackSummary";
 import QuestionAnswerTabs from "./asset/QuestionAnswerTabs";
 import ActionButton from "./asset/ActionButton";
-import { fetchFeedbackResult } from "./feedback/api/feedback";
-
-
-
+import { fetchFeedbackResult } from "./api/feedback";
+import { formatDateTime } from "../../../utils/date";
+import LoadingModal from "../asset/LoadingModal";
 function FeedbackResult() {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState(null);
-  const navigate = useNavigate();
   const { sessionId } = useParams(); // /feedback/:sessionId 같은 라우팅이면 사용
-  
+
   useEffect(() => {
-    if (!sessionId) return;  // undefined면 API 호출하지 않음
+    if (!sessionId) return;
+    let mounted = true;
     async function fetchData() {
       setLoading(true);
       try {
-        // sessionId에 맞는 데이터 불러오기
-        const data = await fetchFeedbackResult(sessionId);
-        setFeedback(data);
+        // "최소 1초 로딩" 약속
+        const [data] = await Promise.all([
+          fetchFeedbackResult(sessionId),
+          new Promise((res) => setTimeout(res, 500)),
+        ]);
+        if (mounted) setFeedback(data);
       } catch (e) {
-        alert("피드백 결과를 불러오지 못했습니다.");
+        if (mounted) alert("피드백 결과를 불러오지 못했습니다.");
       }
-      setLoading(false);
+      if (mounted) setLoading(false);
     }
     fetchData();
+    return () => {
+      mounted = false;
+    };
   }, [sessionId]);
 
-  if (loading || !feedback) {
-    return <div className="feedback-layout">로딩중...</div>;
+  if (loading) {
+    return <LoadingModal message="AI 피드백 결과를 불러오고 있습니다..." />;
   }
+  if (!feedback) {
+    return <div className="feedback-layout">피드백 데이터가 없습니다.</div>;
+  }
+
   return (
     <div className="feedback-layout">
       <main className="feedback-main">
@@ -49,7 +59,7 @@ function FeedbackResult() {
           <section className="feedback-info-row">
             <FeedbackJobTable
               name={feedback.name}
-              date={feedback.date}
+              date={formatDateTime(feedback.date)}
               job={feedback.job}
             />
           </section>
@@ -66,9 +76,9 @@ function FeedbackResult() {
 
           <section className="feedback-question-row">
             <QuestionAnswerTabs
-               questions={feedback.questions}
-               selectedTab={selectedTab}
-               setSelectedTab={setSelectedTab}
+              questions={feedback.questions}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
             />
           </section>
         </div>

@@ -8,7 +8,9 @@ module.exports = function(app) {
             "/api/interview/next_question",
             "/api/interview/final_answer",
             "/api/stt",
-            "/api/tts"
+            "/api/tts",
+            "/api/feedback",       
+            "/api/jd",            
         ],
         createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
     );

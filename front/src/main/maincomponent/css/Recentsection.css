@@ -27,25 +27,25 @@
 }
 
 .Recent-card {
-  display: flex;                  /* Flexbox 적용 */
-  flex-direction: column;        /* 세로 방향 정렬 */
-  justify-content: center;       /* 세로 중앙 정렬 */
-  align-items: center;           /* 가로 중앙 정렬 */
-  text-align: center;            /* 텍스트도 중앙 정렬 */
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  border: 1px solid #c5c5c5;
+  border-radius: 16px;
   width: 220px;
   min-height: 100px;
-  padding: 16px 20px; 
+  padding: 16px 20px;
   font-size: 13px;
-  text-align: center;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .Recent-card:hover {
-  background-color: #f0f3f0;
+  background: linear-gradient(135deg, #f0f3f0 0%, #e8f5e8 100%);
+  transform: scale(1.02);
 }
 
 .Recent-day {
