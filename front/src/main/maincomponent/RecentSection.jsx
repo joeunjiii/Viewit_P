@@ -4,15 +4,12 @@ import { FaRegFileAlt } from "react-icons/fa";
 import LoadingSpinner from "./asset/LoadingSpinner";
 import "./css/Recentsection.css";
 
-function RecentSection({ sessions = [] ,loading}) {
+function RecentSection({ sessions = [], loading }) {
   const [showAll, setShowAll] = useState(false);
   const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
-  
   const navigate = useNavigate();
-  const visibleResults =
-  isTablet && !showAll ? sessions.slice(0, 3) : sessions;
+  const visibleResults = isTablet && !showAll ? sessions.slice(0, 3) : sessions;
 
-  
   // 화면 크기 변화 감지
   useEffect(() => {
     const handleResize = () => {
@@ -34,15 +31,20 @@ function RecentSection({ sessions = [] ,loading}) {
       </div>
 
       <div className="Recent-list">
-      {visibleResults.length === 0 ? (
-          <div className="Recent-card" style={{ color: "#bbb", padding: "24px" }}>
+        {visibleResults.length === 0 ? (
+          <div
+            className="Recent-card"
+            style={{ color: "#bbb", padding: "24px" }}
+          >
             기록이 없습니다.
           </div>
         ) : (
           visibleResults.map((item, index) => {
             // 날짜 가공
             const dateStr = item.started_at || item.date;
-            const [year, month, day] = dateStr ? dateStr.split("T")[0].split("-") : ["-", "-", "-"];
+            const [year, month, day] = dateStr
+              ? dateStr.split("T")[0].split("-")
+              : ["-", "-", "-"];
             return (
               <div
                 className="Recent-card"
@@ -51,8 +53,20 @@ function RecentSection({ sessions = [] ,loading}) {
                 onClick={() => navigate(`/feedback/${item.session_id}`)}
                 title="분석 결과 보기"
               >
-                <div className="Recent-date">{`${year}년 ${month}월 ${day}일`}</div>
-                <div className="Recent-label">직무: {item.job_role || "-"}</div>
+                {/* 상단: 날짜 + 직무 */}
+                <div className="Recent-card-info">
+                  <div className="Recent-date">{`${year}년 ${month}월 ${day}일`}</div>
+                  <div className="Recent-label">
+                    직무: {item.job_role || "-"}
+                  </div>
+                </div>
+                
+                {/* 하단: 질문 개수 버튼 뱃지 */}
+                <div className="Recent-card-badges">
+                  <button type="button" className="Recent-badge">
+                    질문 {item.question_count ?? 0}개
+                  </button>
+                </div>
               </div>
             );
           })

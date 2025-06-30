@@ -13,6 +13,7 @@ router = APIRouter()
 # Spring 서버 주소 (환경변수 또는 기본값)
 SPRING_URL = os.getenv("SPRING_URL", "http://localhost:8083")
 
+
 # 세션 초기화 요청 바디 모델
 class InitRequest(BaseModel):
     session_id: str
@@ -27,6 +28,7 @@ class AnswerRequest(BaseModel):
     session_id: str
     answer: str
 
+
 # 인터뷰 세션 초기화 엔드포인트
 @router.post("/init_session")
 async def init_session(data: InitRequest, request: Request):
@@ -37,10 +39,10 @@ async def init_session(data: InitRequest, request: Request):
     session_store = request.app.state.session_store
 
     # FastAPI 앱 상태에서 AI 관련 객체 꺼내기
-    st_model       = request.app.state.st_model
-    qdrant_client  = request.app.state.qdrant_client
-    openai_client  = request.app.state.openai_client
-    session_store  = request.app.state.session_store  # 세션 저장소 (메모리)
+    st_model = request.app.state.st_model
+    qdrant_client = request.app.state.qdrant_client
+    openai_client = request.app.state.openai_client
+    session_store = request.app.state.session_store  # 세션 저장소 (메모리)
 
     # 새로운 인터뷰 세션 객체 생성
     session = InterviewSession(
@@ -63,12 +65,13 @@ async def init_session(data: InitRequest, request: Request):
     audio_url = generate_tts_audio(first_q)
     return {"question": first_q, "audio_url": audio_url}
 
+
 # 후속 질문 생성 및 답변 피드백 생성 엔드포인트
 @router.post("/next_question")
 async def next_question(
-        data: AnswerRequest,
-        request: Request,
-        authorization: str = Header(None)  # JWT 토큰 (있으면)
+    data: AnswerRequest,
+    request: Request,
+    authorization: str = Header(None),  # JWT 토큰 (있으면)
 ):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
@@ -84,7 +87,9 @@ async def next_question(
 
     # 1) LLM으로 답변 피드백 생성
     try:
-        answer_feedback = feedback_service.generate_answer_feedback(llm, last_q, data.answer)
+        answer_feedback = feedback_service.generate_answer_feedback(
+            llm, last_q, data.answer
+        )
         print("생성된 피드백:", answer_feedback)
 
         # 2) Spring PUT 호출로 피드백 저장 (토큰 포함 가능)
@@ -96,7 +101,9 @@ async def next_question(
         print(f"[WARN] 피드백 저장 실패: {e}")
 
     # 3) 종료 조건: 10분 경과, 최종 질문 미출력 시 최종 질문 생성
-    if time.time() - session.start_time >= 600 and not session.state.get("final_question_given", False):
+    if time.time() - session.start_time >= 600 and not session.state.get(
+        "final_question_given", False
+    ):
         final_q = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.store_answer(final_q, "")
@@ -118,6 +125,7 @@ async def next_question(
         next_q = "질문 음성 생성에 문제가 발생했습니다. 잠시 후 다시 시도해 주세요."
         audio_url = generate_tts_audio(next_q)
     return {"question": next_q, "audio_url": audio_url, "done": False}
+
 
 # 최종 답변 및 전체 피드백 생성 엔드포인트
 @router.post("/final_answer")

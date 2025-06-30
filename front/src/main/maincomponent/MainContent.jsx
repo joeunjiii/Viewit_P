@@ -22,7 +22,7 @@ function MainContent() {
       return;
     }
     // fetch 함수 예시
-    fetchLatestUserSessions(token).then(data => {
+    fetchLatestUserSessions(token).then((data) => {
       setSessions(data || []);
       setLoading(false);
     });
@@ -57,27 +57,34 @@ function MainContent() {
           </div>
 
           <div className="feedback-list">
-
-            {/* 첫 번째 이미지 */}
-            <div>
+            <a
+              href="https://brunch.co.kr/@jungdamfounder/54"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none" }}
+            >
               <img
                 src={feedbackImg3x}
                 alt="피드백 1"
                 className="feedback-image"
               />
-              <div className="feedback-semitext">면접 어떻게해야할까요?</div>
-            </div>
+              <div className="feedback-semitext">면접 어떻게 해야할까요?</div>
+            </a>
 
-            <div>
+            <a
+              href="https://youtu.be/EKYxExHE0B0?si=7WrwQ2wcN86Kohaz"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none" }}
+            >
               <img
                 src={feedbackImg1x}
                 alt="피드백 3"
                 className="feedback-image"
               />
-              <div className="feedback-semitext">멋지게 인사하는법</div>
-            </div>
+              <div className="feedback-semitext">자기소개하는 법</div>
+            </a>
           </div>
-
         </div>
       </div>
       {showModal && <SpeechAlertModal onClose={() => setShowModal(false)} />}

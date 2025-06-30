@@ -2,7 +2,8 @@
   margin-top: 24px;
   margin-bottom: 40px;
 }
-.Recent-section h3{
+
+.Recent-section h3 {
   font-size: 26px;
 }
 
@@ -26,38 +27,58 @@
   gap: 12px;
 }
 
+.Recent-card-info {
+  margin-bottom: 16px; /* 텍스트 아래쪽에 공간 추가 */
+}
+
 .Recent-card {
-  display: flex;
+  width: 230px;
+  background: #f8fcf9;
+  border-radius: 15px;
+  box-shadow: 0 2px 14px rgba(30,70,60,0.07);
+  padding: 28px 16px 18px 16px;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  text-align: center;
-  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-  border: 1px solid #c5c5c5;
-  border-radius: 16px;
-  width: 220px;
-  min-height: 100px;
-  padding: 16px 20px;
-  font-size: 13px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 2px solid #e0f1ea;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.16s;
+  margin: 0 14px 24px 0; /* 여러개 나란히 쓸 때 좌/하단 여백 */
 }
 
 .Recent-card:hover {
-  background: linear-gradient(135deg, #f0f3f0 0%, #e8f5e8 100%);
-  transform: scale(1.02);
-}
-
-.Recent-day {
-  font-weight: bold;
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: #333;
+  box-shadow: 0 4px 24px rgba(30,70,60,0.12);
+  border-color: #80dfbe;
+  transform: translateY(-4px) scale(1.03);
 }
 
 .Recent-label {
   font-size: 13px;
   color: #555;
+}
+
+.Recent-card-badges {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.Recent-badge {
+  background-color: #7f8c8d;
+  color: 	#ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 8px;
+  font-weight: 500;
+  font-size: 0.8  rem;
+  cursor: pointer;
+  box-shadow: 0 1.5px 5px rgba(54, 179, 126, 0.4);
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.Recent-badge:hover {
+  background-color: #3b8c6a;
 }
 
 .recent-toggle-btn {

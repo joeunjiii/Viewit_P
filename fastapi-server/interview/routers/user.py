@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from sqlalchemy.orm import joinedload
 from fastapi import Query
@@ -35,11 +36,19 @@ def get_latest_sessions(
         feedback = (
             db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
         )
+
+        # 질문 수 조회
+        question_count = (
+            db.query(func.count(InterviewAnswer.interview_id))
+            .filter(InterviewAnswer.session_id == session.session_id)
+            .scalar()
+        )
         result.append(
             {
                 "session_id": session.session_id,
                 "job_role": session.job_role,
                 "started_at": session.started_at,
+                "question_count": question_count or 0,
             }
         )
 

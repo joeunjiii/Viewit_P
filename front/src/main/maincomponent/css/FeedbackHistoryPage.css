@@ -21,7 +21,6 @@
   /* overflow-y: auto; */
 }
 
-
 /* hr 스타일 - 연초록, 얇고 양쪽 여백 */
 .feedback-history-divider {
   border: none;
@@ -62,6 +61,7 @@
   border: 1.5px solid #9c9c9c;
   transition: box-shadow 0.15s, border 0.15s;
   cursor: pointer;
+  justify-content: space-between;
 }
 
 .feedback-history-item:hover {
@@ -78,10 +78,64 @@
 .feedback-history-date {
   font-size: 0.97rem;
   color: #37a27e;
+  text-align: right;  /* 우측 정렬 */
+  width: 100%;        /* 한 줄 전체 차지하게 (권장) */
 }
 
 .feedback-history-empty {
   color: #bbb;
   padding: 32px;
   text-align: center;
+}
+
+/* FeedbackHistoryPage.css에 추가 */
+
+.skeleton-item {
+  width: 100%;
+  height: 58px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  background: linear-gradient(
+    90deg,
+    #f2f4f5 25%,
+    #e7ecee 50%,
+    #f2f4f5 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.3s infinite linear;
+  display: flex;
+  flex-direction: column;    /* 한 줄씩 아래로 */
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 20px 9px 20px;
+}
+.skeleton-title {
+  width: 120px;
+  height: 18px;
+  background: #e2e7e7;
+  border-radius: 7px;
+}
+.skeleton-desc {             /* 추가된 두 번째 줄 */
+  width: 70px;
+  height: 12px;
+  background: #edf2f1;
+  border-radius: 5px;
+  margin-top: 2px;
+}
+.skeleton-date {
+  width: 70px;
+  height: 14px;
+  background: #ececec;
+  border-radius: 5px;
+  margin-left: auto;
+  margin-top: -24px;        /* 오른쪽 정렬, 위로 겹치게 */
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

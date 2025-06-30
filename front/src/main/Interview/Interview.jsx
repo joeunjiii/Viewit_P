@@ -1,6 +1,6 @@
 // Interview.jsx
 import React, { useState, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { createInterviewSession, initSession } from "./api/interview";
 import "./css/Interview.css";
@@ -17,7 +17,6 @@ import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
 import ErrorModal from "./asset/ErrorModal";
 import PersonalizationModal from "./PersonalizationModal";
-
 
 function Interview() {
   const location = useLocation();
@@ -59,11 +58,11 @@ function Interview() {
     console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
   const handleStartSettings = ({
-                                 jobRole,
-                                 autoQuestion,
-                                 allowRetry,
-                                 waitTime,
-                               }) => {
+    jobRole,
+    autoQuestion,
+    allowRetry,
+    waitTime,
+  }) => {
     setJobRole(jobRole);
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
@@ -82,16 +81,13 @@ function Interview() {
       return;
     }
 
-
     setStep("interview");
     setInitialQuestion(null);
     setShowLoadingModal(true); // 로딩모달 on
 
-
     try {
       // 2초 대기 + 세션 초기화 병렬 실행
       const delay = new Promise((resolve) => setTimeout(resolve, 2000));
-
 
       // 면접 세션(백엔드/DB) 생성 -> 성공 후 initSession 호출
       await createInterviewSession({
@@ -100,18 +96,16 @@ function Interview() {
         job_role: jobRole,
       });
 
-
       const [res] = await Promise.all([
         initSession({
           session_id: sessionId,
           user_id: safeUserId,
           job_role: jobRole,
           jdText: personalData?.jd_text || "",
-          pdfText: personalData?.pdf_ocr_text || ""
+          pdfText: personalData?.pdf_ocr_text || "",
         }),
         delay,
       ]);
-
 
       setInitialQuestion({
         question: res.data.question,
@@ -208,16 +202,16 @@ function Interview() {
                   onTimeUpdate={setRemainingTime}
                   onNewQuestion={handleNewQuestion}
                   onCaptionUpdate={handleCaptionUpdate}
-                // onAnswerComplete={handleAnswerComplete}
+                  // onAnswerComplete={handleAnswerComplete}
                 />
               )}
             </div>
           </div>
 
-              <CaptionBox text={captionText} />
-            </div>
-        )}
-      </>
+          <CaptionBox text={captionText} />
+        </div>
+      )}
+    </>
   );
 }
 
