@@ -35,7 +35,7 @@ function InterviewSessionManager({
   const timerRef = useRef(null);
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
-
+  const navigate = useNavigate();
   // 초기 질문 세팅
   useEffect(() => {
     setQuestion(initialQuestion);

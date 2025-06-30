@@ -4,13 +4,13 @@ import { fetchInterviewHistory } from "./asset/user.js";
 import "./css/FeedbackHistoryPage.css";
 
 function FeedbackHistoryPage() {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef(null);
   const [initialLoading, setInitialLoading] = useState(true);
-  const navigate = useNavigate();
   const limit = 5;
 
   useEffect(() => {

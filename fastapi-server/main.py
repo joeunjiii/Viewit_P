@@ -20,10 +20,8 @@ from interview.routers.jd_upload import router as jd_router
 from interview.routers.user import router as user_router
 
 from interview.uploads.database import SessionLocal
-from interview.services.feedback_service import save_final_feedback
 from interview.services.llm_feedback import generate_answer_feedback, generate_final_feedback
 from interview.services.feedback_service import save_answer_feedback_to_spring
-from interview.routers.feedback import router as feedback_router
 
 
 env_path = Path(__file__).parent / ".env"
@@ -85,5 +83,5 @@ app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")
 app.include_router(jd_router, prefix="/api/jd")
-app.include_router(feedback_router)
+
 app.include_router(user_router)
