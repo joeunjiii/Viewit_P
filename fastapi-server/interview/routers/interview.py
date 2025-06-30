@@ -8,6 +8,9 @@ import time
 from interview.interview_session import InterviewSession
 from interview.services.tts_service import generate_tts_audio
 from interview.services import feedback_service
+from interview.utils.logger_utils import timing_logger
+
+
 
 router = APIRouter()
 
@@ -29,6 +32,7 @@ class AnswerRequest(BaseModel):
 
 # ── 세션 초기화 엔드포인트 ──
 @router.post("/init_session")
+@timing_logger("세션 초기화 전체")
 async def init_session(data: InitRequest, request: Request):
     st_model      = request.app.state.st_model
     qdrant_client = request.app.state.qdrant_client
@@ -62,6 +66,7 @@ async def init_session(data: InitRequest, request: Request):
 
 # ── 후속 질문 + 자동 최종 피드백 엔드포인트 ──
 @router.post("/next_question")
+@timing_logger("다음 질문 ")
 async def next_question(
         data: AnswerRequest,
         request: Request,
@@ -153,6 +158,7 @@ async def next_question(
 
 # 최종 답변 및 전체 피드백 생성 엔드포인트
 @router.post("/final_answer")
+@timing_logger("마지막")
 async def final_answer(data: AnswerRequest, request: Request):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)

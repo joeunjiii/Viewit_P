@@ -27,10 +27,12 @@ function FeedbackResult() {
           fetchFeedbackResult(sessionId),
           new Promise((res) => setTimeout(res, 500)),
         ]);
+        console.log("AI 피드백 API 결과:", data);
         if (mounted) setFeedback(data);
       } catch (e) {
         if (mounted) alert("피드백 결과를 불러오지 못했습니다.");
       }
+      
       if (mounted) setLoading(false);
     }
     fetchData();
