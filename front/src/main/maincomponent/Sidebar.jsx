@@ -104,38 +104,39 @@ function Sidebar({ onSpeechClick }) {
             {!isTablet && <span>피드백 결과</span>}
           </Link>
         </div>
-    
+
       </nav >
 
-    <div className="settings-button" onClick={() => setShowLogoutModal(true)}>
-      <FaCog className="settings-icon" />
-      {!isTablet && <span>설정</span>}
-    </div>
-  {/* 로그아웃 모달 */ }
-  {
-    showLogoutModal && (
-      <div className="logout-modal-overlay">
-        <div className="logout-modal">
-          <h3 className="logout-title">로그아웃 하시겠습니까?</h3>
-          <div className="logout-actions">
-            <button
-              className="logout-cancel"
-              onClick={() => setShowLogoutModal(false)}
-            >
-              취소
-            </button>
-            <button className="logout-confirm" onClick={handleLogout}>
-              로그아웃
-            </button>
-          </div>
-        </div>
+      <div className="settings-button" onClick={() => setShowLogoutModal(true)}>
+        <FaCog className="settings-icon" />
+        {!isTablet && <span>설정</span>}
       </div>
-    )
-  }
-  <FeedbackModal
-    open={showFeedbackModal}
-    onClose={() => setShowFeedbackModal(false)}
-  />
+      {/* 로그아웃 모달 */}
+      {
+        showLogoutModal && (
+          <div className="logout-modal-overlay">
+            <div className="logout-modal">
+              <h3 className="logout-title">로그아웃 하시겠습니까?</h3>
+              <div className="logout-actions">
+                <button className="logout-confirm" onClick={handleLogout}>
+                  로그아웃
+                </button>
+                <button
+                  className="logout-cancel"
+                  onClick={() => setShowLogoutModal(false)}
+                >
+                  취소
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )
+      }
+      <FeedbackModal
+        open={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+      />
     </div >
   );
 }
