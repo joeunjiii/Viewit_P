@@ -34,10 +34,6 @@ class AnswerRequest(BaseModel):
 @router.post("/init_session")
 @timing_logger("세션 초기화 전체")
 async def init_session(data: InitRequest, request: Request):
-    st_model      = request.app.state.st_model
-    qdrant_client = request.app.state.qdrant_client
-    openai_client = request.app.state.openai_client
-    session_store = request.app.state.session_store
 
     # FastAPI 앱 상태에서 AI 관련 객체 꺼내기
     st_model       = request.app.state.st_model

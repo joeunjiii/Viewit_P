@@ -3,7 +3,10 @@ import hashlib
 import requests
 from dotenv import load_dotenv
 
+from fastapi import APIRouter
 load_dotenv()
+
+
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 VOICE_ID = "7Nah3cbXKVmGX7gQUuwz"  # ElevenLabs의 기본 한국어/기본 목소리 id, 커스텀 가능
@@ -38,3 +41,4 @@ def generate_tts_audio(text: str) -> str:
             raise Exception(f"ElevenLabs TTS API 실패: {response.status_code} {response.text}")
 
     return f"/static/audio/{filename}"
+

@@ -1,9 +1,11 @@
 // src/main/InterviewSettingsModal.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
+
   // 마이크, 직무, 자막, 재답변 허용, 대기 시간 상태
   const [micEnabled] = useState(true);
   const [job, setJob] = useState("backend");
@@ -12,6 +14,19 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [waitTime, setWaitTime] = useState(5);
 
   const navigate = useNavigate();
+  const [voiceOptions, setVoiceOptions] = useState([]);
+  const [voiceId, setVoiceId] = useState("");
+
+  // 목소리 옵션 백엔드에서 불러오기
+  useEffect(() => {
+    axios.get("/api/tts//voice-options")
+      .then(res => {
+        setVoiceOptions(res.data);
+        if (res.data.length > 0) setVoiceId(res.data[0].id);
+      })
+      .catch(() => setVoiceOptions([]));
+  }, []);
+
 
   // 취소 시 메인으로 이동
   const handleCancel = () => {
@@ -26,6 +41,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       jobRole: job,
       autoQuestion,
       allowRetry,
+      voiceId,
     });
   };
 
@@ -76,6 +92,26 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
             <MenuItem value="backend">Back-end 개발자 (Java)</MenuItem>
             <MenuItem value="frontend">Front-end 개발자 (React)</MenuItem>
             <MenuItem value="ai">AI 엔지니어</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* 목소리 선택 */}
+        <FormControl fullWidth size="small" sx={{ mt: 2 }}>
+          <InputLabel id="voice-select-label">목소리 선택</InputLabel>
+          <Select
+            labelId="voice-select-label"
+            value={voiceId}
+            label="목소리 선택"
+            onChange={(e) => setVoiceId(e.target.value)}
+            disabled={voiceOptions.length === 0}
+          >
+            {voiceOptions.length === 0 ? (
+              <MenuItem value="">목소리 옵션 없음</MenuItem>
+            ) : (
+              voiceOptions.map((v) => (
+                <MenuItem key={v.id} value={v.id}>{v.label}</MenuItem>
+              ))
+            )}
           </Select>
         </FormControl>
 
