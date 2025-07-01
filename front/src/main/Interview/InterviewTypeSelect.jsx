@@ -66,12 +66,12 @@ export default function InterviewTypeSelect({ onClose }) {
               개인화 맞춤형 모의면접
             </div>
             <div className="interview-type-card-desc">
-              내 포트폴리오, JD(채용공고)를 통해 
+              내 포트폴리오, JD(채용공고)를 통해
               나만의 자료로 질문을 생성해 연습할 수 있어요.
             </div>
           </div>
         </div>
-        
+
         {/* 공통 세팅 모달 (IT공통/개인화 모두에서 사용) */}
         {showPersonalModal && (
           <PersonalizationModal
