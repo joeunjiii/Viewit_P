@@ -24,27 +24,24 @@ body {
 }
 
 .naver-button {
-  background-color: #639F86;
+  background-color: #03C75A;
   color: white;
   border: none;
   padding: 12px 24px;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
-  
   transition: background-color 0.3s;
-
   display: flex;                /* 요소 정렬용 flex */
   align-items: center;          /* 세로 중앙 정렬 */
   gap: 10px;                    /* 아이콘과 텍스트 간격 */
 }
 
 .naver-icon {
-  width: 25px;
-  height: 25px;
-  border-radius: 6px;
-  object-fit: cover;
-  background-color: white;
+  width: 24px;  /* 필요에 따라 조절 */
+  height: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .login-logo {
@@ -61,4 +58,16 @@ body {
   height: 1px;
   background-color: #aaa;
   margin: 20px 0;
+}
+.naver-login-img {
+  width: 220px;      /* 네이버 공식 버튼 기준 */
+  height: 56px;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(3, 199, 90, 0.12);
+  transition: filter 0.12s;
+}
+.naver-login-img:hover {
+  filter: brightness(0.96);
 }

@@ -25,26 +25,26 @@ export default function Login() {
           credentials: "include",
           body: JSON.stringify({ accessToken }),
         })
-            .then(res => {
-              console.log("[Login] /api/auth/naver response status:", res.status);
-              if (!res.ok) throw new Error("HTTP " + res.status);
-              return res.json();
-            })
-            .then(data => {
-              console.log("[Login] /api/auth/naver response body:", data);
-              if (data.token && data.userId) {
-                // [4] jwt, userId 모두 저장! (이 부분이 핵심)
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("userId", data.userId);
-                window.location.href = "/main";
-              } else {
-                alert("로그인 실패: 토큰 또는 userId 없음");
-              }
-            })
-            .catch(err => {
-              console.error("[Login] 네트워크 오류 또는 백엔드 에러", err);
-              alert("네트워크 오류 발생");
-            });
+          .then(res => {
+            console.log("[Login] /api/auth/naver response status:", res.status);
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(data => {
+            console.log("[Login] /api/auth/naver response body:", data);
+            if (data.token && data.userId) {
+              // [4] jwt, userId 모두 저장! (이 부분이 핵심)
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("userId", data.userId);
+              window.location.href = "/main";
+            } else {
+              alert("로그인 실패: 토큰 또는 userId 없음");
+            }
+          })
+          .catch(err => {
+            console.error("[Login] 네트워크 오류 또는 백엔드 에러", err);
+            alert("네트워크 오류 발생");
+          });
       }
     }
 
@@ -64,22 +64,25 @@ export default function Login() {
   // 네이버 로그인 버튼 클릭 시 팝업 열기
   const handleLogin = () => {
     window.open(
-        "/naver/callback.html", // public/naver/callback.html 경로
-        "naverLoginPopup",
-        "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
+      "/naver/callback.html", // public/naver/callback.html 경로
+      "naverLoginPopup",
+      "width=500,height=600,menubar=no,toolbar=no,status=no,scrollbars=yes"
     );
   };
 
   return (
-      <div className="container">
-        <div className="login-box">
-          <img src="/assets/logo.png" alt="로고" className="login-logo" />
-          <div className="horizontal-line" />
-          <button className="naver-button" onClick={handleLogin}>
-            <img src="/assets/naver.png" alt="네이버 로그인" className="naver-icon" />
-            네이버 로그인
-          </button>
-        </div>
+    <div className="container">
+      <div className="login-box">
+        <img src="/assets/logo.png" alt="로고" className="login-logo" />
+        <div className="horizontal-line" />
+        <img
+          src="/assets/naver.png"
+          alt="네이버 로그인"
+          className="naver-login-img"
+          style={{ cursor: "pointer" }}
+          onClick={handleLogin}
+        />
       </div>
+    </div>
   );
 }

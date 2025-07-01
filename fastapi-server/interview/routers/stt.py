@@ -2,41 +2,59 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
 from interview.services.whisper_service import stt_from_webm
 from interview.utils.logger_utils import timing_logger
+import traceback
 router = APIRouter()
 UPLOAD_DIR = "./interview/uploads/webm"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+MAX_SIZE = 10 * 1024 * 1024
 
 @router.post("/")
 @timing_logger("STT 전체 처리")
 async def speech_to_text(audio: UploadFile = File(...)):
     print("STT API 진입")
-    # ( 호출 :: DB 저장 할 수 있는 코드  )
-    print("audio.filename:", audio.filename)
-
-    # 1) 파일 읽기
-    audio_bytes = await audio.read()
-    print("audio_bytes size:", len(audio_bytes))
-
-    # 2) 파일 저장
-    webm_path = os.path.join(UPLOAD_DIR, audio.filename)
-    with open(webm_path, "wb") as f:
-        f.write(audio_bytes)
-    print("실제 저장된 파일 사이즈", os.path.getsize(webm_path))
-
-    # 3) 파일 존재/사이즈 체크
-    if not os.path.exists(webm_path) or os.path.getsize(webm_path) == 0:
-        raise HTTPException(500, detail="저장된 파일이 존재하지 않거나 사이즈가 0입니다.")
-
-    # 4) STT 처리 (여기서 CUDA 사용!)
+    # 파일명 방어
+    filename = os.path.basename(audio.filename)
+    webm_path = os.path.join(UPLOAD_DIR, filename)
+    
     try:
-        abs_webm_path = os.path.abspath(webm_path)
-        text = stt_from_webm(abs_webm_path)
-        if not text or not text.strip():
-            text = "소리없음"
-        return {"text": text}
+            # 파일 읽기
+            audio_bytes = await audio.read()
+            print("audio_bytes size:", len(audio_bytes))
+            if len(audio_bytes) == 0:
+                raise HTTPException(400, detail="업로드된 파일이 비어 있습니다.")
+            if len(audio_bytes) > MAX_SIZE:
+                raise HTTPException(413, detail="업로드 파일이 너무 큽니다.")
+
+            # 파일 저장
+            try:
+                with open(webm_path, "wb") as f:
+                    f.write(audio_bytes)
+            except Exception as e:
+                traceback.print_exc()
+                raise HTTPException(500, detail=f"파일 저장 실패: {e}")
+
+            print("실제 저장된 파일 사이즈", os.path.getsize(webm_path))
+            if not os.path.exists(webm_path) or os.path.getsize(webm_path) == 0:
+                raise HTTPException(500, detail="저장된 파일이 존재하지 않거나 사이즈가 0입니다.")
+
+            # STT 처리
+            try:
+                abs_webm_path = os.path.abspath(webm_path)
+                text = stt_from_webm(abs_webm_path)
+                if not text or not text.strip():
+                    text = "소리없음"
+                return {"text": text}
+            except Exception as e:
+                traceback.print_exc()
+                raise HTTPException(500, detail=f"STT 처리 오류: {e}")
+
+    except HTTPException as e:
+            # 이미 핸들된 에러는 그냥 다시 raise
+            raise
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(500, detail=f"STT 처리 오류: {e}")
-    
-    
+            traceback.print_exc()
+            raise HTTPException(500, detail=f"알 수 없는 서버 에러: {e}")
+        
+        
