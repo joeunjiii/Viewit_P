@@ -19,7 +19,7 @@ if device == "cuda":
 else:
     print("🔊 Whisper 모델 불러오는 중... (CPU 사용)")
 
-model = whisper.load_model("medium").to(device)
+model = whisper.load_model("base").to(device)
 print("✅ Whisper 모델 로딩 완료 (device:", device, ")")
 print(torch.cuda.memory_allocated() / 1024 ** 2, "MB")
 

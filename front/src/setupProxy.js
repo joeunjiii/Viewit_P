@@ -10,7 +10,8 @@ module.exports = function(app) {
             "/api/stt",
             "/api/tts",
             "/api/feedback",       
-            "/api/jd",            
+            "/api/jd",       
+            "/api/voice-options",     
         ],
         createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
     );

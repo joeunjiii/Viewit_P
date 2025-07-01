@@ -78,11 +78,18 @@ def get_user_sessions(
         feedback = (
             db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
         )
+        # ⬇️ 질문 개수 쿼리 추가!
+        question_count = (
+            db.query(func.count(InterviewAnswer.interview_id))
+            .filter(InterviewAnswer.session_id == session.session_id)
+            .scalar()
+        )
         result.append(
             {
                 "session_id": session.session_id,
                 "job_role": session.job_role,
                 "started_at": session.started_at,
+                "question_count": question_count or 0,
                 "feedback": {
                     "interview_strengths": (
                         feedback.interview_strengths if feedback else None

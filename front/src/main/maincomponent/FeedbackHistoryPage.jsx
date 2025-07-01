@@ -22,25 +22,21 @@ function FeedbackHistoryPage() {
     const loadSessions = async () => {
       if (offset === 0) setInitialLoading(true);
       setLoading(true);
-  
+
       try {
         const data = await fetchInterviewHistory(token, limit, offset);
         if (Array.isArray(data)) {
-          // 1) sessions 추가 병합
           setSessions((prev) => {
             const combined = [...prev, ...data];
-            // 중복 제거
             const unique = Array.from(
               new Map(combined.map((item) => [item.session_id, item])).values()
             );
             return unique;
           });
-          // 2) 더 불러올 게 있는지 판단
           if (data.length < limit) {
             setHasMore(false);
           }
         } else {
-          // API 에러 등으로 배열이 아니면 로딩 끝
           setHasMore(false);
         }
       } catch (error) {
@@ -51,13 +47,12 @@ function FeedbackHistoryPage() {
         if (offset === 0) setInitialLoading(false);
       }
     };
-  
+
     if (hasMore) loadSessions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset]);
-  
 
-  // 바닥 감지 → offset 증가
+
   useEffect(() => {
     if (!hasMore || loading) return;
     const observer = new window.IntersectionObserver((entries) => {
@@ -101,8 +96,9 @@ function FeedbackHistoryPage() {
                     ? `직무: ${session.job_role}`
                     : "직무 정보 없음"}
                 </div>
-                <div className="feedback-history-date">
-                  {formatDate(session.started_at)}
+                <div className="feedback-history-date-row">
+                  <span className="badge-question-count">{session.question_count ?? 0}문항</span>
+                  <span className="feedback-date-text">{formatDate(session.started_at)}</span>
                 </div>
               </li>
             ))
