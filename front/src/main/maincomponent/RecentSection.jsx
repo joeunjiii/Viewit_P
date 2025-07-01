@@ -60,11 +60,17 @@ function RecentSection({ sessions = [], loading }) {
                     직무: {item.job_role || "-"}
                   </div>
                 </div>
-                
+
                 {/* 하단: 질문 개수 버튼 뱃지 */}
                 <div className="Recent-card-badges">
-                  <button type="button" className="Recent-badge">
+                  <button type="button" className="Recent-badge badge-question">
                     질문 {item.question_count ?? 0}개
+                  </button>
+                  <button type="button" className="Recent-badge badge-wait">
+                   대기시간:{item.wait_time ?? "?"}초
+                  </button>
+                  <button type="button" className="Recent-badge badge-voice">
+                    음성: {item.interviewerVoiceLabel ?? "알 수 없음"}
                   </button>
                 </div>
               </div>

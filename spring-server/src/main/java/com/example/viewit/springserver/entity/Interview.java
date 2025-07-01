@@ -16,7 +16,7 @@ public class Interview {
         this.sessionId = sessionId;
         this.questionText = questionText;
         this.answerText = answerText;
-        this.filterWord = filterWord;
+
         this.answerFeedback = answerFeedback;
     }
 

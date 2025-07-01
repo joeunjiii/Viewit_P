@@ -50,10 +50,24 @@ class InterviewSession:
             return random.choice(questions) if questions else None
 
     def ask_fixed_question(self, kind: str = "intro") -> str:
-        return {
-            "intro": "자기소개 부탁드립니다.",
-            "final": "면접을 마무리하기 전에 마지막으로 하고 싶은 말이 있나요?",
-        }.get(kind, "")
+        intro_questions = [
+            "먼저 자기소개 부탁드립니다.",
+            "본인을 한 문장으로 표현한다면 어떻게 소개하시겠어요?",
+            "지원 동기와 함께 본인을 간단히 소개해 주세요.",
+            "최근 가장 도전적이었던 경험과 함께 자기소개 해주세요.",
+            "자신의 강점 위주로 자신을 소개해 주세요.",
+        ]
+        final_questions = [
+            "면접을 마무리하기 전에 마지막으로 하고 싶은 말이 있나요?",
+            "추가로 하고 싶은 말씀이 있으신가요?",
+            "오늘 면접 소감이나 마지막으로 강조하고 싶은 점이 있으신가요?",
+        ]
+        if kind == "intro":
+            return random.choice(intro_questions)
+        elif kind == "final":
+            return random.choice(final_questions)
+        else:
+            return ""
 
     def search_similar_questions(
         self, query: str, top_k: int = 5

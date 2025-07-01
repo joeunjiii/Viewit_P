@@ -32,7 +32,7 @@ public class InterviewSessionController {
         Long userId = null;
 
         // 입력값 로그
-        log.info("[initSession] session_id={}, job_role={}, user_id={}", sessionId, jobRole, userIdObj);
+        log.info("[initSession] session_id={}, job_role={}, user_id={} ,wait_time={}", sessionId, jobRole, userIdObj,waitTime);
 
         // user_id 체크
         if (userIdObj == null) {
@@ -66,6 +66,7 @@ public class InterviewSessionController {
         resp.put("user_id", userId);
         resp.put("job_role", jobRole);
         resp.put("started_at", session.getStartedAt());
+        resp.put("wait_time", session.getWaitTime());
         resp.put("question", "첫 번째 질문"); // 실제 면접 질문은 FastAPI에서 받아와도 됨
 
         log.info("[initSession] 세션 생성 완료! session_id={}, user_id={}", sessionId, userId);

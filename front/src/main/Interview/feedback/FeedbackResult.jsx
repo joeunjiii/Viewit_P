@@ -9,6 +9,8 @@ import ActionButton from "./asset/ActionButton";
 import { fetchFeedbackResult } from "./api/feedback";
 import { formatDateTime } from "../../../utils/date";
 import LoadingModal from "../asset/LoadingModal";
+
+
 function FeedbackResult() {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -32,7 +34,7 @@ function FeedbackResult() {
       } catch (e) {
         if (mounted) alert("피드백 결과를 불러오지 못했습니다.");
       }
-      
+
       if (mounted) setLoading(false);
     }
     fetchData();

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
-
+  
   // 마이크, 직무, 자막, 재답변 허용, 대기 시간 상태
   const [micEnabled] = useState(true);
   const [job, setJob] = useState("backend");
@@ -15,19 +15,23 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
 
   const navigate = useNavigate();
   const [voiceOptions, setVoiceOptions] = useState([]);
-  const [voiceId, setVoiceId] = useState("");
-
+  const [interviewerVoice, setInterviewerVoice] = useState("");
+  
   // 목소리 옵션 백엔드에서 불러오기
   useEffect(() => {
-    axios.get("/api/tts//voice-options")
+    axios.get("/api/tts/voice-options")
       .then(res => {
         setVoiceOptions(res.data);
-        if (res.data.length > 0) setVoiceId(res.data[0].id);
+        if (res.data.length > 0) {
+          setInterviewerVoice(res.data[0].id);  // 여기가 실제 기본값 결정 위치
+        }
       })
-      .catch(() => setVoiceOptions([]));
+      .catch(() => {
+        setVoiceOptions([]);
+      });
   }, []);
 
-
+  
   // 취소 시 메인으로 이동
   const handleCancel = () => {
     navigate("/main");
@@ -41,7 +45,8 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       jobRole: job,
       autoQuestion,
       allowRetry,
-      voiceId,
+      interviewerVoice,
+      
     });
   };
 
@@ -100,9 +105,9 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           <InputLabel id="voice-select-label">목소리 선택</InputLabel>
           <Select
             labelId="voice-select-label"
-            value={voiceId}
+            value={interviewerVoice}
             label="목소리 선택"
-            onChange={(e) => setVoiceId(e.target.value)}
+            onChange={(e) => setInterviewerVoice(e.target.value)}
             disabled={voiceOptions.length === 0}
           >
             {voiceOptions.length === 0 ? (

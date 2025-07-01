@@ -6,13 +6,11 @@ from dotenv import load_dotenv
 from fastapi import APIRouter
 load_dotenv()
 
-
-
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID = "7Nah3cbXKVmGX7gQUuwz"  # ElevenLabs의 기본 한국어/기본 목소리 id, 커스텀 가능
+
 print(f"API 키: {ELEVENLABS_API_KEY}")
-def generate_tts_audio(text: str) -> str:
-    h = hashlib.md5(text.encode()).hexdigest()[:8]
+def generate_tts_audio(text: str, voice_id: str) -> str:
+    h = hashlib.md5((text + voice_id).encode()).hexdigest()[:8]
     filename = f"q_{h}.mp3"
     save_path = os.path.join("static", "audio", filename)
 
@@ -20,7 +18,7 @@ def generate_tts_audio(text: str) -> str:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         
         # ElevenLabs API 호출
-        url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
         headers = {
             "xi-api-key": ELEVENLABS_API_KEY,
             "Content-Type": "application/json"
