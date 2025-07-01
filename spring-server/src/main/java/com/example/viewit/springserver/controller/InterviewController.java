@@ -49,6 +49,8 @@ public class InterviewController {
         String sessionId = (String) body.get("session_id");
         String jobRole = (String) body.get("job_role");
         Object userIdRaw = body.get("user_id");
+        String voiceId = (String) body.get("interviewerVoice");
+
         Long userId = null;
         if (userIdRaw instanceof String) {
             userId = Long.valueOf((String) userIdRaw);
@@ -62,6 +64,8 @@ public class InterviewController {
         session.setJobRole(jobRole);
         session.setUserId(userId);
         session.setStartedAt(new Timestamp(System.currentTimeMillis()));
+        session.setInterviewerVoice(voiceId);
+
         interviewSessionDao.insertSession(session);
 
         // FastAPI 호출

@@ -30,6 +30,7 @@ function Interview() {
 
   const [step, setStep] = useState("settings");
   const [sessionId] = useState(uuidv4());
+  const [interviewerVoice, setInterviewerVoice] = useState("");
   const [jobRole, setJobRole] = useState("backend");
   const [autoQuestion, setAutoQuestion] = useState(true);
   const [allowRetry, setAllowRetry] = useState(true);
@@ -58,11 +59,13 @@ function Interview() {
     console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
   const handleStartSettings = ({
+    interviewerVoice,
     jobRole,
     autoQuestion,
     allowRetry,
     waitTime,
   }) => {
+    setInterviewerVoice(interviewerVoice);
     setJobRole(jobRole);
     setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
@@ -94,6 +97,15 @@ function Interview() {
         session_id: sessionId,
         user_id: safeUserId,
         job_role: jobRole,
+        wait_time: waitTime,
+        interviewerVoice
+      });
+      console.log("🔍 session 초기화 파라미터:", {
+        session_id: sessionId,
+        user_id: safeUserId,
+        job_role: jobRole,
+        wait_time: waitTime,
+        interviewerVoice: interviewerVoice,
       });
 
       const [res] = await Promise.all([
@@ -103,6 +115,7 @@ function Interview() {
           job_role: jobRole,
           jdText: personalData?.jd_text || "",
           pdfText: personalData?.pdf_ocr_text || "",
+          interviewerVoice
         }),
         delay,
       ]);
@@ -202,7 +215,7 @@ function Interview() {
                   onTimeUpdate={setRemainingTime}
                   onNewQuestion={handleNewQuestion}
                   onCaptionUpdate={handleCaptionUpdate}
-                  // onAnswerComplete={handleAnswerComplete}
+                // onAnswerComplete={handleAnswerComplete}
                 />
               )}
             </div>

@@ -58,6 +58,7 @@
 
 .Recent-card-badges {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
   gap: 12px;
   margin-top: 8px;
@@ -79,6 +80,18 @@
 
 .Recent-badge:hover {
   background-color: #3b8c6a;
+}
+.badge-question {
+  background-color: #4CAF50; 
+}
+
+.badge-wait {
+  background-color: #ff9224; 
+  
+}
+
+.badge-voice {
+  background-color: #7986CB; 
 }
 
 .recent-toggle-btn {

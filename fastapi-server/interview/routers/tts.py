@@ -23,9 +23,9 @@ async def tts_synthesize(data: TTSRequest):
 async def get_voice_options():
     
     options = [
-        {"id": "default", "label": "기본 목소리"},
-        {"id": "korean_female", "label": "여성 - 차분한"},
-        {"id": "korean_male", "label": "남성 - 명확한"},
+        {"id": "ErXwobaYiN019PkySvjV", "label": "기본 목소리"},
+        {"id": "21m00Tcm4TlvDq8ikWAM", "label": "차분한 여성"},
+        {"id": "TxGEqnHWrfWFTfGW9XjX", "label": "명확한 남성"},
         # ...더 추가 가능
     ]
     return JSONResponse(content=options)

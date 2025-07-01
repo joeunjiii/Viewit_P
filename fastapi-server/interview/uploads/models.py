@@ -21,6 +21,8 @@ class InterviewSession(Base):
     user_id = Column(BigInteger, nullable=False)
     job_role = Column(String(100), nullable=True)
     started_at = Column(DateTime, nullable=False)
+    interviewer_voice = Column(String(50), nullable=False)  
+    wait_time = Column(Integer, nullable=False)  
     
     
 class InterviewAnswer(Base):

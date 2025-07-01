@@ -135,15 +135,9 @@ function InterviewSessionManager({
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
           const data = res.data;
 
-          // 2-1) 자동 총평이 포함되어 돌아왔으면
           if (data.final_feedback) {
             alert("면접이 종료되었습니다.\n" + (data.message || ""));
-            navigate("/feedback-result", {
-              state: {
-                feedback: data.final_feedback,
-                history: data.history || [],
-              },
-            });
+            navigate(`/feedback/${sessionId}`);  // <- sessionId 포함하여 이동!
             onAnswerComplete?.(sttResult);
             return;
           }
