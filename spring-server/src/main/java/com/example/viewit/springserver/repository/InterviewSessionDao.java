@@ -16,14 +16,14 @@ public class InterviewSessionDao {
     }
 
     public void insertSession(InterviewSession session) {
-        String sql = "INSERT INTO INTERVIEW_SESSION (session_id, user_id, job_role, started_at) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, session.getSessionId(), session.getUserId(), session.getJobRole(), session.getStartedAt());
+        String sql = "INSERT INTO INTERVIEW_SESSION (session_id, user_id, job_role, started_at, wait_time, interviewer_voice) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, session.getSessionId(), session.getUserId(), session.getJobRole(), session.getStartedAt(), session.getWaitTime(), session.getInterviewerVoice());
     }
 
-    public void updateEndedAt(String sessionId, Timestamp endedAt) {
-        String sql = "UPDATE INTERVIEW_SESSION SET ended_at = ? WHERE session_id = ?";
-        jdbcTemplate.update(sql, endedAt, sessionId);
-    }
+//    public void updateEndedAt(String sessionId, Timestamp endedAt) {
+//        String sql = "UPDATE INTERVIEW_SESSION SET WHERE session_id = ?";
+//        jdbcTemplate.update(sql, sessionId);
+//    }
 
     public boolean existsById(String sessionId) {
         String sql = "SELECT COUNT(*) FROM INTERVIEW_SESSION WHERE session_id = ?";

@@ -27,6 +27,8 @@ public class InterviewSessionController {
         String sessionId = (String) body.get("session_id");
         String jobRole = (String) body.get("job_role");
         Object userIdObj = body.get("user_id");
+        int waitTime = (body.get("wait_time") != null) ? Integer.parseInt(body.get("wait_time").toString()) : 5;
+        String interviewerVoice = (String) body.getOrDefault("interviewerVoice", "기본 목소리");
         Long userId = null;
 
         // 입력값 로그
@@ -53,6 +55,8 @@ public class InterviewSessionController {
         session.setJobRole(jobRole);
         session.setUserId(userId);
         session.setStartedAt(new Timestamp(System.currentTimeMillis()));
+        session.setWaitTime(waitTime);
+        session.setInterviewerVoice(interviewerVoice);
 
         // DB Insert
         interviewSessionDao.insertSession(session);
@@ -75,8 +79,8 @@ public class InterviewSessionController {
             log.warn("[endSession] sessionId가 없습니다.");
             return ResponseEntity.badRequest().body(Map.of("error", "sessionId가 없습니다."));
         }
-        interviewSessionDao.updateEndedAt(sessionId, new Timestamp(System.currentTimeMillis()));
-        log.info("[endSession] 세션 종료 처리 완료: session_id={}", sessionId);
+//        interviewSessionDao.updateEndedAt(sessionId, new Timestamp(System.currentTimeMillis()));
+//        log.info("[endSession] 세션 종료 처리 완료: session_id={}", sessionId);
         return ResponseEntity.ok(Map.of("session_id", sessionId, "status", "ended"));
     }
 }
