@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
-import Timer from "./asset/Timer";
-import { endSession } from "./api/interview";
 import { useNavigate } from "react-router-dom";
 
 const PHASE = {
@@ -15,18 +13,18 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
-                                   sessionId,
-                                   waitTime = 3,
-                                   allowRetry = true,
-                                   initialQuestion,
-                                   onStatusChange,
-                                   onTimeUpdate,
-                                   onNewQuestion,
-                                   onAnswerComplete,
-                                   onCaptionUpdate,
-                                   jdText,
-                                   pdfText,
-                                 }) {
+  sessionId,
+  waitTime = 3,
+  // allowRetry = true,
+  initialQuestion,
+  onStatusChange,
+  onTimeUpdate,
+  onNewQuestion,
+  onAnswerComplete,
+  onCaptionUpdate,
+  jdText,
+  pdfText,
+}) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -55,20 +53,21 @@ function InterviewSessionManager({
     if (phase === PHASE.TTS && question?.audio_url) {
       audioRef.current?.pause();
       const url = question.audio_url.startsWith("http")
-          ? question.audio_url
-          : "http://localhost:8000" + question.audio_url;
+        ? question.audio_url
+        : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
       audio.onended = () => {
         console.log("[TTS] 오디오 재생 종료, phase WAITING 전환");
         setPhase(PHASE.WAITING);
       };
-      audio.play()
-      .then(() => console.log("[TTS] 오디오 재생 시작!"))
-      .catch((err) => {
-        console.error("[TTS] 오디오 play 에러:", err);
-        setPhase(PHASE.WAITING);
-      });
+      audio
+        .play()
+        .then(() => console.log("[TTS] 오디오 재생 시작!"))
+        .catch((err) => {
+          console.error("[TTS] 오디오 play 에러:", err);
+          setPhase(PHASE.WAITING);
+        });
     }
   }, [phase, question, onStatusChange, onCaptionUpdate]);
 
@@ -80,7 +79,7 @@ function InterviewSessionManager({
       setRemainingTime(waitTime);
       onTimeUpdate?.(waitTime);
       timerRef.current = setInterval(() => {
-        setRemainingTime(prev => {
+        setRemainingTime((prev) => {
           onTimeUpdate?.(prev - 1);
           if (prev <= 1) {
             clearInterval(timerRef.current);
@@ -100,7 +99,7 @@ function InterviewSessionManager({
   }, [phase, waitTime, onTimeUpdate]);
 
   // 녹음 완료 → STT
-  const handleRecordingComplete = async blob => {
+  const handleRecordingComplete = async (blob) => {
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -133,15 +132,10 @@ function InterviewSessionManager({
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
           const data = res.data;
 
-          // **방어코드 : alert창**
-          if (
-              data.question?.includes("질문 음성 생성에 문제가 발생했습니다") ||
-              !data.audio_url
-          ) {
-            alert("면접 질문 음성 생성에 문제가 생겼습니다. 잠시 후 새로고침하거나 나가기를 이용하세요.");
-            // 종료 처리 (예: 피드백 페이지 이동, or phase 고정, 버튼 disabled 등)
-            // navigate(`/feedback/${sessionId}`);
-            setPhase(PHASE.TTS); // 더 진행 안 하게 잠깐 멈춤 (or done 상태로 관리)
+          if (data.final_feedback) {
+            alert("면접이 종료되었습니다.\n" + (data.message || ""));
+            navigate(`/feedback/${sessionId}`); // <- sessionId 포함하여 이동!
+            onAnswerComplete?.(sttResult);
             return;
           }
 
@@ -177,27 +171,16 @@ function InterviewSessionManager({
     // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
     setTimeout(() => setPhase(PHASE.TTS), 20);
     setRemainingTime(waitTime);
-
   };
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-        {phase === PHASE.WAITING && (
-            <div className="timer-area">
-              <Timer duration={remainingTime} autoStart label="대기시간" />
-              {allowRetry && (
-                  <button className="replay-button" onClick={handleRetry}>
-                    다시 답변하기
-                  </button>
-              )}
-            </div>
-        )}
-      </div>
+    <div className="interview-session">
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+    </div>
   );
 }
 

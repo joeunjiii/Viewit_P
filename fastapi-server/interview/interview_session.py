@@ -3,18 +3,19 @@ import torch
 from sentence_transformers import util
 import random
 
+
 class InterviewSession:
     def __init__(
-            self,
-            session_id: str,
-            qdrant_client,
-            openai_client,
-            st_model,
-            collection_name: str,
-            job_role: str,
-            softskill_label: str | None = None,
-            jdText: str | None = None,
-            pdfText: str | None = None,
+        self,
+        session_id: str,
+        qdrant_client,
+        openai_client,
+        st_model,
+        collection_name: str,
+        job_role: str,
+        softskill_label: str | None = None,
+        jdText: str | None = None,
+        pdfText: str | None = None,
     ):
         self.session_id = session_id
         self.qdrant_client = qdrant_client
@@ -24,8 +25,8 @@ class InterviewSession:
         self.start_time = time.time()
         self.job_role = job_role
         self.softskill_label = softskill_label
-        self.jdText = jdText       # 그대로 유지
-        self.pdfText = pdfText     # 그대로 유지
+        self.jdText = jdText  # 그대로 유지
+        self.pdfText = pdfText  # 그대로 유지
         self.state = {
             "step": 0,
             "current_topic": None,
@@ -34,17 +35,33 @@ class InterviewSession:
             "completed": False,
         }
         self.interviewer_profiles = [
-            {"name": "김AI", "role": "기술", "system_msg": "당신은 기술면접관입니다. 깊이있고 논리적인 질문을 던집니다."},
-            {"name": "박AI", "role": "인성", "system_msg": "당신은 인성면접관입니다. 따뜻하고 배려 깊은 질문을 던집니다."},
-            {"name": "이AI", "role": "창의", "system_msg": "당신은 창의적이고 문제해결 중심의 면접관입니다. 열린 질문을 좋아합니다."}
+            {
+                "name": "김AI",
+                "role": "기술",
+                "voice_id": "21m00Tcm4TlvDq8ikWAM",
+                "system_msg": "당신은 기술면접관입니다. 깊이있고 논리적인 질문을 던집니다.",
+            },
+            {
+                "name": "박AI",
+                "role": "인성",
+                "voice_id": "TxGEqnHWrfWFTfGW9XjX",
+                "system_msg": "당신은 인성면접관입니다. 따뜻하고 배려 깊은 질문을 던집니다.",
+            },
+            {
+                "name": "이AI",
+                "role": "창의",
+                "voice_id": "ErXwobaYiN019PkySvjV",
+                "system_msg": "당신은 창의적이고 문제해결 중심의 면접관입니다. 열린 질문을 좋아합니다.",
+            },
         ]
         self.interviewer_index = 0  # 면접관 순차 교대
 
     def get_next_interviewer(self):
-        idx = self.interviewer_index
-        profile = self.interviewer_profiles[idx]
-        self.interviewer_index = (idx + 1) % len(self.interviewer_profiles)
-        return profile
+        interviewer = random.choice(self.interviewer_profiles)
+        print(
+            f"[DEBUG] 랜덤 면접관: {interviewer['name']} / voice_id: {interviewer['voice_id']}"
+        )
+        return interviewer
 
     def get_random_common_question(self) -> str | None:
         results = self.qdrant_client.search(
@@ -60,7 +77,7 @@ class InterviewSession:
             ]
             return random.choice(questions) if questions else None
 
-    def ask_fixed_question(self, kind: str = "intro") -> str:
+    def ask_fixed_question(self, kind: str = "intro") -> tuple[str, str, str, str]:
         intro_questions = [
             "먼저 자기소개 부탁드립니다.",
             "본인을 한 문장으로 표현한다면 어떻게 소개하시겠어요?",
@@ -74,14 +91,16 @@ class InterviewSession:
             "오늘 면접 소감이나 마지막으로 강조하고 싶은 점이 있으신가요?",
         ]
         if kind == "intro":
-            return random.choice(intro_questions)
+            q = random.choice(intro_questions)
         elif kind == "final":
-            return random.choice(final_questions)
+            q = random.choice(final_questions)
         else:
-            return ""
+            q = ""
+        interviewer = self.get_next_interviewer()
+        return q, interviewer["name"], interviewer["role"], interviewer["voice_id"]
 
     def search_similar_questions(
-            self, query: str, top_k: int = 5
+        self, query: str, top_k: int = 5
     ) -> list[tuple[str, float]]:
         query_vector = self.embedder.encode(query).tolist()
         filters = [{"key": "job_role", "match": {"value": self.job_role}}]
@@ -100,12 +119,22 @@ class InterviewSession:
         return [(r.payload.get("question", ""), r.score) for r in results]
 
     def store_answer(
-            self, question: str, answer: str, topic: str | None = None,
-            interviewer_name: str = None, interviewer_role: str = None
+        self,
+        question: str,
+        answer: str,
+        topic: str | None = None,
+        interviewer_name: str = None,
+        interviewer_role: str = None,
+        interviewer_voice_id: str = None,
     ) -> None:
         self.state["history"].append(
-            {"question": question, "answer": answer, "topic": topic,
-             "interviewer_name": interviewer_name, "interviewer_role": interviewer_role}
+            {
+                "question": question,
+                "answer": answer,
+                "topic": topic,
+                "interviewer_name": interviewer_name,
+                "interviewer_role": interviewer_role,
+            }
         )
         if topic == self.state.get("current_topic"):
             self.state["topic_count"] += 1
@@ -114,7 +143,7 @@ class InterviewSession:
             self.state["topic_count"] = 1
 
     def is_too_similar_to_previous(
-            self, new_question: str, threshold: float = 0.9
+        self, new_question: str, threshold: float = 0.9
     ) -> bool:
         prev_qs = [item["question"] for item in self.state["history"]]
         if not prev_qs:
@@ -124,26 +153,36 @@ class InterviewSession:
         sim = util.cos_sim(new_vec, prev_vecs)
         return torch.max(sim).item() > threshold
 
-    def decide_next_question(self, last_answer: str) -> tuple[str, str, str]:
+    def decide_next_question(self, last_answer: str) -> tuple[str, str, str,str]:
         interviewer = self.get_next_interviewer()
         interviewer_name = interviewer["name"]
         interviewer_role = interviewer["role"]
         system_msg = interviewer["system_msg"]
+        voice_id = interviewer["voice_id"]
 
         # history_text 항상 준비
         history_text = "\n".join(
             f"{i+1}) Q: {h['question']} / A: {h['answer']}"
             for i, h in enumerate(self.state["history"])
         )
-        is_short_or_passive = (
-                len(last_answer.strip()) < 20 or
-                last_answer.strip() in ["잘 모르겠습니다", "없습니다", "생각이 나지 않습니다", "네", "아니오"]
+        is_short_or_passive = len(last_answer.strip()) < 20 or last_answer.strip() in [
+            "잘 모르겠습니다",
+            "없습니다",
+            "생각이 나지 않습니다",
+            "네",
+            "아니오",
+        ]
+        common_count = sum(
+            1 for item in self.state["history"] if item.get("topic") == "common"
         )
-        common_count = sum(1 for item in self.state["history"] if item.get("topic") == "common")
         total_count = len(self.state["history"])
         need_more_common = (common_count / (total_count + 1)) < 0.3
 
-        answer_desc = last_answer if last_answer and last_answer.strip() != "" else "(지원자가 아직 답변을 하지 않았음)"
+        answer_desc = (
+            last_answer
+            if last_answer and last_answer.strip() != ""
+            else "(지원자가 아직 답변을 하지 않았음)"
+        )
         # ---- JD/자소서 기반 질문 분기 (★변수명 그대로 사용★)
         if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
             prompt = f"""
@@ -180,7 +219,7 @@ class InterviewSession:
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": prompt}
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=0.7,
                     max_tokens=512,
@@ -189,8 +228,8 @@ class InterviewSession:
                 if not nxt or not nxt.strip():
                     continue
                 if not self.is_too_similar_to_previous(nxt):
-                    return nxt, interviewer_name, interviewer_role
-            return nxt, interviewer_name, interviewer_role
+                    return nxt, interviewer_name, interviewer_role,voice_id
+            return nxt, interviewer_name, interviewer_role,voice_id
 
         # 공통질문(소프트스킬) LLM 생성
         if is_short_or_passive or need_more_common:
@@ -209,18 +248,22 @@ class InterviewSession:
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": prompt}
+                        {"role": "user", "content": prompt},
                     ],
                     temperature=0.85,
-                    max_tokens=256
+                    max_tokens=256,
                 )
                 next_question = response.choices[0].message.content.strip()
                 if not self.is_too_similar_to_previous(next_question):
-                    return next_question, interviewer_name, interviewer_role
-            return next_question, interviewer_name, interviewer_role  # fallback
+                    return next_question, interviewer_name, interviewer_role, voice_id
+            return next_question, interviewer_name, interviewer_role,voice_id  # fallback
 
         # 직무 Pool 기반 질문 생성
-        example_job_q = self.get_random_common_question() if self.job_role == "common" else self.get_random_common_question()
+        example_job_q = (
+            self.get_random_common_question()
+            if self.job_role == "common"
+            else self.get_random_common_question()
+        )
         similar_qas = self.search_similar_questions(last_answer, top_k=3)
         retrieved_context = "\n".join([f"- {q}" for q, _ in similar_qas])
         prompt = f"""
@@ -249,12 +292,12 @@ class InterviewSession:
                 model="gpt-4o",
                 messages=[
                     {"role": "system", "content": system_msg},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=0.8,
-                max_tokens=256
+                max_tokens=256,
             )
             next_question = response.choices[0].message.content.strip()
             if not self.is_too_similar_to_previous(next_question):
-                return next_question, interviewer_name, interviewer_role
-        return next_question, interviewer_name, interviewer_role  # fallback
+                return next_question, interviewer_name, interviewer_role,voice_id
+        return next_question, interviewer_name, interviewer_role, voice_id  # fallback

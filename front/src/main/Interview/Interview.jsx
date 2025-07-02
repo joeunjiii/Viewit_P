@@ -17,6 +17,10 @@ import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
 import ErrorModal from "./asset/ErrorModal";
 import PersonalizationModal from "./PersonalizationModal";
+import Timer from "./asset/Timer";
+import defaultImg from "./img/default.png";
+import ttsImg from "./img/tts.png";
+import waitImg from "./img/waiting.png";
 
 function Interview() {
   const location = useLocation();
@@ -41,6 +45,7 @@ function Interview() {
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
   const [initialQuestion, setInitialQuestion] = useState(null);
+  const [captionEnabled, setCaptionEnabled] = useState(true);
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
@@ -50,6 +55,12 @@ function Interview() {
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const statusImages = {
+    tts: ttsImg,
+    default: defaultImg,
+    wait: waitImg,
+  };
 
   const handlePersonalConfirm = (data) => {
     setPersonalData(data); // JD/파일 등 저장
@@ -64,6 +75,7 @@ function Interview() {
     autoQuestion,
     allowRetry,
     waitTime,
+    captionEnabled,
   }) => {
     setInterviewerVoice(interviewerVoice);
     setJobRole(jobRole);
@@ -71,6 +83,7 @@ function Interview() {
     setAllowRetry(allowRetry);
     setWaitTime(waitTime);
     setShowSettingModal(false);
+    setCaptionEnabled(captionEnabled);
     setStep("guide");
   };
 
@@ -98,7 +111,7 @@ function Interview() {
         user_id: safeUserId,
         job_role: jobRole,
         wait_time: waitTime,
-        interviewerVoice
+        interviewerVoice,
       });
       console.log("🔍 session 초기화 파라미터:", {
         session_id: sessionId,
@@ -115,7 +128,7 @@ function Interview() {
           job_role: jobRole,
           jdText: personalData?.jd_text || "",
           pdfText: personalData?.pdf_ocr_text || "",
-          interviewerVoice
+          interviewerVoice,
         }),
         delay,
       ]);
@@ -194,35 +207,55 @@ function Interview() {
         <div className="interview-wrapper">
           <InterviewHeader totalDuration={200} />
           <div className="interview-section-body">
-            <QuestionTabs questionNumber={questionNumber} />
+            <QuestionTabs
+              questionNumber={questionNumber}
+              status={status}
+              remainingTime={remainingTime}
+            />
+            <CaptionBox text={captionText} enabled={captionEnabled} />
             <div className="interview-body">
-              {status !== "wait" && status !== "WAITING" && (
-                <div className="status-display-box">
-                  <QuestionStatusBar
-                    status={status}
-                    remainingTime={remainingTime}
+              <div className="center-row-fixed">
+                <div className="side-area-fixed" />
+                <div className="img-area">
+                  {console.log("status:", status)}
+                  <img
+                    src={statusImages[status] || defaultImg}
+                    alt={status}
+                    className="step-img"
                   />
                 </div>
-              )}
-              {initialQuestion && (
-                <InterviewSessionManager
-                  sessionId={sessionId}
-                  jobRole={jobRole}
-                  waitTime={waitTime}
-                  allowRetry={allowRetry}
-                  initialQuestion={initialQuestion}
-                  onStatusChange={setStatus}
-                  onTimeUpdate={setRemainingTime}
-                  onNewQuestion={handleNewQuestion}
-                  onCaptionUpdate={handleCaptionUpdate}
-                // onAnswerComplete={handleAnswerComplete}
-                />
-              )}
+                <div className="timer-area-fixed">
+                  {status === "wait" ? (
+                    <Timer
+                      duration={remainingTime}
+                      autoStart
+                      label="대기시간"
+                    />
+                  ) : (
+                    <div style={{ width: "160px", height: "70px" }} />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <CaptionBox text={captionText} />
+            {initialQuestion && (
+              <InterviewSessionManager
+                sessionId={sessionId}
+                jobRole={jobRole}
+                waitTime={waitTime}
+                allowRetry={allowRetry}
+                initialQuestion={initialQuestion}
+                onStatusChange={setStatus}
+                onTimeUpdate={setRemainingTime}
+                onNewQuestion={handleNewQuestion}
+                onCaptionUpdate={handleCaptionUpdate}
+                // onAnswerComplete={handleAnswerComplete}
+              />
+            )}
+          </div>
         </div>
+
+        // {/* <CaptionBox text={captionText} /> */}
       )}
     </>
   );

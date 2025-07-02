@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Request, Header
 from pydantic import BaseModel
 import os
 import time
-
+import random
 from interview.interview_session import InterviewSession
 from interview.services.tts_service import generate_tts_audio
 from interview.services import feedback_service
@@ -29,6 +29,7 @@ class AnswerRequest(BaseModel):
     answer: str
 
 
+
 # ── 세션 초기화 ──
 @router.post("/init_session")
 @timing_logger("세션 초기화 전체")
@@ -51,18 +52,26 @@ async def init_session(data: InitRequest, request: Request):
         jdText=data.jdText,
         pdfText=data.pdfText,
     )
-    session.state["interviewerVoice"] = data.interviewerVoice
-
-    # 첫 질문 생성 및 저장 (기본 면접관 정보 포함)
-    first_q = session.ask_fixed_question("intro")
+    # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
+    first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
+    
     session.store_answer(
-        first_q, "", interviewer_name="AI면접관", interviewer_role="기술"
+        first_q, "",
+        interviewer_name=interviewer_name,
+        interviewer_role=interviewer_role,
+        interviewer_voice_id=voice_id
     )
     session_store[data.session_id] = session
 
-    # TTS
-    audio_url = generate_tts_audio(first_q, data.interviewerVoice)
-    return {"question": first_q, "audio_url": audio_url}
+    audio_url = generate_tts_audio(first_q, voice_id)
+    return {
+        "question": first_q,
+        "audio_url": audio_url,
+        "interviewer_name": interviewer_name,
+        "interviewer_role": interviewer_role,
+        "voice_id": voice_id,
+    }
+
 
 
 # ── 다음 질문 & 피드백 ──
@@ -139,10 +148,17 @@ async def next_question(
         }
 
     # 5) 일반 다음 질문
-    nq, nn, nr = session.decide_next_question(data.answer)
-    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr)
-    audio_url = generate_tts_audio(nq, session.state["interviewerVoice"])
-    return {"question": nq, "audio_url": audio_url, "done": False}
+    nq, nn, nr, voice_id = session.decide_next_question(data.answer)
+    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr,interviewer_voice_id=voice_id)
+    audio_url = generate_tts_audio(nq, voice_id)
+    return {
+    "question": nq,
+    "audio_url": audio_url,
+    "interviewer_name": nn,
+    "interviewer_role": nr,
+    "voice_id": voice_id,
+    "done": False
+}
 
 
 # ── 마지막 답변 수집 ──

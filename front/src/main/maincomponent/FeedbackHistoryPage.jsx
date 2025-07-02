@@ -98,9 +98,9 @@ function FeedbackHistoryPage() {
                 </div>
                 <div className="feedback-history-date-row">
                   <div className="badge-group">
-                    <span className="badge-question-count">{session.question_count ?? 0}문항</span>
-                    <span className="badge-wait-time"> {session.wait_time ?? "?"}초</span>
-                    <span className="badge-voice-label"> {session.interviewerVoiceLabel ?? "알 수 없음"}</span>
+                    <span className="badge-question-count">질문: {session.question_count ?? 0}문항</span>
+                    <span className="badge-wait-time">대기시간: {session.wait_time ?? "?"}초</span>
+                    {/* <span className="badge-voice-label">TTS 목소리: {session.interviewerVoiceLabel ?? "알 수 없음"}</span> */}
                   </div>
                   <span className="feedback-date-text">
                     📅 {formatDate(session.started_at)}

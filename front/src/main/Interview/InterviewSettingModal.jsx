@@ -5,25 +5,28 @@ import { useNavigate } from "react-router-dom";
 import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
-  
   // 마이크, 직무, 자막, 재답변 허용, 대기 시간 상태
   const [micEnabled] = useState(true);
   const [job, setJob] = useState("backend");
-  const [autoQuestion, setAutoQuestion] = useState(false);
+  // 기존 autoQuestion -> captionEnabled로 변경
+  const [captionEnabled, setCaptionEnabled] = useState(true); // 기본값 ON
+  // const [autoQuestion, setAutoQuestion] = useState(false);
+
   const [allowRetry, setAllowRetry] = useState(true);
   const [waitTime, setWaitTime] = useState(5);
 
   const navigate = useNavigate();
   const [voiceOptions, setVoiceOptions] = useState([]);
   const [interviewerVoice, setInterviewerVoice] = useState("");
-  
+
   // 목소리 옵션 백엔드에서 불러오기
   useEffect(() => {
-    axios.get("/api/tts/voice-options")
-      .then(res => {
+    axios
+      .get("/api/tts/voice-options")
+      .then((res) => {
         setVoiceOptions(res.data);
         if (res.data.length > 0) {
-          setInterviewerVoice(res.data[0].id);  // 여기가 실제 기본값 결정 위치
+          setInterviewerVoice(res.data[0].id); // 여기가 실제 기본값 결정 위치
         }
       })
       .catch(() => {
@@ -31,7 +34,6 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       });
   }, []);
 
-  
   // 취소 시 메인으로 이동
   const handleCancel = () => {
     navigate("/main");
@@ -43,10 +45,10 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       micEnabled,
       waitTime,
       jobRole: job,
-      autoQuestion,
+      // autoQuestion,
       allowRetry,
       interviewerVoice,
-      
+      captionEnabled,
     });
   };
 
@@ -100,7 +102,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           </Select>
         </FormControl>
 
-        {/* 목소리 선택 */}
+        {/* 목소리 선택
         <FormControl fullWidth size="small" sx={{ mt: 2 }}>
           <InputLabel id="voice-select-label">목소리 선택</InputLabel>
           <Select
@@ -114,11 +116,13 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
               <MenuItem value="">목소리 옵션 없음</MenuItem>
             ) : (
               voiceOptions.map((v) => (
-                <MenuItem key={v.id} value={v.id}>{v.label}</MenuItem>
+                <MenuItem key={v.id} value={v.id}>
+                  {v.label}
+                </MenuItem>
               ))
             )}
           </Select>
-        </FormControl>
+        </FormControl> */}
 
         {/* 질문 자막 설정 */}
         <div className="section">
@@ -126,15 +130,17 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           <label className="switch">
             <input
               type="checkbox"
-              checked={autoQuestion}
-              onChange={() => setAutoQuestion(!autoQuestion)}
+              // checked={autoQuestion}
+              // onChange={() => setAutoQuestion(!autoQuestion)}
+              checked={captionEnabled}
+              onChange={() => setCaptionEnabled(!captionEnabled)}
             />
             <span className="slider" />
           </label>
         </div>
 
         {/* 다시 답변하기 허용 */}
-        <div className="section">
+        {/* <div className="section">
           <p>다시 답변하기 허용</p>
           <label className="switch">
             <input
@@ -144,7 +150,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
             />
             <span className="slider" />
           </label>
-        </div>
+        </div> */}
 
         {/* 액션 버튼 */}
         <div className="modal-actions">
