@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
-import Timer from "./asset/Timer";
-import { endSession } from "./api/interview";
 import { useNavigate } from "react-router-dom";
 
 const PHASE = {
@@ -17,7 +15,7 @@ const PHASE = {
 function InterviewSessionManager({
   sessionId,
   waitTime = 3,
-  allowRetry = true,
+  // allowRetry = true,
   initialQuestion,
   onStatusChange,
   onTimeUpdate,
@@ -26,7 +24,6 @@ function InterviewSessionManager({
   onCaptionUpdate,
   jdText,
   pdfText,
-
 }) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
@@ -64,7 +61,8 @@ function InterviewSessionManager({
         console.log("[TTS] 오디오 재생 종료, phase WAITING 전환");
         setPhase(PHASE.WAITING);
       };
-      audio.play()
+      audio
+        .play()
         .then(() => console.log("[TTS] 오디오 재생 시작!"))
         .catch((err) => {
           console.error("[TTS] 오디오 play 에러:", err);
@@ -81,7 +79,7 @@ function InterviewSessionManager({
       setRemainingTime(waitTime);
       onTimeUpdate?.(waitTime);
       timerRef.current = setInterval(() => {
-        setRemainingTime(prev => {
+        setRemainingTime((prev) => {
           onTimeUpdate?.(prev - 1);
           if (prev <= 1) {
             clearInterval(timerRef.current);
@@ -101,7 +99,7 @@ function InterviewSessionManager({
   }, [phase, waitTime, onTimeUpdate]);
 
   // 녹음 완료 → STT
-  const handleRecordingComplete = async blob => {
+  const handleRecordingComplete = async (blob) => {
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -115,8 +113,6 @@ function InterviewSessionManager({
 
   // 답변 저장 & 다음 질문 또는 자동 총평
   useEffect(() => {
-
-
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
         // 1) 답변 저장
@@ -140,7 +136,7 @@ function InterviewSessionManager({
 
           if (data.final_feedback) {
             alert("면접이 종료되었습니다.\n" + (data.message || ""));
-            navigate(`/feedback/${sessionId}`);  // <- sessionId 포함하여 이동!
+            navigate(`/feedback/${sessionId}`); // <- sessionId 포함하여 이동!
             onAnswerComplete?.(sttResult);
             return;
           }
@@ -177,7 +173,6 @@ function InterviewSessionManager({
     // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
     setTimeout(() => setPhase(PHASE.TTS), 20);
     setRemainingTime(waitTime);
-
   };
 
   return (
@@ -187,16 +182,6 @@ function InterviewSessionManager({
         isRecording={phase === PHASE.RECORDING}
         onStop={handleRecordingComplete}
       />
-      {/* {phase === PHASE.WAITING && (
-            <div className="timer-area">
-              <Timer duration={remainingTime} autoStart label="대기시간" />
-              {allowRetry && (
-                  <button className="replay-button" onClick={handleRetry}>
-                    다시 답변하기
-                  </button>
-              )}
-            </div>
-        )} */}
     </div>
   );
 }

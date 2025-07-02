@@ -45,6 +45,7 @@ function Interview() {
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
   const [initialQuestion, setInitialQuestion] = useState(null);
+  const [captionEnabled, setCaptionEnabled] = useState(true);
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
@@ -74,6 +75,7 @@ function Interview() {
     autoQuestion,
     allowRetry,
     waitTime,
+    captionEnabled,
   }) => {
     setInterviewerVoice(interviewerVoice);
     setJobRole(jobRole);
@@ -81,6 +83,7 @@ function Interview() {
     setAllowRetry(allowRetry);
     setWaitTime(waitTime);
     setShowSettingModal(false);
+    setCaptionEnabled(captionEnabled);
     setStep("guide");
   };
 
@@ -208,13 +211,11 @@ function Interview() {
               questionNumber={questionNumber}
               status={status}
               remainingTime={remainingTime}
-
             />
-            <CaptionBox text={captionText} />
-
+            <CaptionBox text={captionText} enabled={captionEnabled} />
             <div className="interview-body">
               <div className="center-row-fixed">
-                <div className="side-area-fixed" /> {/* 왼쪽 */}
+                <div className="side-area-fixed" />
                 <div className="img-area">
                   {console.log("status:", status)}
                   <img
@@ -248,7 +249,7 @@ function Interview() {
                 onTimeUpdate={setRemainingTime}
                 onNewQuestion={handleNewQuestion}
                 onCaptionUpdate={handleCaptionUpdate}
-              // onAnswerComplete={handleAnswerComplete}
+                // onAnswerComplete={handleAnswerComplete}
               />
             )}
           </div>

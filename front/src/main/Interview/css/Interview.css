@@ -123,8 +123,8 @@
 
 .timer-area-fixed {
   flex: 0 0 330px;
-  min-width: 330px;
-  min-height: 300px;
+  min-width: 270px;
+  min-height: 270px;
   margin-left: 0;
   /* 좌우 여백이 있으니 margin-left 없어도 됨 */
   display: flex;
