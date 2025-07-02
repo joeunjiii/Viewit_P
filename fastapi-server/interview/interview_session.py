@@ -3,19 +3,18 @@ import torch
 from sentence_transformers import util
 import random
 
-
 class InterviewSession:
     def __init__(
-        self,
-        session_id: str,
-        qdrant_client,
-        openai_client,
-        st_model,
-        collection_name: str,
-        job_role: str,
-        softskill_label: str | None = None,
-        jdText: str | None = None,
-        pdfText: str | None = None,
+            self,
+            session_id: str,
+            qdrant_client,
+            openai_client,
+            st_model,
+            collection_name: str,
+            job_role: str,
+            softskill_label: str | None = None,
+            jdText: str | None = None,
+            pdfText: str | None = None,
     ):
         self.session_id = session_id
         self.qdrant_client = qdrant_client
@@ -25,6 +24,8 @@ class InterviewSession:
         self.start_time = time.time()
         self.job_role = job_role
         self.softskill_label = softskill_label
+        self.jdText = jdText       # 그대로 유지
+        self.pdfText = pdfText     # 그대로 유지
         self.state = {
             "step": 0,
             "current_topic": None,
@@ -32,8 +33,18 @@ class InterviewSession:
             "history": [],
             "completed": False,
         }
-        self.jdText = jdText
-        self.pdfText = pdfText
+        self.interviewer_profiles = [
+            {"name": "김AI", "role": "기술", "system_msg": "당신은 기술면접관입니다. 깊이있고 논리적인 질문을 던집니다."},
+            {"name": "박AI", "role": "인성", "system_msg": "당신은 인성면접관입니다. 따뜻하고 배려 깊은 질문을 던집니다."},
+            {"name": "이AI", "role": "창의", "system_msg": "당신은 창의적이고 문제해결 중심의 면접관입니다. 열린 질문을 좋아합니다."}
+        ]
+        self.interviewer_index = 0  # 면접관 순차 교대
+
+    def get_next_interviewer(self):
+        idx = self.interviewer_index
+        profile = self.interviewer_profiles[idx]
+        self.interviewer_index = (idx + 1) % len(self.interviewer_profiles)
+        return profile
 
     def get_random_common_question(self) -> str | None:
         results = self.qdrant_client.search(
@@ -70,7 +81,7 @@ class InterviewSession:
             return ""
 
     def search_similar_questions(
-        self, query: str, top_k: int = 5
+            self, query: str, top_k: int = 5
     ) -> list[tuple[str, float]]:
         query_vector = self.embedder.encode(query).tolist()
         filters = [{"key": "job_role", "match": {"value": self.job_role}}]
@@ -89,10 +100,12 @@ class InterviewSession:
         return [(r.payload.get("question", ""), r.score) for r in results]
 
     def store_answer(
-        self, question: str, answer: str, topic: str | None = None
+            self, question: str, answer: str, topic: str | None = None,
+            interviewer_name: str = None, interviewer_role: str = None
     ) -> None:
         self.state["history"].append(
-            {"question": question, "answer": answer, "topic": topic}
+            {"question": question, "answer": answer, "topic": topic,
+             "interviewer_name": interviewer_name, "interviewer_role": interviewer_role}
         )
         if topic == self.state.get("current_topic"):
             self.state["topic_count"] += 1
@@ -101,7 +114,7 @@ class InterviewSession:
             self.state["topic_count"] = 1
 
     def is_too_similar_to_previous(
-        self, new_question: str, threshold: float = 0.9
+            self, new_question: str, threshold: float = 0.9
     ) -> bool:
         prev_qs = [item["question"] for item in self.state["history"]]
         if not prev_qs:
@@ -111,25 +124,27 @@ class InterviewSession:
         sim = util.cos_sim(new_vec, prev_vecs)
         return torch.max(sim).item() > threshold
 
-    def decide_next_question(self, last_answer: str) -> str:
-        
-        # history_text를 항상 준비
+    def decide_next_question(self, last_answer: str) -> tuple[str, str, str]:
+        interviewer = self.get_next_interviewer()
+        interviewer_name = interviewer["name"]
+        interviewer_role = interviewer["role"]
+        system_msg = interviewer["system_msg"]
+
+        # history_text 항상 준비
         history_text = "\n".join(
             f"{i+1}) Q: {h['question']} / A: {h['answer']}"
             for i, h in enumerate(self.state["history"])
         )
-        # 30% 확률로 공통 질문 섞기
-        if self.job_role != "common" and random.random() < 0.3:
-            common_q = self.get_random_common_question()
-            if common_q and not self.is_too_similar_to_previous(common_q):
-                return common_q
-            
-        if not last_answer or last_answer.strip() == "" or last_answer.strip() == "소리없음":
-            answer_desc = "(지원자가 아직 답변을 하지 않았음)"
-        else:
-            answer_desc = last_answer
-            
-        # 1. 개인화 질문 분기
+        is_short_or_passive = (
+                len(last_answer.strip()) < 20 or
+                last_answer.strip() in ["잘 모르겠습니다", "없습니다", "생각이 나지 않습니다", "네", "아니오"]
+        )
+        common_count = sum(1 for item in self.state["history"] if item.get("topic") == "common")
+        total_count = len(self.state["history"])
+        need_more_common = (common_count / (total_count + 1)) < 0.3
+
+        answer_desc = last_answer if last_answer and last_answer.strip() != "" else "(지원자가 아직 답변을 하지 않았음)"
+        # ---- JD/자소서 기반 질문 분기 (★변수명 그대로 사용★)
         if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
             prompt = f"""
 당신은 기업의 인사 담당자(면접관) 역할을 맡은 AI 에이전트입니다.
@@ -150,7 +165,6 @@ class InterviewSession:
 [이전 질문/답변 기록]
 {history_text}
 
-
 질문 생성 가이드:
 - 우리 회사가 찾는 인재상(아래 JD 참고)에 맞게, 지원자가 실제로 그런 역량이나 경험을 갖추었는지 확인할 수 있는 질문을 만드세요.
 - 회사에서 중요하게 여기는 역량/경험이 실제로 있는지, 있다면 구체적으로 어떤 역할을 했는지, 사례를 묻는 질문이 좋습니다.
@@ -158,59 +172,89 @@ class InterviewSession:
 - 지원자의 답변이 모호하거나 부족할 때는, 더 구체적인 사례나 설명을 유도하는 추가 질문을 하세요.
 - 이전 질문들과 동일한 질문은 하지마세요
 - 지원자가 못들었다고 다시 질문해달라고하면 질문을 이전 질문을 한번하거나 다른 주제로 넘어가세요.
-    
+
 → 다음 질문:    
 """.strip()
-        else:
-            topic = self.state.get("current_topic")
-            count = self.state.get("topic_count", 0)
-            history_text = "\n".join(
-                f"{i+1}) Q: {h['question']} / A: {h['answer']}"
-                for i, h in enumerate(self.state["history"])
-            )
-            context = "\n".join(
-                f"- {q}" for q, _ in self.search_similar_questions(last_answer)
-            )
+            for _ in range(3):
+                resp = self.openai.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": system_msg},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=512,
+                )
+                nxt = resp.choices[0].message.content.strip()
+                if not nxt or not nxt.strip():
+                    continue
+                if not self.is_too_similar_to_previous(nxt):
+                    return nxt, interviewer_name, interviewer_role
+            return nxt, interviewer_name, interviewer_role
 
+        # 공통질문(소프트스킬) LLM 생성
+        if is_short_or_passive or need_more_common:
+            example_common_q = self.get_random_common_question()
             prompt = f"""
-    사용자의 답변과 이전 면접 기록을 참고하여 다음 질문을 생성해주세요.
+아래는 공통 소프트스킬 면접질문의 예시입니다.
+[공통질문 예시]
+- {example_common_q if example_common_q else ''}
+[기존질문/답변]
+{history_text}
 
-    [지원직무] {self.job_role}
-    [현재 주제] {topic}
-    [동일 주제 연속 질문 수] {count}
-    [응답 내용] {answer_desc}
+→ 새 공통질문:
+""".strip()
+            for _ in range(3):
+                response = self.openai.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": system_msg},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.85,
+                    max_tokens=256
+                )
+                next_question = response.choices[0].message.content.strip()
+                if not self.is_too_similar_to_previous(next_question):
+                    return next_question, interviewer_name, interviewer_role
+            return next_question, interviewer_name, interviewer_role  # fallback
 
-    [기존 질문/답변]
-    {history_text}
+        # 직무 Pool 기반 질문 생성
+        example_job_q = self.get_random_common_question() if self.job_role == "common" else self.get_random_common_question()
+        similar_qas = self.search_similar_questions(last_answer, top_k=3)
+        retrieved_context = "\n".join([f"- {q}" for q, _ in similar_qas])
+        prompt = f"""
+아래는 {self.job_role} 직무 면접질문의 예시입니다.
+[직무질문 예시]
+- {example_job_q if example_job_q else ''}
 
-    [참고 유사 질문들]
-    {context}
+아래는 사용자의 최근 답변입니다.
+[응답]
+{last_answer}
 
-    조건:
-    - 반드시 직무({self.job_role})에 맞는 내용으로 질문하세요.
-    - 사용자가 부담없이 이야기할 수 있도록 부드럽고 친근한 말투로 질문하세요
-    - 동일 주제에 대하여 3번 이상 묻지 말고, 새로운 주제로 자연스럽게 넘어가세요
-    - 유사한 질문을 반복하지 마세요.
-    - 사용자의 답변이 짧거나 모호하다면, 그 내용을 확장할 수 있도록 유도 질문을 하세요
+아래는 기존에 했던 질문/답변과 유사질문 예시입니다.
+[기존질문/답변]
+{history_text}
 
-    → 다음 질문:
-    """.strip()
+[참고 유사질문 Pool]
+{retrieved_context}
 
-        # 최대 3회 생성 시도
+이 예시들을 참고하되, 같은 문장이나 주제를 반복하지 말고,
+최근 3개 질문(카테고리/문장 포함)과 겹치지 않는 완전히 새로운 {self.job_role} 직무 면접 질문을 자연스럽게 생성하세요.
+
+→ 새 직무질문:
+""".strip()
         for _ in range(3):
-            resp = self.openai.chat.completions.create(
+            response = self.openai.chat.completions.create(
                 model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": "당신은 AI 면접관입니다."},
-                    {"role": "user", "content": prompt},
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=512,
+                temperature=0.8,
+                max_tokens=256
             )
-            nxt = resp.choices[0].message.content.strip()
-            if not nxt or not nxt.strip():
-                continue
-            if not self.is_too_similar_to_previous(nxt):
-                return nxt
-
-        return "답변 감사합니다. 다른 경험이나 프로젝트에 대해 이야기해주실 수 있나요?" # fallback
+            next_question = response.choices[0].message.content.strip()
+            if not self.is_too_similar_to_previous(next_question):
+                return next_question, interviewer_name, interviewer_role
+        return next_question, interviewer_name, interviewer_role  # fallback

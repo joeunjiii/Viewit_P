@@ -116,7 +116,6 @@ function InterviewSessionManager({
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
-        // 1) 답변 저장
         try {
           await saveInterview({
             sessionId,
@@ -130,15 +129,19 @@ function InterviewSessionManager({
           return;
         }
 
-        // 2) next_question 호출 (마지막 질문 포함)
         try {
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
           const data = res.data;
 
-          if (data.final_feedback) {
-            alert("면접이 종료되었습니다.\n" + (data.message || ""));
-            navigate(`/feedback/${sessionId}`);  // <- sessionId 포함하여 이동!
-            onAnswerComplete?.(sttResult);
+          // **방어코드 : alert창**
+          if (
+              data.question?.includes("질문 음성 생성에 문제가 발생했습니다") ||
+              !data.audio_url
+          ) {
+            alert("면접 질문 음성 생성에 문제가 생겼습니다. 잠시 후 새로고침하거나 나가기를 이용하세요.");
+            // 종료 처리 (예: 피드백 페이지 이동, or phase 고정, 버튼 disabled 등)
+            // navigate(`/feedback/${sessionId}`);
+            setPhase(PHASE.TTS); // 더 진행 안 하게 잠깐 멈춤 (or done 상태로 관리)
             return;
           }
 

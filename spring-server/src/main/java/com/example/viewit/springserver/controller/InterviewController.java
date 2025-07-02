@@ -29,6 +29,21 @@ public class InterviewController {
     private final InterviewFeedbackDao feedbackDao;
     private static final Logger log = LoggerFactory.getLogger(InterviewController.class);
 
+    private String extractFirstString(Object value, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException(fieldName + " 값이 비어 있습니다.");
+        }
+        if (value instanceof String s) {
+            return s;
+        }
+        if (value instanceof java.util.List<?> list && !list.isEmpty() && list.get(0) instanceof String s) {
+            log.warn("{}가 배열(List)로 넘어옴. 첫 번째 값만 사용: {}", fieldName, s);
+            return s;
+        }
+        throw new IllegalArgumentException(fieldName + " 값이 올바르지 않습니다: " + value);
+    }
+
+
     @Value("${fastapi.url}")
     private String fastapiUrl;
 
@@ -91,12 +106,15 @@ public class InterviewController {
     // 답변 피드백 업데이트 API (FastAPI에서 PUT 호출)
     @PutMapping("/answer/feedback")
     public String updateAnswerFeedback(@RequestBody Map<String, Object> body) {
-        String sessionId = (String) body.get("sessionId");
-        String questionText = (String) body.get("questionText");
-        String answerFeedback = (String) body.get("answerFeedback");
-        interviewService.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
+        String sessionId = extractFirstString(body.get("sessionId"), "sessionId");
+        String questionText = extractFirstString(body.get("questionText"), "questionText");
+        String answerFeedback = extractFirstString(body.get("answerFeedback"), "answerFeedback");
+        String interviewerName = extractFirstString(body.get("interviewerName"), "interviewerName");
+        String interviewRole = extractFirstString(body.get("interviewRole"), "interviewRole");
+        interviewService.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback, interviewerName, interviewRole);
         return "피드백 저장 완료";
     }
+
 
     // 답변/피드백 전체 조회 (session_id 기반)
     @GetMapping("/{sessionId}")
@@ -113,6 +131,8 @@ public class InterviewController {
         log.info("[최종피드백] 저장 완료: status={}", status);
         return Map.of("message", "총평 저장 완료", "status", status);
     }
+
+
 
 
 }
