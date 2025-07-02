@@ -102,7 +102,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           </Select>
         </FormControl>
 
-        {/* 목소리 선택 */}
+        {/* 목소리 선택
         <FormControl fullWidth size="small" sx={{ mt: 2 }}>
           <InputLabel id="voice-select-label">목소리 선택</InputLabel>
           <Select
@@ -122,7 +122,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
               ))
             )}
           </Select>
-        </FormControl>
+        </FormControl> */}
 
         {/* 질문 자막 설정 */}
         <div className="section">

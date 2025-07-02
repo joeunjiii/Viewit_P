@@ -19,14 +19,14 @@ async def tts_synthesize(data: TTSRequest):
     except Exception as e:
         raise HTTPException(500, detail=f"TTS 에러: {e}")
 
-@router.get("/voice-options")
-async def get_voice_options():
+# @router.get("/voice-options")
+# async def get_voice_options():
     
-    options = [
-        {"id": "ErXwobaYiN019PkySvjV", "label": "기본 목소리"},
-        {"id": "AW5wrnG1jVizOYY7R1Oo", "label": "차분한 여성"},
-        {"id": "fLvpMIGwcTmxzsUF4z1U", "label": "편안한 목소리(남성)"},
-        {"id": "4JJwo477JUAx3HV0T7n7", "label": "자신감 있는 목소리(남성)"},
-        # ...더 추가 가능
-    ]
-    return JSONResponse(content=options)
+#     options = [
+#         {"id": "ErXwobaYiN019PkySvjV", "label": "기본 목소리"},
+#         {"id": "AW5wrnG1jVizOYY7R1Oo", "label": "차분한 여성"},
+#         {"id": "fLvpMIGwcTmxzsUF4z1U", "label": "편안한 목소리(남성)"},
+#         {"id": "4JJwo477JUAx3HV0T7n7", "label": "자신감 있는 목소리(남성)"},
+#         # ...더 추가 가능
+#     ]
+#     return JSONResponse(content=options)
