@@ -153,7 +153,7 @@ class InterviewSession:
         sim = util.cos_sim(new_vec, prev_vecs)
         return torch.max(sim).item() > threshold
 
-    def decide_next_question(self, last_answer: str) -> tuple[str, str, str]:
+    def decide_next_question(self, last_answer: str) -> tuple[str, str, str,str]:
         interviewer = self.get_next_interviewer()
         interviewer_name = interviewer["name"]
         interviewer_role = interviewer["role"]
@@ -228,8 +228,8 @@ class InterviewSession:
                 if not nxt or not nxt.strip():
                     continue
                 if not self.is_too_similar_to_previous(nxt):
-                    return nxt, interviewer_name, interviewer_role
-            return nxt, interviewer_name, interviewer_role
+                    return nxt, interviewer_name, interviewer_role,voice_id
+            return nxt, interviewer_name, interviewer_role,voice_id
 
         # 공통질문(소프트스킬) LLM 생성
         if is_short_or_passive or need_more_common:
@@ -255,8 +255,8 @@ class InterviewSession:
                 )
                 next_question = response.choices[0].message.content.strip()
                 if not self.is_too_similar_to_previous(next_question):
-                    return next_question, interviewer_name, interviewer_role
-            return next_question, interviewer_name, interviewer_role  # fallback
+                    return next_question, interviewer_name, interviewer_role, voice_id
+            return next_question, interviewer_name, interviewer_role,voice_id  # fallback
 
         # 직무 Pool 기반 질문 생성
         example_job_q = (
@@ -299,5 +299,5 @@ class InterviewSession:
             )
             next_question = response.choices[0].message.content.strip()
             if not self.is_too_similar_to_previous(next_question):
-                return next_question, interviewer_name, interviewer_role
+                return next_question, interviewer_name, interviewer_role,voice_id
         return next_question, interviewer_name, interviewer_role, voice_id  # fallback

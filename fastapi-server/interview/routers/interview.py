@@ -148,10 +148,17 @@ async def next_question(
         }
 
     # 5) 일반 다음 질문
-    nq, nn, nr = session.decide_next_question(data.answer)
-    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr)
-    audio_url = generate_tts_audio(nq, session.state["interviewerVoice"])
-    return {"question": nq, "audio_url": audio_url, "done": False}
+    nq, nn, nr, voice_id = session.decide_next_question(data.answer)
+    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr,interviewer_voice_id=voice_id)
+    audio_url = generate_tts_audio(nq, voice_id)
+    return {
+    "question": nq,
+    "audio_url": audio_url,
+    "interviewer_name": nn,
+    "interviewer_role": nr,
+    "voice_id": voice_id,
+    "done": False
+}
 
 
 # ── 마지막 답변 수집 ──
