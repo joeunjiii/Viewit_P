@@ -42,7 +42,7 @@ public class InterviewService {
         return interviewDao.findBySessionId(sessionId);
     }
 
-    public void updateAnswerFeedbackBySessionAndQuestion(String sessionId, String questionText, String answerFeedback) {
-        interviewDao.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback);
+    public void updateAnswerFeedbackBySessionAndQuestion(String sessionId, String questionText, String answerFeedback, String interviewerName, String interviewerRole) {
+        interviewDao.updateAnswerFeedbackBySessionAndQuestion(sessionId, questionText, answerFeedback, interviewerName, interviewerRole);
     }
 }

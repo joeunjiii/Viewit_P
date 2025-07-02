@@ -33,6 +33,8 @@ class InterviewAnswer(Base):
     question_text = Column(Text, nullable=False)
     answer_text = Column(Text, nullable=False)
     answer_feedback = Column(Text, nullable=True)
+    interviewer_name = Column(String(32), nullable=True)
+    interviewer_role = Column(String(16), nullable=True)
 
 class InterviewFeedback(Base):
     __tablename__ = "INTERVIEW_FEEDBACK"  # ← 대소문자 정확히 일치시켜야 함

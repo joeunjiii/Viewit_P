@@ -115,7 +115,6 @@ function InterviewSessionManager({
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
-        // 1) 답변 저장
         try {
           await saveInterview({
             sessionId,
@@ -129,7 +128,6 @@ function InterviewSessionManager({
           return;
         }
 
-        // 2) next_question 호출 (마지막 질문 포함)
         try {
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
           const data = res.data;

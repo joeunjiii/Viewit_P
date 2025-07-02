@@ -10,9 +10,14 @@ ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 
 def generate_tts_audio(text: str, voice_id: str) -> str:
+    print(f"[TTS-DEBUG] voice_id: {voice_id}")
+    print(f"[TTS-DEBUG] text: {text}")
+
     h = hashlib.md5((text + voice_id).encode()).hexdigest()[:8]
     filename = f"q_{h}.mp3"
     save_path = os.path.join("static", "audio", filename)
+
+    print(f"[TTS-DEBUG] save_path: {save_path}")
 
     try:
         if not os.path.exists(save_path):

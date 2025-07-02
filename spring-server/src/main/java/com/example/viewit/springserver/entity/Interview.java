@@ -5,8 +5,9 @@ public class Interview {
     private String sessionId;
     private String questionText;
     private String answerText;
-    private String filterWord;
     private String answerFeedback;
+    private String interviewerName;
+    private String interviewerRole;
 
 
     public Interview() {}
@@ -37,6 +38,12 @@ public class Interview {
     public String getAnswerFeedback() { return answerFeedback; }
     public void setAnswerFeedback(String answerFeedback) { this.answerFeedback = answerFeedback; }
 
+    public String getInterviewerName() { return interviewerName; }
+    public void setInterviewerName(String interviewerName) { this.interviewerName = interviewerName; }
+
+    public String getInterviewerRole() { return interviewerRole; }
+    public void setInterviewerRole(String interviewerRole) { this.interviewerRole = interviewerRole; }
+
     @Override
     public String toString() {
         return "Interview{" +
@@ -45,6 +52,9 @@ public class Interview {
                 ", questionText='" + questionText + '\'' +
                 ", answerText='" + answerText + '\'' +
                 ", answerFeedback='" + answerFeedback + '\'' +
+                ", interviewerName='" + interviewerName + '\'' +
+                ", interviewerRole='" + interviewerRole + '\'' +
+
                 '}';
     }
 }
