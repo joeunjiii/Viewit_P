@@ -42,23 +42,22 @@
 .question-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 50px;
 }
-.tab.main-tab {
+.qt-main-tab {
   padding: 12px 28px;
   font-size: 1.15rem;
   font-weight: 700;
   border-radius: 999px;
-  border: 2px solid #181818;   
-  background: #f5f5f5;         
-  color: #181818;               
+  border: 2px solid #181818;
+  background: #f5f5f5;
+  color: #181818;
   min-width: 90px;
   letter-spacing: 1px;
   box-shadow: 0 2px 6px rgba(150, 156, 155, 0.09);
   cursor: default;
   user-select: none;
 }
-.tab2 {
+.qt-tab {
   padding: 12px 28px;
   font-size: 1.15rem;
   font-weight: 700;
@@ -71,25 +70,58 @@
   box-shadow: 0 2px 6px rgba(94, 156, 118, 0.09);
   transition: background 0.18s, color 0.16s, border 0.19s, box-shadow 0.18s;
 }
-.tab2-selected {
+.qt-tab-selected {
   background: #5e9c76;
   color: #fff;
   border-color: #357851;
 }
 
-
-/*  타이머를 나란히 배치 */
 .interview-body {
+  width: 100vw;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+.center-row-fixed {
   display: flex;
-  /* justify-content: space-between; */
-  height: 100%;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  min-height: 400px;
+  box-sizing: border-box;
+}
+
+.side-area {
+  flex: 1 1 0;
+}
+.side-area-fixed {
+  flex: 0 0 330px; /* timer-area-fixed와 똑같이 */
+  min-width: 330px;
+  min-height: 300px;
+}
+.img-area {
+  flex: 0 0 600px;
+  display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  padding: 40px 5vw;
-  gap: 80px;
-  box-sizing: border-box;
+.timer-area-fixed {
+  flex: 0 0 330px;
+  min-width: 330px;
+  min-height: 300px;
+  margin-left: 0; /* 좌우 여백이 있으니 margin-left 없어도 됨 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.step-img {
+  width: 600px;
+  height: 400px;
+  max-width: 100%;
+  border-radius: 18px;
+  object-fit: cover;
 }
 
 .status-display-box {
@@ -213,7 +245,8 @@
 .end-button:hover {
   background-color: #ffe5e5;
 }
-.caption-box {
+/* 원래 기본이미지 */
+/* .caption-box {  
   background-color: #f4f9f4;
   padding: 16px 24px;
   margin: 20px auto 0;
@@ -226,6 +259,36 @@
   line-height: 1.5;
   word-wrap: break-word;
   white-space: pre-wrap;
+} */
+.caption-box {
+  position: relative;
+  background-color: #e1fae1;
+  padding: 16px 24px;
+  margin: 20px auto 0;
+  border-radius: 18px;
+  max-width: 900px;
+  font-size: 16px;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  line-height: 1.5;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* 말풍선 꼬리 (아래 중앙) */
+.caption-box::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -20px; /* 꼬리가 상자에서 아래로 20px 내려옴 */
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 20px solid #e1fae1; /* 배경색과 맞추기 */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
 }
 
 @media (max-width: 1024px) {

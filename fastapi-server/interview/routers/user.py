@@ -15,11 +15,11 @@ from interview.routers.auth import get_current_user  # 인증 유저 추출 함�
 
 router = APIRouter()
 # 🔊 목소리 라벨 매핑
-VOICE_LABELS = {
-    "ErXwobaYiN019PkySvjV": "기본 목소리",
-    "21m00Tcm4TlvDq8ikWAM": "차분한 여성",
-    "TxGEqnHWrfWFTfGW9XjX": "명확한 남성",
-}
+# VOICE_LABELS = {
+#     "ErXwobaYiN019PkySvjV": "기본 목소리",
+#     "21m00Tcm4TlvDq8ikWAM": "차분한 여성",
+#     "TxGEqnHWrfWFTfGW9XjX": "명확한 남성",
+# }
 
 
 # 메인화면 5개 받아오는 api
@@ -28,6 +28,7 @@ def get_latest_sessions(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    
     sessions = (
         db.query(InterviewSession)
         .filter_by(user_id=current_user["user_id"])
@@ -39,6 +40,7 @@ def get_latest_sessions(
 
     result = []
     for session in sessions:
+        # print("session.interviewer_voice:", session.interviewer_voice)
         feedback = (
             db.query(InterviewFeedback).filter_by(session_id=session.session_id).first()
         )
@@ -56,8 +58,8 @@ def get_latest_sessions(
                 "started_at": session.started_at,
                 "question_count": question_count or 0,
                 "wait_time": session.wait_time,
-                "interviewerVoice": session.interviewer_voice,
-                "interviewerVoiceLabel": VOICE_LABELS.get(session.interviewer_voice, "알 수 없음")
+                # "interviewerVoice": session.interviewer_voice,
+                # "interviewerVoiceLabel": VOICE_LABELS.get(session.interviewer_voice, "알 수 없음")
             }   
         )
 
@@ -100,8 +102,8 @@ def get_user_sessions(
                 "started_at": session.started_at,
                 "question_count": question_count or 0,
                 "wait_time": session.wait_time,
-                "interviewerVoice": session.interviewer_voice,
-                "interviewerVoiceLabel": VOICE_LABELS.get(session.interviewer_voice, "알 수 없음"),
+                # "interviewerVoice": session.interviewer_voice,
+                # "interviewerVoiceLabel": VOICE_LABELS.get(session.interviewer_voice, "알 수 없음"),
                 "feedback": {
                     "interview_strengths": (
                         feedback.interview_strengths if feedback else None

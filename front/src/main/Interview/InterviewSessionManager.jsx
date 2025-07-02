@@ -184,7 +184,7 @@ function InterviewSessionManager({
             isRecording={phase === PHASE.RECORDING}
             onStop={handleRecordingComplete}
         />
-        {phase === PHASE.WAITING && (
+        {/* {phase === PHASE.WAITING && (
             <div className="timer-area">
               <Timer duration={remainingTime} autoStart label="대기시간" />
               {allowRetry && (
@@ -193,7 +193,7 @@ function InterviewSessionManager({
                   </button>
               )}
             </div>
-        )}
+        )} */}
       </div>
   );
 }

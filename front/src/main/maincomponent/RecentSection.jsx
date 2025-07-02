@@ -69,9 +69,9 @@ function RecentSection({ sessions = [], loading }) {
                   <button type="button" className="Recent-badge badge-wait">
                    대기시간:{item.wait_time ?? "?"}초
                   </button>
-                  <button type="button" className="Recent-badge badge-voice">
+                  {/* <button type="button" className="Recent-badge badge-voice">
                     음성: {item.interviewerVoiceLabel ?? "알 수 없음"}
-                  </button>
+                  </button> */}
                 </div>
               </div>
             );
