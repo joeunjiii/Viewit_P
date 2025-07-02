@@ -208,6 +208,7 @@ function Interview() {
               questionNumber={questionNumber}
               status={status}
               remainingTime={remainingTime}
+
             />
             <CaptionBox text={captionText} />
 
@@ -247,7 +248,7 @@ function Interview() {
                 onTimeUpdate={setRemainingTime}
                 onNewQuestion={handleNewQuestion}
                 onCaptionUpdate={handleCaptionUpdate}
-                // onAnswerComplete={handleAnswerComplete}
+              // onAnswerComplete={handleAnswerComplete}
               />
             )}
           </div>

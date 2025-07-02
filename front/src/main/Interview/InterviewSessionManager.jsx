@@ -15,18 +15,19 @@ const PHASE = {
 };
 
 function InterviewSessionManager({
-                                   sessionId,
-                                   waitTime = 3,
-                                   allowRetry = true,
-                                   initialQuestion,
-                                   onStatusChange,
-                                   onTimeUpdate,
-                                   onNewQuestion,
-                                   onAnswerComplete,
-                                   onCaptionUpdate,
-                                   jdText,
-                                   pdfText,
-                                 }) {
+  sessionId,
+  waitTime = 3,
+  allowRetry = true,
+  initialQuestion,
+  onStatusChange,
+  onTimeUpdate,
+  onNewQuestion,
+  onAnswerComplete,
+  onCaptionUpdate,
+  jdText,
+  pdfText,
+
+}) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -55,8 +56,8 @@ function InterviewSessionManager({
     if (phase === PHASE.TTS && question?.audio_url) {
       audioRef.current?.pause();
       const url = question.audio_url.startsWith("http")
-          ? question.audio_url
-          : "http://localhost:8000" + question.audio_url;
+        ? question.audio_url
+        : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
       audio.onended = () => {
@@ -64,11 +65,11 @@ function InterviewSessionManager({
         setPhase(PHASE.WAITING);
       };
       audio.play()
-      .then(() => console.log("[TTS] 오디오 재생 시작!"))
-      .catch((err) => {
-        console.error("[TTS] 오디오 play 에러:", err);
-        setPhase(PHASE.WAITING);
-      });
+        .then(() => console.log("[TTS] 오디오 재생 시작!"))
+        .catch((err) => {
+          console.error("[TTS] 오디오 play 에러:", err);
+          setPhase(PHASE.WAITING);
+        });
     }
   }, [phase, question, onStatusChange, onCaptionUpdate]);
 
@@ -114,6 +115,8 @@ function InterviewSessionManager({
 
   // 답변 저장 & 다음 질문 또는 자동 총평
   useEffect(() => {
+
+
     if (phase === PHASE.COMPLETE && sttResult) {
       (async () => {
         // 1) 답변 저장
@@ -178,13 +181,13 @@ function InterviewSessionManager({
   };
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-        {/* {phase === PHASE.WAITING && (
+    <div className="interview-session">
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+      {/* {phase === PHASE.WAITING && (
             <div className="timer-area">
               <Timer duration={remainingTime} autoStart label="대기시간" />
               {allowRetry && (
@@ -194,7 +197,7 @@ function InterviewSessionManager({
               )}
             </div>
         )} */}
-      </div>
+    </div>
   );
 }
 

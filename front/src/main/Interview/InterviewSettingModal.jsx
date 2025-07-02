@@ -5,18 +5,21 @@ import { useNavigate } from "react-router-dom";
 import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
-  
+
   // 마이크, 직무, 자막, 재답변 허용, 대기 시간 상태
   const [micEnabled] = useState(true);
   const [job, setJob] = useState("backend");
-  const [autoQuestion, setAutoQuestion] = useState(false);
+  // 기존 autoQuestion -> captionEnabled로 변경
+  const [captionEnabled, setCaptionEnabled] = useState(true); // 기본값 ON
+  // const [autoQuestion, setAutoQuestion] = useState(false);
+
   const [allowRetry, setAllowRetry] = useState(true);
   const [waitTime, setWaitTime] = useState(5);
 
   const navigate = useNavigate();
   const [voiceOptions, setVoiceOptions] = useState([]);
   const [interviewerVoice, setInterviewerVoice] = useState("");
-  
+
   // 목소리 옵션 백엔드에서 불러오기
   useEffect(() => {
     axios.get("/api/tts/voice-options")
@@ -31,7 +34,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       });
   }, []);
 
-  
+
   // 취소 시 메인으로 이동
   const handleCancel = () => {
     navigate("/main");
@@ -43,10 +46,10 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
       micEnabled,
       waitTime,
       jobRole: job,
-      autoQuestion,
+      // autoQuestion,
       allowRetry,
       interviewerVoice,
-      
+      captionEnabled,
     });
   };
 
@@ -126,15 +129,17 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           <label className="switch">
             <input
               type="checkbox"
-              checked={autoQuestion}
-              onChange={() => setAutoQuestion(!autoQuestion)}
+              // checked={autoQuestion}
+              // onChange={() => setAutoQuestion(!autoQuestion)}
+              checked={captionEnabled}
+              onChange={() => setCaptionEnabled(!captionEnabled)}
             />
             <span className="slider" />
           </label>
         </div>
-
+            
         {/* 다시 답변하기 허용 */}
-        <div className="section">
+        {/* <div className="section">
           <p>다시 답변하기 허용</p>
           <label className="switch">
             <input
@@ -144,7 +149,7 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
             />
             <span className="slider" />
           </label>
-        </div>
+        </div> */}
 
         {/* 액션 버튼 */}
         <div className="modal-actions">

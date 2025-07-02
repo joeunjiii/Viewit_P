@@ -15,19 +15,19 @@
 .question-status-bar.tts {
   border: 2px solid #7ea9f5;
   background: #f2f7fd;
-  color: #0f0f0f;
+  color: #252525;
 }
 
 .question-status-bar.wait {
   border: 2px solid #36d6b6;
   background: #e8f8f4;
-  color: #169574;
+  color: #252525;
 }
 
 .question-status-bar.recording {
   border: 2px solid #ffc357;
   background: #fff9ec;
-  color: #000000;
+  color: #252525;
   /* 녹음 중엔 약간 깜빡이는 효과 */
   animation: recording-blink 1.1s infinite alternate;
 }
@@ -41,9 +41,9 @@
 }
 
 .question-status-bar.uploading {
-  border: 2px solid #bbbbbb;
+  border: 2px solid #a09d9d;
   background: #f6f6f6;
-  color: #888;
+  color: #252525;
   animation: blink-bar 1s infinite;
 }
 

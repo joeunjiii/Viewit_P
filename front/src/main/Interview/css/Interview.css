@@ -41,8 +41,18 @@
 
 .question-tabs {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
+
+.qt-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
 .qt-main-tab {
   padding: 12px 28px;
   font-size: 1.15rem;
@@ -57,6 +67,7 @@
   cursor: default;
   user-select: none;
 }
+
 .qt-tab {
   padding: 12px 28px;
   font-size: 1.15rem;
@@ -70,6 +81,7 @@
   box-shadow: 0 2px 6px rgba(94, 156, 118, 0.09);
   transition: background 0.18s, color 0.16s, border 0.19s, box-shadow 0.18s;
 }
+
 .qt-tab-selected {
   background: #5e9c76;
   color: #fff;
@@ -94,11 +106,14 @@
 .side-area {
   flex: 1 1 0;
 }
+
 .side-area-fixed {
-  flex: 0 0 330px; /* timer-area-fixed와 똑같이 */
+  flex: 0 0 330px;
+  /* timer-area-fixed와 똑같이 */
   min-width: 330px;
   min-height: 300px;
 }
+
 .img-area {
   flex: 0 0 600px;
   display: flex;
@@ -110,7 +125,8 @@
   flex: 0 0 330px;
   min-width: 330px;
   min-height: 300px;
-  margin-left: 0; /* 좌우 여백이 있으니 margin-left 없어도 됨 */
+  margin-left: 0;
+  /* 좌우 여백이 있으니 margin-left 없어도 됨 */
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -134,15 +150,20 @@
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
+
 .first-question-loading {
   display: flex;
-  justify-content: center; /* 가로 중앙 */
-  align-items: center; /* 세로 중앙 */
+  justify-content: center;
+  /* 가로 중앙 */
+  align-items: center;
+  /* 세로 중앙 */
 
-  font-size: 1.25rem; /* 원하는 크기로 */
+  font-size: 1.25rem;
+  /* 원하는 크기로 */
   color: #444;
   letter-spacing: 0.02em;
 }
+
 /* 아이콘 공통 스타일 */
 .icon {
   font-size: 28px;
@@ -152,12 +173,15 @@
   align-items: center;
   justify-content: center;
 }
+
 .icon.robot::before {
   content: "🤖";
 }
+
 .icon.mic::before {
   content: "🎤";
 }
+
 .icon.robot::before,
 .icon.mic::before {
   font-size: 28px;
@@ -165,6 +189,7 @@
   width: 40px;
   height: 40px;
 }
+
 .header-timer {
   background: #d8e8ec;
   border-radius: 14px;
@@ -175,6 +200,7 @@
   margin-left: 0;
   letter-spacing: 1px;
 }
+
 /* 오른쪽: 타이머 영역 */
 .timer-area {
   width: 30vw;
@@ -242,24 +268,29 @@
   cursor: pointer;
   transition: 0.2s;
 }
+
 .end-button:hover {
   background-color: #ffe5e5;
 }
-/* 원래 기본이미지 */
-/* .caption-box {  
-  background-color: #f4f9f4;
-  padding: 16px 24px;
-  margin: 20px auto 0;
-  border-radius: 12px;
-  max-width: 900px;
-  font-size: 16px;
-  color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  line-height: 1.5;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-} */
+
+.reset-btn {
+  display: flex;
+  background: #5e9b87;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  justify-content: right;
+}
+
+.reset-btn:hover {
+  background: #357ab7;
+}
+
 .caption-box {
   position: relative;
   background-color: #e1fae1;
@@ -282,12 +313,14 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -20px; /* 꼬리가 상자에서 아래로 20px 내려옴 */
+  bottom: -20px;
+  /* 꼬리가 상자에서 아래로 20px 내려옴 */
   width: 0;
   height: 0;
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
-  border-top: 20px solid #e1fae1; /* 배경색과 맞추기 */
+  border-top: 20px solid #e1fae1;
+  /* 배경색과 맞추기 */
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
 }
 
@@ -298,6 +331,7 @@
     justify-content: flex-start;
     padding: 12px 16px;
   }
+
   .interview-body {
     display: flex;
     flex-direction: row;
@@ -306,27 +340,35 @@
   }
 
   .header-spacer {
-    flex-grow: 0; /* ✅ 오른쪽 밀지 않도록 */
-    max-width: none; /* ✅ 너비 제한 제거 */
+    flex-grow: 0;
+    /* ✅ 오른쪽 밀지 않도록 */
+    max-width: none;
+    /* ✅ 너비 제한 제거 */
   }
 
   .end-button {
-    transform: none; /* ✅ 위치 조정 제거 */
+    transform: none;
+    /* ✅ 위치 조정 제거 */
     font-size: 13px;
     padding: 5px 12px;
-    margin-left: 0; /* 혹시 auto 같은 속성 있었으면 제거 */
+    margin-left: 0;
+    /* 혹시 auto 같은 속성 있었으면 제거 */
   }
+
   .voice-area {
     margin: 0;
     gap: 40px;
     flex: 1;
     margin-right: 80px;
   }
+
   .voice-item {
     flex-direction: column;
-    align-items: flex-start; /* 세로 배치 시 왼쪽 정렬 */
+    align-items: flex-start;
+    /* 세로 배치 시 왼쪽 정렬 */
     gap: 8px;
   }
+
   .timer-area {
     align-self: center;
     margin-left: 200px;
@@ -357,7 +399,8 @@
     margin: 20px auto 0;
     border-radius: 12px;
     max-width: 800px;
-    width: 90%; /* 💡 반응형 너비 */
+    width: 90%;
+    /* 💡 반응형 너비 */
     font-size: 16px;
     color: #333;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);

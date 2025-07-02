@@ -25,7 +25,7 @@ function QuestionStatusBar({ status, remainingTime, small }) {
     default:
       return null; // 표시 안 함
   }
-   // small일 때 클래스 추가
+  // small일 때 클래스 추가
   const className = [
     "question-status-bar",
     status,
@@ -34,7 +34,7 @@ function QuestionStatusBar({ status, remainingTime, small }) {
 
   return (
 
-    
+
     <div className={className}>
       <span className="qs-icon">{icon}</span>
       <span className="qs-text">{message}</span>
