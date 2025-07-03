@@ -21,6 +21,7 @@ import Timer from "./asset/Timer";
 import defaultImg from "./img/default.png";
 import ttsImg from "./img/tts.png";
 import waitImg from "./img/waiting.png";
+import { useNavigate } from "react-router-dom";
 
 import UserAnswerDisplay from "./asset/UserAnswerDisplay";
 
@@ -73,6 +74,10 @@ function Interview() {
     console.log("JD 텍스트:", data.jd_text);
     console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
+
+
+
+
   const handleStartSettings = ({
     interviewerVoice,
     jobRole,

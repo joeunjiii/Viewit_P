@@ -3,19 +3,18 @@ import torch
 from sentence_transformers import util
 import random
 
-
 class InterviewSession:
     def __init__(
-        self,
-        session_id: str,
-        qdrant_client,
-        openai_client,
-        st_model,
-        collection_name: str,
-        job_role: str,
-        softskill_label: str | None = None,
-        jdText: str | None = None,
-        pdfText: str | None = None,
+            self,
+            session_id: str,
+            qdrant_client,
+            openai_client,
+            st_model,
+            collection_name: str,
+            job_role: str,
+            softskill_label: str | None = None,
+            jdText: str | None = None,
+            pdfText: str | None = None,
     ):
         self.session_id = session_id
         self.qdrant_client = qdrant_client
@@ -100,7 +99,7 @@ class InterviewSession:
         return q, interviewer["name"], interviewer["role"], interviewer["voice_id"]
 
     def search_similar_questions(
-        self, query: str, top_k: int = 5
+            self, query: str, top_k: int = 5
     ) -> list[tuple[str, float]]:
         query_vector = self.embedder.encode(query).tolist()
         filters = [{"key": "job_role", "match": {"value": self.job_role}}]
@@ -119,13 +118,13 @@ class InterviewSession:
         return [(r.payload.get("question", ""), r.score) for r in results]
 
     def store_answer(
-        self,
-        question: str,
-        answer: str,
-        topic: str | None = None,
-        interviewer_name: str = None,
-        interviewer_role: str = None,
-        interviewer_voice_id: str = None,
+            self,
+            question: str,
+            answer: str,
+            topic: str | None = None,
+            interviewer_name: str = None,
+            interviewer_role: str = None,
+            interviewer_voice_id: str = None,
     ) -> None:
         self.state["history"].append(
             {
@@ -143,7 +142,7 @@ class InterviewSession:
             self.state["topic_count"] = 1
 
     def is_too_similar_to_previous(
-        self, new_question: str, threshold: float = 0.9
+            self, new_question: str, threshold: float = 0.9
     ) -> bool:
         prev_qs = [item["question"] for item in self.state["history"]]
         if not prev_qs:
@@ -277,25 +276,30 @@ class InterviewSession:
         similar_qas = self.search_similar_questions(last_answer, top_k=3)
         retrieved_context = "\n".join([f"- {q}" for q, _ in similar_qas])
         prompt = f"""
-아래는 {self.job_role} 직무 면접질문의 예시입니다.
-[직무질문 예시]
-- {example_job_q if example_job_q else ''}
+당신은 AI 면접관입니다. 아래 지침을 엄격하게 준수해 다음 질문을 생성하세요
 
-아래는 사용자의 최근 답변입니다.
-[응답]
-{last_answer}
+- 반드시 직무({self.job_role})에 맞는 실무적/현장감 있는 질문을 포함하세요.
+- 전체 질문의 비율은 개발 30%, 알고리즘 15%, 프로젝트 15%, 문제해결능력 10%, 인성 10%를 목표로 하며, 약 30%는 공통질문(예: 의사소통, 스트레스 관리, 동기, 성격, 협업, 갈등해결 등)으로 구성하세요.
+- 질문 출제 시 직무 질문과 공통 질문이 자연스럽게 섞이도록 하세요.
+- 사용자가 부담없이 이야기할 수 있도록 부드럽고 친근한 말투로 질문하세요.
+- **동일 주제는 3번 이상 묻지 말고, 직전 3개 이내의 질문과 비슷한 질문은 절대 하지 마세요.**
+- 사용자의 답변이 짧거나 모호하다면, 반드시 이전에 하지 않았던 새로운 각도에서 질문을 만드세요.
+- ** 데이터셋(질문 Pool)에 그대로 사용하지 말고, 지원자의 답변에서 파생되거나 새로운 각도에서 질문을 만드세요.**
+- 사용자가 “잘 모르겠습니다”, “없습니다”, “생각이 나지 않습니다” 등 소극적으로 답하면 같은/비슷한 질문을 반복하지 말고, {self.job_role} 직무와 연관된 쉽고 열린 주제로 자연스럽게 넘어가세요.
+- 경험이 없을 경우 앞으로 배우고 싶은 점, 관심 기술, 성향 등 자유롭게 이야기할 수 있도록 다양한 각도에서 질문하세요.
+- 경력이 부족해도 부정적으로 평가하지 말고, 지원자가 본인의 생각을 편하게 말하도록 도와주세요.
+- 각 질문은 **1~2문장 이내로 간결하고, 구체적으로 작성하세요.**
 
-아래는 기존에 했던 질문/답변과 유사질문 예시입니다.
-[기존질문/답변]
+[이전 질문/답변]
 {history_text}
 
-[참고 유사질문 Pool]
+[질문 Pool(참고용, 복붙 금지!)]
 {retrieved_context}
 
-이 예시들을 참고하되, 같은 문장이나 주제를 반복하지 말고,
-최근 3개 질문(카테고리/문장 포함)과 겹치지 않는 완전히 새로운 {self.job_role} 직무 면접 질문을 자연스럽게 생성하세요.
+[지원자 마지막 답변]
+{last_answer}
 
-→ 새 직무질문:
+→ 위 내용을 참고해, 다음 면접 질문을 하나만 생성하세요.
 """.strip()
         for _ in range(3):
             response = self.openai.chat.completions.create(

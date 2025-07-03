@@ -21,6 +21,10 @@ export function nextQuestion(sessionId, answer, jdText, pdfText) {
     });
 }
 
+export function endSession(sessionId) {
+    return api.post("/api/interview/end_session", { session_id:sessionId});
+}
+
 export function saveInterview(payload) {
     return api.post("/api/interview/save", payload);
 }

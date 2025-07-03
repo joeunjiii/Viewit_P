@@ -22,7 +22,7 @@ def generate_tts_audio(text: str, voice_id: str) -> str:
     try:
         if not os.path.exists(save_path):
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            
+
             # ElevenLabs API 호출
             url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
             headers = {

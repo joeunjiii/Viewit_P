@@ -28,6 +28,9 @@ class AnswerRequest(BaseModel):
     session_id: str
     answer: str
 
+class EndRequest(BaseModel):
+    session_id: str
+
 
 
 # ── 세션 초기화 ──
@@ -70,6 +73,7 @@ async def init_session(data: InitRequest, request: Request):
         "interviewer_name": interviewer_name,
         "interviewer_role": interviewer_role,
         "voice_id": voice_id,
+        "done": False
     }
 
 
@@ -85,7 +89,6 @@ async def next_question(
     if not session:
         raise HTTPException(404, "Session not found")
 
-    # 1) 이전 Q&A 저장 (with interviewer info)
     last_q = session.state["history"][-1]["question"]
     prev = session.state["history"][-1]
     name = prev.get("interviewer_name") or "AI면접관"
@@ -94,34 +97,26 @@ async def next_question(
     print(f"[DEBUG] interviewer_name={name}, interviewer_role={role}")
     session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
 
-    # 2) 개별 피드백 생성·저장
-    try:
-        llm = request.app.state.openai_client
-        fb = feedback_service.generate_answer_feedback(
-            llm, last_q, data.answer, interviewer_name=name, interviewer_role=role
-        )
-        feedback_service.save_answer_feedback_to_spring(
-            data.session_id,
-            last_q,
-            fb,
-            SPRING_URL,
-            interviewer_name=name,
-            interviewer_role=role,
-            token=authorization,
-        )
-    except Exception as e:
-        print(f"[WARN] 개별 피드백 저장 실패: {e}")
-
-    # 3) 5분 경과 → final 질문
-    if time.time() - session.start_time >= 300 and not session.state.get("final_question_given"):
-        fq = session.ask_fixed_question("final")
+    # 1분 40초(100초) 경과 후 마지막 질문 던지기
+    if time.time() - session.start_time >= 100 and not session.state.get("final_question_given"):
+        fq, nn, nr, voice_id = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
-        session.store_answer(fq, "", interviewer_name=name, interviewer_role=role)
-        audio_url = generate_tts_audio(fq, session.state["interviewerVoice"])
+        session.state["final_answer_received"] = False  # 새로운 플래그 추가
+        session.store_answer(fq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+        audio_url = generate_tts_audio(fq, voice_id)
         return {"question": fq, "audio_url": audio_url, "done": False}
 
-    # 4) final 이후 → 최종 피드백
-    if session.state.get("final_question_given"):
+    # 마지막 질문에 대한 답변이 도착했으면 final_answer_received를 True로 변경
+    if session.state.get("final_question_given") and not session.state.get("final_answer_received"):
+        # 여기서 last_q가 마지막 질문 텍스트인지 체크하는 게 안전함
+        final_question_text = session.state["history"][-2]["question"]  # 마지막 질문 직전 질문
+        # 또는 session.ask_fixed_question("final") 반환값 중 질문 텍스트를 저장해두고 비교 가능
+        # 간단히 last_q가 마지막 질문과 같다고 가정
+        if last_q == session.state["history"][-2]["question"]:
+            session.state["final_answer_received"] = True
+
+    # 최종 질문 답변을 받았을 때만 피드백 생성 진행
+    if session.state.get("final_question_given") and session.state.get("final_answer_received"):
         try:
             answers = feedback_service.fetch_all_interview_answers_from_spring(data.session_id, SPRING_URL)
         except Exception as e:
@@ -145,21 +140,21 @@ async def next_question(
         return {
             "message": "면접 종료 및 총평 저장 완료",
             "final_feedback": {"summary": summary, "strengths": strengths, "weaknesses": weaknesses},
+            "done": True,  # done True를 보내서 클라이언트가 종료 처리하도록
         }
 
-    # 5) 일반 다음 질문
+    # 일반 질문
     nq, nn, nr, voice_id = session.decide_next_question(data.answer)
-    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr,interviewer_voice_id=voice_id)
+    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
     audio_url = generate_tts_audio(nq, voice_id)
     return {
-    "question": nq,
-    "audio_url": audio_url,
-    "interviewer_name": nn,
-    "interviewer_role": nr,
-    "voice_id": voice_id,
-    "done": False
-}
-
+        "question": nq,
+        "audio_url": audio_url,
+        "interviewer_name": nn,
+        "interviewer_role": nr,
+        "voice_id": voice_id,
+        "done": False
+    }
 
 # ── 마지막 답변 수집 ──
 @router.post("/final_answer")
@@ -171,3 +166,56 @@ async def final_answer(data: AnswerRequest, request: Request):
         raise HTTPException(404, "Session not found")
     session.store_answer("마지막으로 하실 말 있나요?", data.answer)
     return {"message": "면접 종료", "history": session.state["history"]}
+
+@router.post("/end_session")
+@timing_logger("면접 종료 및 피드백 생성")
+async def end_session(data: EndRequest, request: Request, authorization: str = Header(None)):
+    session_id = data.session_id
+
+    # 1. 전체 답변 가져오기 (Spring에서)
+    answers = feedback_service.fetch_all_interview_answers_from_spring(session_id, SPRING_URL)
+
+    # 2. 개별 피드백 생성 및 저장
+    for item in answers:
+        fb = feedback_service.generate_answer_feedback(
+            request.app.state.openai_client,
+            item.get('questionText') or item.get('question_text'),
+            item.get('answerText') or item.get('answer_text'),
+            interviewer_name=item.get('interviewerName'),
+            interviewer_role=item.get('interviewerRole')
+        )
+        feedback_service.save_answer_feedback_to_spring(
+            session_id,
+            item.get('questionText') or item.get('question_text'),
+            fb,
+            SPRING_URL,
+            interviewer_name=item.get('interviewerName'),
+            interviewer_role=item.get('interviewerRole'),
+            token=authorization,
+            )
+
+    # 3. 총평/강점/약점 생성 및 저장
+    fixed = [
+        {
+            "questionText": a.get("questionText") or a.get("question_text"),
+            "answerText": a.get("answerText") or a.get("answer_text")
+        }
+        for a in answers
+    ]
+    summary, strengths, weaknesses = feedback_service.generate_final_feedback(request.app.state.openai_client, fixed)
+    try:
+        feedback_service.send_final_feedback_to_spring(
+            session_id, summary, strengths, weaknesses, SPRING_URL, token=authorization
+        )
+    except Exception as e:
+        print(f"[ERROR] 최종 피드백 저장 실패: {e}")
+        raise HTTPException(500, "Spring에 총평 저장 실패")
+
+    return {
+        "message": "면접 종료 및 총평 저장 완료",
+        "final_feedback": {
+            "summary": summary,
+            "strengths": strengths,
+            "weaknesses": weaknesses
+        }
+    }

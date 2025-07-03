@@ -52,4 +52,8 @@ module.exports = function(app) {
         "/api/finalfeedback",
         createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
     );
+    app.use(
+        "/api/interview/end_session",
+        createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
+    )
 };
