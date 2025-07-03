@@ -20,7 +20,10 @@ from interview.routers.jd_upload import router as jd_router
 from interview.routers.user import router as user_router
 
 from interview.uploads.database import SessionLocal
-from interview.services.llm_feedback import generate_answer_feedback, generate_final_feedback
+from interview.services.llm_feedback import (
+    generate_answer_feedback,
+    generate_final_feedback,
+)
 from interview.services.feedback_service import save_answer_feedback_to_spring
 
 
@@ -33,7 +36,8 @@ logger = logging.getLogger("uvicorn")
 app = FastAPI()
 start_time = time.time()
 
-session_store: dict[str, 'InterviewSession'] = {}
+session_store: dict[str, "InterviewSession"] = {}
+
 
 @app.on_event("startup")
 async def load_resources():
@@ -58,6 +62,7 @@ async def load_resources():
     app.state.openai_client = openai_client
     app.state.session_store = session_store
 
+
 @app.get("/health")
 async def health_check():
     return {
@@ -65,9 +70,10 @@ async def health_check():
             "sentence_transformer": app.state.st_model is not None,
             "qdrant": app.state.qdrant_client is not None,
             "openai": app.state.openai_client is not None,
-            "uptime_seconds": int(time.time() - start_time)
+            "uptime_seconds": int(time.time() - start_time),
         }
     }
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,7 +84,7 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# ✅ 각 라우터 등록
+# 각 라우터 등록
 app.include_router(stt_router, prefix="/api/stt")
 app.include_router(tts_router, prefix="/api/tts")
 app.include_router(interview_router, prefix="/api/interview")

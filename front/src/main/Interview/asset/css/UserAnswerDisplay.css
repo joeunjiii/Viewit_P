@@ -1,0 +1,184 @@
+.user-answer-container {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+  width: 100%;
+  align-self: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.user-answer-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.user-answer-title {
+  font-weight: 600;
+  color: #495057;
+  font-size: 13px;
+}
+
+.user-answer-content {
+  min-height: 50px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.user-answer-done {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  animation: fade-in 0.3s;
+}
+
+.user-answer-done-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #22c55e;
+}
+
+.user-answer-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  animation: fade-in 0.3s;
+}
+
+.user-answer-status-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.user-answer-recording-dots {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.user-answer-uploading-dots {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.dot {
+  width: 4px;
+  height: 16px;
+  background: #ef4444;
+  border-radius: 3px;
+  animation: bounce 1s infinite;
+}
+
+.dot-amber {
+  width: 8px;
+  height: 8px;
+  background: #f59e42;
+  border-radius: 50%;
+  animation: bounce 1s infinite;
+}
+
+/* 상태별 배경/테두리 */
+.status-blue {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+.status-gray {
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+.status-red {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+.status-amber {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+.status-green {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* 아이콘 색상 */
+.icon-blue {
+  color: #2563eb;
+}
+.icon-gray {
+  color: #6b7280;
+}
+.icon-red {
+  color: #ef4444;
+}
+.icon-green {
+  color: #22c55e;
+}
+.icon-amber {
+  color: #d97706;
+}
+
+/* 애니메이션 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1.2s infinite;
+}
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.blinking {
+    animation: blink 0.9s steps(1, end) infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    40%, 60% { opacity: 0; }
+  }
+  

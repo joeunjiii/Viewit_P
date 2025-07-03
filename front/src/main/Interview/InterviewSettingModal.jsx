@@ -20,19 +20,19 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
   const [interviewerVoice, setInterviewerVoice] = useState("");
 
   // 목소리 옵션 백엔드에서 불러오기
-  useEffect(() => {
-    axios
-      .get("/api/tts/voice-options")
-      .then((res) => {
-        setVoiceOptions(res.data);
-        if (res.data.length > 0) {
-          setInterviewerVoice(res.data[0].id); // 여기가 실제 기본값 결정 위치
-        }
-      })
-      .catch(() => {
-        setVoiceOptions([]);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/api/tts/voice-options")
+  //     .then((res) => {
+  //       setVoiceOptions(res.data);
+  //       if (res.data.length > 0) {
+  //         setInterviewerVoice(res.data[0].id); // 여기가 실제 기본값 결정 위치
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setVoiceOptions([]);
+  //     });
+  // }, []);
 
   // 취소 시 메인으로 이동
   const handleCancel = () => {

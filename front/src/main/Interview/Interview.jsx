@@ -22,6 +22,8 @@ import defaultImg from "./img/default.png";
 import ttsImg from "./img/tts.png";
 import waitImg from "./img/waiting.png";
 
+import UserAnswerDisplay from "./asset/UserAnswerDisplay";
+
 function Interview() {
   const location = useLocation();
   const mode = new URLSearchParams(location.search).get("mode");
@@ -36,7 +38,7 @@ function Interview() {
   const [sessionId] = useState(uuidv4());
   const [interviewerVoice, setInterviewerVoice] = useState("");
   const [jobRole, setJobRole] = useState("backend");
-  const [autoQuestion, setAutoQuestion] = useState(true);
+  // const [autoQuestion, setAutoQuestion] = useState(true);
   const [allowRetry, setAllowRetry] = useState(true);
   const [waitTime, setWaitTime] = useState(5);
   const [micCheckOpen, setMicCheckOpen] = useState(false);
@@ -46,6 +48,8 @@ function Interview() {
   const [remainingTime, setRemainingTime] = useState(0);
   const [initialQuestion, setInitialQuestion] = useState(null);
   const [captionEnabled, setCaptionEnabled] = useState(true);
+
+  const [currentUserAnswer, setCurrentUserAnswer] = useState(""); //답변전달 스테이트
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
@@ -79,7 +83,7 @@ function Interview() {
   }) => {
     setInterviewerVoice(interviewerVoice);
     setJobRole(jobRole);
-    setAutoQuestion(autoQuestion);
+    // setAutoQuestion(autoQuestion);
     setAllowRetry(allowRetry);
     setWaitTime(waitTime);
     setShowSettingModal(false);
@@ -150,9 +154,16 @@ function Interview() {
     }
   };
 
+  // 사용자 답변을 처리하는 콜백 함수
+  const handleUserAnswer = useCallback((answerText) => {
+    console.log("사용자 답변:", answerText);
+    setCurrentUserAnswer(answerText);
+  }, []);
+
   // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
     setQuestionNumber((n) => n + 1);
+    setCurrentUserAnswer(""); //다음질문 시작되면 사용자 답변나오는곳은 초기화
   }, []);
 
   // 캡션 제어 콜백: 면접관/이용자 모두 InterviewSessionManager에서 직접 세팅
@@ -217,7 +228,7 @@ function Interview() {
               <div className="center-row-fixed">
                 <div className="side-area-fixed" />
                 <div className="img-area">
-                  {console.log("status:", status)}
+                  {/* {console.log("status:", status)} */}
                   <img
                     src={statusImages[status] || defaultImg}
                     alt={status}
@@ -249,13 +260,20 @@ function Interview() {
                 onTimeUpdate={setRemainingTime}
                 onNewQuestion={handleNewQuestion}
                 onCaptionUpdate={handleCaptionUpdate}
+                onUserAnswer={handleUserAnswer} // 사용자 답변 전달 콜백
                 // onAnswerComplete={handleAnswerComplete}
               />
             )}
+
+            <UserAnswerDisplay
+              answer={currentUserAnswer}
+              isVisible={status === "recording" || currentUserAnswer !== ""}
+              title="내 답변"
+              isRecording={status === "recording"}
+              isDev={true} // 개발 모드에서는 true, 실제 서비스에서는 false
+            />
           </div>
         </div>
-
-        // {/* <CaptionBox text={captionText} /> */}
       )}
     </>
   );

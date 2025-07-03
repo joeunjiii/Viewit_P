@@ -24,6 +24,7 @@ function InterviewSessionManager({
   onCaptionUpdate,
   jdText,
   pdfText,
+  onUserAnswer, // 사용자 답변 전달 콜백
 }) {
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
@@ -45,29 +46,45 @@ function InterviewSessionManager({
     console.log("[useEffect] phase:", phase, "| question:", question);
     onStatusChange?.(phase);
 
+    // TTS phase 자막 출력
     if (phase === PHASE.TTS && question?.question) {
       console.log("[TTS] 자막:", question.question);
       onCaptionUpdate?.(`면접관: ${question.question}`);
     }
 
+    // 오디오 재생
     if (phase === PHASE.TTS && question?.audio_url) {
-      audioRef.current?.pause();
       const url = question.audio_url.startsWith("http")
         ? question.audio_url
         : "http://localhost:8000" + question.audio_url;
       const audio = new Audio(url);
       audioRef.current = audio;
+
       audio.onended = () => {
         console.log("[TTS] 오디오 재생 종료, phase WAITING 전환");
         setPhase(PHASE.WAITING);
       };
+
       audio
         .play()
         .then(() => console.log("[TTS] 오디오 재생 시작!"))
         .catch((err) => {
-          console.error("[TTS] 오디오 play 에러:", err);
-          setPhase(PHASE.WAITING);
+          // AbortError는 무시
+          if (err.name !== "AbortError") {
+            console.error("[TTS] 오디오 play 에러:", err);
+            setPhase(PHASE.WAITING);
+          }
         });
+
+      // cleanup 함수: 이 effect가 다시 실행되거나 unmount될 때 호출됨
+      return () => {
+        audio.pause();
+        audioRef.current = null;
+      };
+    } else {
+      // TTS phase가 아니면 이전 오디오 정지
+      audioRef.current?.pause();
+      audioRef.current = null;
     }
   }, [phase, question, onStatusChange, onCaptionUpdate]);
 
@@ -104,7 +121,9 @@ function InterviewSessionManager({
     try {
       const data = await requestSpeechToText(blob);
       setSttResult(data.text);
-      onCaptionUpdate?.(`이용자: ${data.text}`);
+      // onCaptionUpdate?.(`이용자: ${data.text}`);
+      // 사용자 답변을 별도 콜백으로 전달
+      onUserAnswer?.(data.text);
       setPhase(PHASE.COMPLETE);
     } catch (err) {
       console.error("STT 오류:", err);
@@ -164,14 +183,14 @@ function InterviewSessionManager({
     pdfText,
   ]);
 
-  const handleRetry = () => {
-    // 1) phase를 READY 같은 임시값으로 변경
-    setPhase(PHASE.READY);
+  // const handleRetry = () => {
+  //   // 1) phase를 READY 같은 임시값으로 변경
+  //   setPhase(PHASE.READY);
 
-    // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
-    setTimeout(() => setPhase(PHASE.TTS), 20);
-    setRemainingTime(waitTime);
-  };
+  //   // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
+  //   setTimeout(() => setPhase(PHASE.TTS), 20);
+  //   setRemainingTime(waitTime);
+  // };
 
   return (
     <div className="interview-session">
