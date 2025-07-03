@@ -41,18 +41,19 @@ function InterviewSessionManager({
     setPhase(PHASE.TTS);
   }, [initialQuestion]);
 
-  // TTS 재생
   useEffect(() => {
-    console.log("[useEffect] phase:", phase, "| question:", question);
-    onStatusChange?.(phase);
+    if (!onStatusChange) return;
+    // 렌더 직후 안전하게 부모 상태 변경
+    const id = requestAnimationFrame(() => onStatusChange(phase));
+    return () => cancelAnimationFrame(id);
+  }, [phase, onStatusChange]);
 
-    // TTS phase 자막 출력
+  useEffect(() => {
     if (phase === PHASE.TTS && question?.question) {
       console.log("[TTS] 자막:", question.question);
       onCaptionUpdate?.(`면접관: ${question.question}`);
     }
 
-    // 오디오 재생
     if (phase === PHASE.TTS && question?.audio_url) {
       const url = question.audio_url.startsWith("http")
         ? question.audio_url
@@ -69,24 +70,22 @@ function InterviewSessionManager({
         .play()
         .then(() => console.log("[TTS] 오디오 재생 시작!"))
         .catch((err) => {
-          // AbortError는 무시
           if (err.name !== "AbortError") {
             console.error("[TTS] 오디오 play 에러:", err);
             setPhase(PHASE.WAITING);
           }
         });
 
-      // cleanup 함수: 이 effect가 다시 실행되거나 unmount될 때 호출됨
       return () => {
         audio.pause();
         audioRef.current = null;
       };
     } else {
-      // TTS phase가 아니면 이전 오디오 정지
       audioRef.current?.pause();
       audioRef.current = null;
     }
-  }, [phase, question, onStatusChange, onCaptionUpdate]);
+  }, [phase, question, onCaptionUpdate]);
+
 
   // 대기 후 녹음
   useEffect(() => {
@@ -183,14 +182,6 @@ function InterviewSessionManager({
     pdfText,
   ]);
 
-  // const handleRetry = () => {
-  //   // 1) phase를 READY 같은 임시값으로 변경
-  //   setPhase(PHASE.READY);
-
-  //   // 2) 10~50ms 뒤에 다시 TTS로 변경 (비동기 트리거)
-  //   setTimeout(() => setPhase(PHASE.TTS), 20);
-  //   setRemainingTime(waitTime);
-  // };
 
   return (
     <div className="interview-session">

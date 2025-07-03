@@ -9,6 +9,8 @@ const UserAnswerDisplay = ({
   placeholder = "답변을 기다리는 중...",
   status = "idle",
 }) => {
+
+
   if (!isVisible) return null;
 
   const getStatusConfig = () => {
@@ -66,9 +68,8 @@ const UserAnswerDisplay = ({
 
   return (
     <div
-      className={`user-answer-container ${
-        hasAnswer ? "" : config.containerClass
-      }`}
+      className={`user-answer-container ${hasAnswer ? "" : config.containerClass
+        }`}
     >
       <div className="user-answer-header">
         <span className="user-answer-title">{title}</span>

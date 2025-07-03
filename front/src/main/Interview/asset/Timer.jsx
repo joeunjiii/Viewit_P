@@ -38,9 +38,10 @@ function Timer({
   };
 
   return mode === "text" ? (
-    <span className={className} style={{ display: "inline-block" }}>
-      {label} {formatTime(timeLeft)}
-    </span>
+    <div className={`custom-timer-card ${className}`}>
+      <span className="timer-badge">{label}</span>
+      <span className="timer-value" style={{ marginLeft: 12 }}>{formatTime(timeLeft)}</span>
+    </div>
   ) : (
     <div className="timer-circle">
       <div className="timer-label">{label}</div>

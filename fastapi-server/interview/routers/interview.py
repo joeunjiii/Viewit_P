@@ -54,7 +54,7 @@ async def init_session(data: InitRequest, request: Request):
     )
     # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
     first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
-    
+    session.state["interviewerVoice"] = data.interviewerVoice 
     session.store_answer(
         first_q, "",
         interviewer_name=interviewer_name,

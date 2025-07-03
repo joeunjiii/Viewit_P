@@ -38,19 +38,19 @@ class InterviewSession:
             {
                 "name": "김AI",
                 "role": "기술",
-                "voice_id": "21m00Tcm4TlvDq8ikWAM",
+                "voice_id": "7Nah3cbXKVmGX7gQUuwz",
                 "system_msg": "당신은 기술면접관입니다. 깊이있고 논리적인 질문을 던집니다.",
             },
             {
                 "name": "박AI",
                 "role": "인성",
-                "voice_id": "TxGEqnHWrfWFTfGW9XjX",
+                "voice_id": "fLvpMIGwcTmxzsUF4z1U",
                 "system_msg": "당신은 인성면접관입니다. 따뜻하고 배려 깊은 질문을 던집니다.",
             },
             {
                 "name": "이AI",
                 "role": "창의",
-                "voice_id": "ErXwobaYiN019PkySvjV",
+                "voice_id": "YBRudLRm83BV5Mazcr42",
                 "system_msg": "당신은 창의적이고 문제해결 중심의 면접관입니다. 열린 질문을 좋아합니다.",
             },
         ]
@@ -159,6 +159,13 @@ class InterviewSession:
         interviewer_role = interviewer["role"]
         system_msg = interviewer["system_msg"]
         voice_id = interviewer["voice_id"]
+        
+        # ✅ 여기 추가하세요
+        stt_failure_keywords = ["예", "아니오", "잘 모르겠", "모르겠습니다", "죄송", "못 들었"]
+        is_stt_fail = (
+            len(last_answer.strip()) < 10 or
+            any(k in last_answer for k in stt_failure_keywords)
+    )
 
         # history_text 항상 준비
         history_text = "\n".join(
@@ -182,6 +189,7 @@ class InterviewSession:
             last_answer
             if last_answer and last_answer.strip() != ""
             else "(지원자가 아직 답변을 하지 않았음)"
+            
         )
         # ---- JD/자소서 기반 질문 분기 (★변수명 그대로 사용★)
         if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
@@ -191,7 +199,7 @@ class InterviewSession:
 
 아래 자료를 참고해, 지원자가 기업 요구 직무에 실제로 적합한지 ‘검증’하기 위한 심층 질문을 생성하세요.
 
-1번은 지원자의 포트폴리오 및 자기소개서이고, 2번은 저희가 공고로 올린 요구 직무와 주요 업무, 자격요건입니다.
+1번은 지원자의 포트폴리오 및 자기소개서이고, 2번은 저희가 공고로 올린 요구 직무(JD)와 주요 업무, 자격요건입니다.
 
 [1번 지원자 포트폴리오/자기소개서]
 {getattr(self, 'pdfText', '')}
@@ -201,18 +209,20 @@ class InterviewSession:
 
 [응답 내용] {answer_desc}
 
+{"※ 현재 답변은 음성 인식 오류 또는 부정확한 응답으로 판단됩니다. JD나 자소서 내용을 활용해 자연스럽게 연결되는 새로운 질문을 생성해 주세요." if is_stt_fail else ""}
+
 [이전 질문/답변 기록]
 {history_text}
 
 질문 생성 가이드:
-- 우리 회사가 찾는 인재상(아래 JD 참고)에 맞게, 지원자가 실제로 그런 역량이나 경험을 갖추었는지 확인할 수 있는 질문을 만드세요.
+- JD 또는 자소서 내용을 참고해, 지원자가 실제로 해당 역량과 경험을 갖추었는지 파악할 수 있도록 질문하세요.
 - 회사에서 중요하게 여기는 역량/경험이 실제로 있는지, 있다면 구체적으로 어떤 역할을 했는지, 사례를 묻는 질문이 좋습니다.
-- JD 내용은 회사가 지원자에게 요구하는 것이므로, 면접관이 외부 정보처럼 다시 소개하지 말고 자연스럽게 언급하세요.
-- 지원자의 답변이 모호하거나 부족할 때는, 더 구체적인 사례나 설명을 유도하는 추가 질문을 하세요.
-- 이전 질문들과 동일한 질문은 하지마세요
-- 지원자가 못들었다고 다시 질문해달라고하면 질문을 이전 질문을 한번하거나 다른 주제로 넘어가세요.
+- 동일한 질문 반복은 피하고, 이전 질문과 유사한 주제라도 문맥이나 표현이 중복되지 않도록 유의하세요.
+- STT 오류나 부정확한 응답이 있을 경우, 그 내용을 보완하거나 다른 측면에서 다시 확인할 수 있는 방향으로 질문을 구성하세요.
+- ***질문은 최대 2문장, 250자 이내로 작성하세요.***
 
 → 다음 질문:    
+
 """.strip()
             for _ in range(3):
                 resp = self.openai.chat.completions.create(

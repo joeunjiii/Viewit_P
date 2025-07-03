@@ -216,7 +216,7 @@ function Interview() {
 
       {step === "interview" && (
         <div className="interview-wrapper">
-          <InterviewHeader totalDuration={200} />
+          <InterviewHeader totalDuration={600} />
           <div className="interview-section-body">
             <QuestionTabs
               questionNumber={questionNumber}
@@ -270,6 +270,7 @@ function Interview() {
               isVisible={status === "recording" || currentUserAnswer !== ""}
               title="내 답변"
               isRecording={status === "recording"}
+              status={status} 
               isDev={true} // 개발 모드에서는 true, 실제 서비스에서는 false
             />
           </div>

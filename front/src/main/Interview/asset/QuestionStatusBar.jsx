@@ -1,4 +1,5 @@
 // components/Interview/QuestionStatusBar.jsx
+import {Volume2,Clock,Mic,UploadCloud,Hourglass} from "lucide-react";
 import "./css/QuestionStatusBar.css";
 
 function QuestionStatusBar({ status, remainingTime, small }) {
@@ -7,36 +8,37 @@ function QuestionStatusBar({ status, remainingTime, small }) {
 
   switch (status) {
     case "tts":
-      icon = "🔊";
+      icon = <Volume2 className="qs-icon lucide-blue animate-pulse" size={20} />;
       message = "면접관 질문 재생 중";
       break;
     case "wait":
-      icon = "⏱";
-      message = `대기중입니다 `;
+      icon = <Hourglass className="qs-icon lucide-amber animate-spin" size={20} />;
+      message = "대기중입니다";
       break;
     case "recording":
-      icon = "🎤";
-      message = `답변 녹음 중입니다`;
+      icon = <Mic className="qs-icon lucide-red animate-pulse" size={20} />;
+      message = "답변 녹음 중입니다";
       break;
     case "uploading":
-      icon = "📤";
+      icon = <UploadCloud className="qs-icon lucide-green animate-bounce" size={20} />;
       message = "답변 제출 및 질문 생성 중입니다";
       break;
     default:
-      return null; // 표시 안 함
+      return null;
   }
-  // small일 때 클래스 추가
+  
   const className = [
     "question-status-bar",
     status,
-    small ? "small" : ""
+    small ? "small" : "",
+    status === "uploading" ? "wide-message" : ""  // 추가!
   ].join(" ");
 
   return (
 
 
     <div className={className}>
-      <span className="qs-icon">{icon}</span>
+      {icon}
       <span className="qs-text">{message}</span>
     </div>
   );

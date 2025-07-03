@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./css/InterviewSettingModal.css";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
+function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck, mode }) {
   // 마이크, 직무, 자막, 재답변 허용, 대기 시간 상태
   const [micEnabled] = useState(true);
   const [job, setJob] = useState("backend");
@@ -87,42 +87,21 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck }) {
           </div>
         </div>
 
-        {/* 직무 선택 */}
-        <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-          <InputLabel id="job-select-label">직무 선택</InputLabel>
-          <Select
-            labelId="job-select-label"
-            value={job}
-            label="직무 선택"
-            onChange={(e) => setJob(e.target.value)}
-          >
-            <MenuItem value="backend">Back-end 개발자 (Java)</MenuItem>
-            <MenuItem value="frontend">Front-end 개발자 (React)</MenuItem>
-            <MenuItem value="ai">AI 엔지니어</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* 목소리 선택
-        <FormControl fullWidth size="small" sx={{ mt: 2 }}>
-          <InputLabel id="voice-select-label">목소리 선택</InputLabel>
-          <Select
-            labelId="voice-select-label"
-            value={interviewerVoice}
-            label="목소리 선택"
-            onChange={(e) => setInterviewerVoice(e.target.value)}
-            disabled={voiceOptions.length === 0}
-          >
-            {voiceOptions.length === 0 ? (
-              <MenuItem value="">목소리 옵션 없음</MenuItem>
-            ) : (
-              voiceOptions.map((v) => (
-                <MenuItem key={v.id} value={v.id}>
-                  {v.label}
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl> */}
+        {mode !== "personal" && (
+          <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+            <InputLabel id="job-select-label">직무 선택</InputLabel>
+            <Select
+              labelId="job-select-label"
+              value={job}
+              label="직무 선택"
+              onChange={(e) => setJob(e.target.value)}
+            >
+              <MenuItem value="backend">Back-end 개발자 (Java)</MenuItem>
+              <MenuItem value="frontend">Front-end 개발자 (React)</MenuItem>
+              <MenuItem value="ai">AI 엔지니어</MenuItem>
+            </Select>
+          </FormControl>
+        )}
 
         {/* 질문 자막 설정 */}
         <div className="section">
