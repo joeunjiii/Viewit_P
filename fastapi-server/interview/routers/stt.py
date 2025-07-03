@@ -1,14 +1,16 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-from interview.services.whisper_service import stt_from_webm
+from interview.services.whisper_service import stt_from_webm #stt_from_audio,stt_from_webm
+# stt_from_webm
 from interview.utils.logger_utils import timing_logger
 import traceback
+
 router = APIRouter()
 UPLOAD_DIR = "./interview/uploads/webm"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-MAX_SIZE = 10 * 1024 * 1024
+MAX_SIZE = 20 * 1024 * 1024
 
 @router.post("/")
 @timing_logger("STT 전체 처리")
