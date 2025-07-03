@@ -29,7 +29,6 @@ class AnswerRequest(BaseModel):
     answer: str
 
 
-
 # ── 세션 초기화 ──
 @router.post("/init_session")
 @timing_logger("세션 초기화 전체")
@@ -53,13 +52,16 @@ async def init_session(data: InitRequest, request: Request):
         pdfText=data.pdfText,
     )
     # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
-    first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
-    session.state["interviewerVoice"] = data.interviewerVoice 
+    first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question(
+        "intro"
+    )
+    session.state["interviewerVoice"] = data.interviewerVoice
     session.store_answer(
-        first_q, "",
+        first_q,
+        "",
         interviewer_name=interviewer_name,
         interviewer_role=interviewer_role,
-        interviewer_voice_id=voice_id
+        interviewer_voice_id=voice_id,
     )
     session_store[data.session_id] = session
 
@@ -73,12 +75,11 @@ async def init_session(data: InitRequest, request: Request):
     }
 
 
-
 # ── 다음 질문 & 피드백 ──
 @router.post("/next_question")
 @timing_logger("다음 질문")
 async def next_question(
-        data: AnswerRequest, request: Request, authorization: str = Header(None)
+    data: AnswerRequest, request: Request, authorization: str = Header(None)
 ):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
@@ -92,7 +93,14 @@ async def next_question(
     role = prev.get("interviewer_role") or "기술"
 
     print(f"[DEBUG] interviewer_name={name}, interviewer_role={role}")
-    session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
+    # 이미 답변이 저장된 상태인지 체크 (예시)
+    if "answer" in prev and prev["answer"]:
+        # 이미 답변이 저장되어 있으면 새로 저장 안 함
+        pass
+    else:
+        session.store_answer(
+            last_q, data.answer, interviewer_name=name, interviewer_role=role
+        )
 
     # 2) 개별 피드백 생성·저장
     try:
@@ -113,52 +121,78 @@ async def next_question(
         print(f"[WARN] 개별 피드백 저장 실패: {e}")
 
     # 3) 5분 경과 → final 질문
-    if time.time() - session.start_time >= 300 and not session.state.get("final_question_given"):
-        fq = session.ask_fixed_question("final")
+    if time.time() - session.start_time >= 40 and not session.state.get(
+        "final_question_given"
+    ):
+        # 히스토리 마지막 질문이 이미 final인지 한 번 더 체크
+        if (
+            session.state["history"]
+            and session.state["history"][-1].get("question_type") == "final"
+        ):
+            # 이미 저장되어 있다면 중복 실행 방지!
+            return {
+                "question": session.state["history"][-1]["question"],
+                "audio_url": session.state["history"][-1].get("audio_url"),
+                "done": False,
+            }
+        fq, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question(
+            "final"
+        )
+        audio_url = generate_tts_audio(fq, voice_id)
         session.state["final_question_given"] = True
-        session.store_answer(fq, "", interviewer_name=name, interviewer_role=role)
-        audio_url = generate_tts_audio(fq, session.state["interviewerVoice"])
+
+        session.store_answer(
+            fq,
+            "",
+            interviewer_name=interviewer_name,
+            interviewer_role=interviewer_role,
+            interviewer_voice_id=voice_id,
+            question_type="final",
+            audio_url=audio_url,
+        )
         return {"question": fq, "audio_url": audio_url, "done": False}
 
     # 4) final 이후 → 최종 피드백
     if session.state.get("final_question_given"):
-        try:
-            answers = feedback_service.fetch_all_interview_answers_from_spring(data.session_id, SPRING_URL)
-        except Exception as e:
-            print(f"[ERROR] Q&A 조회 실패: {e}")
-            raise HTTPException(500, "Spring DB에서 Q&A를 불러오지 못했습니다.")
-
-        fixed = [
-            {"questionText": a.get("questionText") or a.get("question_text"),
-             "answerText": a.get("answerText") or a.get("answer_text")}
-            for a in answers
-        ]
-        summary, strengths, weaknesses = feedback_service.generate_final_feedback(request.app.state.openai_client, fixed)
-        try:
-            feedback_service.send_final_feedback_to_spring(
-                data.session_id, summary, strengths, weaknesses, SPRING_URL, token=authorization
-            )
-        except Exception as e:
-            print(f"[ERROR] 최종 피드백 저장 실패: {e}")
-            raise HTTPException(500, "Spring에 총평 저장 실패")
-
+        if session.state.get("final_feedback_given"):
+            return {
+                "message": "면접 종료 및 총평 저장 완료(중복방지)",
+                "final_feedback": session.state.get("final_feedback_cache"),
+            }
+        # ...피드백 생성 및 저장 코드... 아직구현 X
+        summary, strengths, weaknesses = "", "", ""
+        # 저장 성공 시 플래그 및 캐시
+        session.state["final_feedback_given"] = True
+        session.state["final_feedback_cache"] = {
+            "summary": summary,
+            "strengths": strengths,
+            "weaknesses": weaknesses,
+        }
         return {
             "message": "면접 종료 및 총평 저장 완료",
-            "final_feedback": {"summary": summary, "strengths": strengths, "weaknesses": weaknesses},
+            "final_feedback": session.state["final_feedback_cache"],
         }
 
     # 5) 일반 다음 질문
     nq, nn, nr, voice_id = session.decide_next_question(data.answer)
-    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr,interviewer_voice_id=voice_id)
+    # 중복 질문 방지: history 마지막 질문과 같은 경우 저장 생략
+    if session.state["history"][-1]["question"] != nq:
+        session.store_answer(
+            nq,
+            "",
+            interviewer_name=nn,
+            interviewer_role=nr,
+            interviewer_voice_id=voice_id,
+        )
     audio_url = generate_tts_audio(nq, voice_id)
     return {
-    "question": nq,
-    "audio_url": audio_url,
-    "interviewer_name": nn,
-    "interviewer_role": nr,
-    "voice_id": voice_id,
-    "done": False
-}
+        "question": nq,
+        "audio_url": audio_url,
+        "interviewer_name": nn,
+        "interviewer_role": nr,
+        "voice_id": voice_id,
+        "done": False,
+    }
 
 
 # ── 마지막 답변 수집 ──

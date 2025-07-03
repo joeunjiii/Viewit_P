@@ -126,6 +126,8 @@ class InterviewSession:
         interviewer_name: str = None,
         interviewer_role: str = None,
         interviewer_voice_id: str = None,
+        question_type: str = None,   # 추가
+        audio_url: str = None,       # 추가
     ) -> None:
         self.state["history"].append(
             {
@@ -134,6 +136,8 @@ class InterviewSession:
                 "topic": topic,
                 "interviewer_name": interviewer_name,
                 "interviewer_role": interviewer_role,
+                "question_type": question_type,  
+                "audio_url": audio_url,          
             }
         )
         if topic == self.state.get("current_topic"):

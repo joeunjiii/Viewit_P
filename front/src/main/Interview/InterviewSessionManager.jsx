@@ -35,6 +35,7 @@ function InterviewSessionManager({
   const recorderRef = useRef(null);
   const audioRef = useRef(null);
   const navigate = useNavigate();
+  const sttInProgressRef = useRef(false);
   // 초기 질문 세팅
   useEffect(() => {
     setQuestion(initialQuestion);
@@ -116,6 +117,13 @@ function InterviewSessionManager({
 
   // 녹음 완료 → STT
   const handleRecordingComplete = async (blob) => {
+    if (sttInProgressRef.current) {
+      console.warn("STT 중복 호출 차단!");
+      return;
+    }
+    sttInProgressRef.current = true; // 첫 진입에만 true
+
+    console.log("🎤 handleRecordingComplete 호출됨!", blob);
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -129,9 +137,18 @@ function InterviewSessionManager({
     }
   };
 
+  // phase가 RECORDING이 될 때마다 flag를 초기화
+  useEffect(() => {
+    if (phase === PHASE.RECORDING) {
+      sttInProgressRef.current = false;
+    }
+  }, [phase]);
+
+  
   // 답변 저장 & 다음 질문 또는 자동 총평
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
+      console.log("🔥 nextQuestion API 요청 시작:", { phase, sttResult });
       (async () => {
         try {
           await saveInterview({
@@ -141,6 +158,7 @@ function InterviewSessionManager({
             filterWord: "",
             answerFeedback: "",
           });
+          console.log("✅ 답변 저장 성공!");
         } catch (e) {
           alert("저장 실패: " + e.message);
           return;
@@ -148,6 +166,7 @@ function InterviewSessionManager({
 
         try {
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
+          console.log("✅ nextQuestion API 응답:", res);
           const data = res.data;
 
           if (data.final_feedback) {
