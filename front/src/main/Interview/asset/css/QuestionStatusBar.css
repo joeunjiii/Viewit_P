@@ -26,8 +26,8 @@
 }
 
 .question-status-bar.recording {
-  border: 2px solid #ffc357;
-  background: #fff9ec;
+  border: 2px solid #fecaca;
+  background: #fef2f2 ;
   animation: recording-blink 1.1s infinite alternate;
 }
 
