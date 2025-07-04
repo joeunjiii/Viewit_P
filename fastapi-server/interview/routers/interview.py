@@ -57,7 +57,7 @@ async def init_session(data: InitRequest, request: Request):
     )
     # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
     first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
-    session.state["interviewerVoice"] = data.interviewerVoice 
+    session.state["interviewerVoice"] = data.interviewerVoice
     session.store_answer(
         first_q, "",
         interviewer_name=interviewer_name,
@@ -98,7 +98,7 @@ async def next_question(
     session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
 
     # 1분 40초(100초) 경과 후 마지막 질문 던지기
-    if time.time() - session.start_time >= 30 and not session.state.get("final_question_given"):
+    if time.time() - session.start_time >= 600 and not session.state.get("final_question_given"):
         fq, nn, nr, voice_id = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.state["final_answer_received"] = False  # 새로운 플래그 추가
@@ -129,16 +129,16 @@ async def next_question(
             for a in answers
         ]
         summary, strengths, weaknesses = feedback_service.generate_final_feedback(request.app.state.openai_client, fixed)
-        try:
-            feedback_service.send_final_feedback_to_spring(
-                data.session_id, summary, strengths, weaknesses, SPRING_URL, token=authorization
-            )
-        except Exception as e:
-            print(f"[ERROR] 최종 피드백 저장 실패: {e}")
-            raise HTTPException(500, "Spring에 총평 저장 실패")
+        # try:
+        #     feedback_service.send_final_feedback_to_spring(
+        #         data.session_id, summary, strengths, weaknesses, SPRING_URL, token=authorization
+        #     )
+        # except Exception as e:
+        #     print(f"[ERROR] 최종 피드백 저장 실패: {e}")
+        #     raise HTTPException(500, "Spring에 총평 저장 실패")
 
         return {
-            "message": "면접 종료 및 총평 저장 완료",
+            "message": "면접 종료 및 총평 미리보기",
             "final_feedback": {"summary": summary, "strengths": strengths, "weaknesses": weaknesses},
             "done": True,  # done True를 보내서 클라이언트가 종료 처리하도록
         }

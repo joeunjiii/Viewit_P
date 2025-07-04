@@ -1,8 +1,8 @@
 // Interview.jsx
-import React, { useState, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import React, {useState, useCallback, useEffect} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { createInterviewSession, initSession } from "./api/interview";
+import {createInterviewSession, endSession, initSession} from "./api/interview";
 import "./css/Interview.css";
 import InterviewSettingModal from "./InterviewSettingModal";
 import AssessmentIntro from "./AssessmentIntro";
@@ -21,12 +21,12 @@ import Timer from "./asset/Timer";
 import defaultImg from "./img/default.png";
 import ttsImg from "./img/tts.png";
 import waitImg from "./img/waiting.png";
-import { useNavigate } from "react-router-dom";
-
 import UserAnswerDisplay from "./asset/UserAnswerDisplay";
+
 
 function Interview() {
   const location = useLocation();
+  const navigate = useNavigate()
   const mode = new URLSearchParams(location.search).get("mode");
   const [showPersonalModal, setShowPersonalModal] = useState(
     mode === "personal"
@@ -75,7 +75,16 @@ function Interview() {
     console.log("PDF OCR 텍스트:", data.pdf_ocr_text);
   };
 
-
+  //종료하기 핸들러
+  const handleManualEnd = async () => {
+    if (!window.confirm("정말 면접을 종료하시겠습니까?")) return;
+    try {
+      await endSession(sessionId); //종료 API 호출
+      navigate(`/feedback/${sessionId}`);
+    }catch (err) {
+      alert("면접 종료에 실패했습니다 :" + err.message);
+    }
+  }
 
 
   const handleStartSettings = ({
@@ -221,7 +230,8 @@ function Interview() {
 
       {step === "interview" && (
         <div className="interview-wrapper">
-          <InterviewHeader totalDuration={600} />
+          <InterviewHeader totalDuration={600}
+           onEndInterview={handleManualEnd}/>
           <div className="interview-section-body">
             <QuestionTabs
               questionNumber={questionNumber}
