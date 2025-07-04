@@ -1,5 +1,5 @@
 import React from "react";
-import { Mic, Clock, Pause, CheckCircle, MessageCircle } from "lucide-react";
+import { Mic, UploadCloud,CheckCircle, MessageCircle,Volume2,Hourglass } from "lucide-react";
 import "./css/UserAnswerDisplay.css";
 
 const UserAnswerDisplay = ({
@@ -16,16 +16,16 @@ const UserAnswerDisplay = ({
     switch (status) {
       case "tts":
         return {
-          icon: MessageCircle,
+          icon: Volume2,
           message: "면접관이 질문하고 있습니다",
-          iconClass: "icon-blue",
+          iconClass: "icon-blue swing",
           containerClass: "status-blue",
         };
       case "wait":
         return {
-          icon: Pause,
+          icon: Hourglass,
           message: "답변 대기 중입니다",
-          iconClass: "icon-gray",
+          iconClass: "icon-gray spin",
           containerClass: "status-gray",
         };
       case "recording":
@@ -37,9 +37,9 @@ const UserAnswerDisplay = ({
         };
       case "uploading":
         return {
-          icon: Clock,
+          icon: UploadCloud,
           message: "답변을 처리하고 있습니다",
-          iconClass: "icon-amber animate-spin",
+          iconClass: "icon-amber animate-bounce",
           containerClass: "status-amber",
         };
       case "complete":
