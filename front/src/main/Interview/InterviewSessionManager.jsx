@@ -36,6 +36,7 @@ function InterviewSessionManager({
   const timerRef = useRef(null);       // 타이머 관리용 ref
   const recorderRef = useRef(null);    // 녹음기 관리용 ref
   const audioRef = useRef(null);       // TTS 오디오 관리용 ref
+  const isSttProcessing = useRef(false); //stt두번요청 확인 ref
   const navigate = useNavigate();      // 페이지 이동용 훅
 
   // 초기 질문 세팅: initialQuestion이 바뀌면 질문과 단계 초기화
@@ -111,17 +112,23 @@ function InterviewSessionManager({
 
   // 녹음 완료 시 호출: STT API 호출 및 결과 처리
   const handleRecordingComplete = async (blob) => {
+    if (isSttProcessing.current) {
+      console.warn("STT 중복 호출 방지: 이미 처리 중");
+      return;
+    }
+    isSttProcessing.current = true;
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
       setSttResult(data.text);
-      // onCaptionUpdate?.(`이용자: ${data.text}`);
-      // 사용자 답변을 별도 콜백으로 전달
       onUserAnswer?.(data.text);
       setPhase(PHASE.COMPLETE);
     } catch (err) {
       console.error("STT 오류:", err);
+    } finally {
+      isSttProcessing.current = false;
     }
+
   };
 
   // 답변 저장 & 다음 질문 요청 또는 면접 종료 처리
