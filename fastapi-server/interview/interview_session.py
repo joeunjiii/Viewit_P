@@ -37,20 +37,29 @@ class InterviewSession:
             {
                 "name": "김AI",
                 "role": "기술",
-                "voice_id": "7Nah3cbXKVmGX7gQUuwz",
-                "system_msg": "당신은 기술면접관입니다. 깊이있고 논리적인 질문을 던집니다.",
+                "voice_id": "21m00Tcm4TlvDq8ikWAM",
+                "system_msg": "당신은 기술면접관입니다. 지원자의 실무 능력, 문제해결력, 최신 기술 트렌드 이해, 구체적 경험 위주의 질문을 중시합니다."
+                              "질문은 기술적 원리, 구현 과정, 본인이 직접 해결한 사례에 집중하세요"
+                              "모호한 답변에는 꼬리 질문으로 원인/과정/결과를 반드시 구체적으로 파고듭니다"
+                              "코드, 알고리즘, 성능 최적화, 장애 대응 경험, 실제 사용한 기술 등을 중심으로 질문을 생성하세요"
+                              "인성·창의와 직접 관련 없는 내용이어야 하며, 절대 추상적/포괄적 질문(예: '협업 경험 말씀해보세요')은 피하세요."
+
             },
             {
                 "name": "박AI",
                 "role": "인성",
-                "voice_id": "fLvpMIGwcTmxzsUF4z1U",
-                "system_msg": "당신은 인성면접관입니다. 따뜻하고 배려 깊은 질문을 던집니다.",
+                "voice_id": "TxGEqnHWrfWFTfGW9XjX",
+                "system_msg": "당신은 인성면접관입니다. 지원자의 태도, 협업능력, 동기, 커뮤니케이션, 스트레스 대처, 갈등 해결 방식 등에 초점을 맞춥니다. "
+                              "지원자가 편안하게 이야기할 수 있도록 공감하고 배려하는 어투로 질문하세요. "
+                              "구체적인 상황/사례를 물으며, 추상적 질문은 지양합니다. 기술 구현에 대한 질문은 삼가고, 인간적인 면과 조직 적응력, 동료와의 소통, 리더십, 자기성장 경험 등을 중심으로 질문을 만드세요."
             },
             {
                 "name": "이AI",
                 "role": "창의",
-                "voice_id": "YBRudLRm83BV5Mazcr42",
-                "system_msg": "당신은 창의적이고 문제해결 중심의 면접관입니다. 열린 질문을 좋아합니다.",
+                "voice_id": "ErXwobaYiN019PkySvjV",
+                "system_msg": "당신은 창의적 문제해결 면접관입니다. 고정관념을 벗어난 접근, 새로운 아이디어, 변화/개선 제안, 스스로 도전한 경험, 실패 후 배움 등에 초점을 맞춥니다. "
+                              "질문은 열린 형태(Yes/No가 아닌), 정답이 없는 상황, 지원자만의 관점과 사고를 유도해야 하며, 단순 경험 나열은 피하세요. "
+                              "창의·혁신을 끌어낼 수 있도록 질문은 상황 중심 또는 가상의 문제/상황 제시 형식도 환영합니다."
             },
         ]
         self.interviewer_index = 0  # 면접관 순차 교대
@@ -89,13 +98,13 @@ class InterviewSession:
             "추가로 하고 싶은 말씀이 있으신가요?",
             "오늘 면접 소감이나 마지막으로 강조하고 싶은 점이 있으신가요?",
         ]
+        interviewer = [p for p in self.interviewer_profiles if p["role"] == "인성"][0]
         if kind == "intro":
             q = random.choice(intro_questions)
         elif kind == "final":
             q = random.choice(final_questions)
         else:
             q = ""
-        interviewer = self.get_next_interviewer()
         return q, interviewer["name"], interviewer["role"], interviewer["voice_id"]
 
     def search_similar_questions(
@@ -152,21 +161,13 @@ class InterviewSession:
         sim = util.cos_sim(new_vec, prev_vecs)
         return torch.max(sim).item() > threshold
 
-    def decide_next_question(self, last_answer: str) -> tuple[str, str, str,str]:
+    def decide_next_question(self, last_answer: str) -> tuple[str, str, str, str]:
         interviewer = self.get_next_interviewer()
         interviewer_name = interviewer["name"]
         interviewer_role = interviewer["role"]
         system_msg = interviewer["system_msg"]
         voice_id = interviewer["voice_id"]
-        
-        # ✅ 여기 추가하세요
-        stt_failure_keywords = ["예", "아니오", "잘 모르겠", "모르겠습니다", "죄송", "못 들었"]
-        is_stt_fail = (
-            len(last_answer.strip()) < 10 or
-            any(k in last_answer for k in stt_failure_keywords)
-    )
 
-        # history_text 항상 준비
         history_text = "\n".join(
             f"{i+1}) Q: {h['question']} / A: {h['answer']}"
             for i, h in enumerate(self.state["history"])
@@ -182,15 +183,15 @@ class InterviewSession:
             1 for item in self.state["history"] if item.get("topic") == "common"
         )
         total_count = len(self.state["history"])
-        need_more_common = (common_count / (total_count + 1)) < 0.3
+        need_more_common = (common_count / (total_count + 1)) < 0.12
 
         answer_desc = (
             last_answer
             if last_answer and last_answer.strip() != ""
             else "(지원자가 아직 답변을 하지 않았음)"
-            
         )
-        # ---- JD/자소서 기반 질문 분기 (★변수명 그대로 사용★)
+
+        # ---- JD/자소서 기반 질문 분기 (절대 건드리지 마세요!)
         if hasattr(self, "jdText") and (self.jdText or getattr(self, "pdfText", None)):
             prompt = f"""
 당신은 기업의 인사 담당자(면접관) 역할을 맡은 AI 에이전트입니다.
@@ -198,7 +199,7 @@ class InterviewSession:
 
 아래 자료를 참고해, 지원자가 기업 요구 직무에 실제로 적합한지 ‘검증’하기 위한 심층 질문을 생성하세요.
 
-1번은 지원자의 포트폴리오 및 자기소개서이고, 2번은 저희가 공고로 올린 요구 직무(JD)와 주요 업무, 자격요건입니다.
+1번은 지원자의 포트폴리오 및 자기소개서이고, 2번은 저희가 공고로 올린 요구 직무와 주요 업무, 자격요건입니다.
 
 [1번 지원자 포트폴리오/자기소개서]
 {getattr(self, 'pdfText', '')}
@@ -208,20 +209,18 @@ class InterviewSession:
 
 [응답 내용] {answer_desc}
 
-{"※ 현재 답변은 음성 인식 오류 또는 부정확한 응답으로 판단됩니다. JD나 자소서 내용을 활용해 자연스럽게 연결되는 새로운 질문을 생성해 주세요." if is_stt_fail else ""}
-
 [이전 질문/답변 기록]
 {history_text}
 
 질문 생성 가이드:
-- JD 또는 자소서 내용을 참고해, 지원자가 실제로 해당 역량과 경험을 갖추었는지 파악할 수 있도록 질문하세요.
+- 우리 회사가 찾는 인재상(아래 JD 참고)에 맞게, 지원자가 실제로 그런 역량이나 경험을 갖추었는지 확인할 수 있는 질문을 만드세요.
 - 회사에서 중요하게 여기는 역량/경험이 실제로 있는지, 있다면 구체적으로 어떤 역할을 했는지, 사례를 묻는 질문이 좋습니다.
-- 동일한 질문 반복은 피하고, 이전 질문과 유사한 주제라도 문맥이나 표현이 중복되지 않도록 유의하세요.
-- STT 오류나 부정확한 응답이 있을 경우, 그 내용을 보완하거나 다른 측면에서 다시 확인할 수 있는 방향으로 질문을 구성하세요.
-- ***질문은 최대 2문장, 250자 이내로 작성하세요.***
+- JD 내용은 회사가 지원자에게 요구하는 것이므로, 면접관이 외부 정보처럼 다시 소개하지 말고 자연스럽게 언급하세요.
+- 지원자의 답변이 모호하거나 부족할 때는, 더 구체적인 사례나 설명을 유도하는 추가 질문을 하세요.
+- 이전 질문들과 동일한 질문은 하지마세요
+- 지원자가 못들었다고 다시 질문해달라고하면 질문을 이전 질문을 한번하거나 다른 주제로 넘어가세요.
 
 → 다음 질문:    
-
 """.strip()
             for _ in range(3):
                 resp = self.openai.chat.completions.create(
@@ -234,29 +233,32 @@ class InterviewSession:
                     max_tokens=512,
                 )
                 nxt = resp.choices[0].message.content.strip()
-                if not nxt or not nxt.strip():
-                    continue
-                if not self.is_too_similar_to_previous(nxt):
-                    return nxt, interviewer_name, interviewer_role,voice_id
-            return nxt, interviewer_name, interviewer_role,voice_id
+                if nxt and not self.is_too_similar_to_previous(nxt):
+                    return nxt, interviewer_name, interviewer_role, voice_id
+            return nxt, interviewer_name, interviewer_role, voice_id
 
-        # 공통질문(소프트스킬) LLM 생성
-        if is_short_or_passive or need_more_common:
+        # -------- 공통질문(인성) 조건 충족 시에만 --------
+        if interviewer_role == "인성" and need_more_common and is_short_or_passive:
             example_common_q = self.get_random_common_question()
             prompt = f"""
-아래는 공통 소프트스킬 면접질문의 예시입니다.
+당신은 인성 면접관입니다. 지원자의 인성, 협업, 의사소통 등 소프트스킬을 파악하기 위한 질문을 하세요.
+
 [공통질문 예시]
 - {example_common_q if example_common_q else ''}
-[기존질문/답변]
-{history_text}
 
-→ 새 공통질문:
-""".strip()
+[이전 질문/답변]
+{history_text}
+[지원자 답변] {answer_desc}
+
+질문 생성 가이드:
+- 공통 소프트스킬(협업, 의사소통, 갈등관리 등)에 관한 새로운 질문을 1~2문장 이내로 작성하세요.
+- 동일/유사 주제 반복 금지, 답변이 짧으면 다양한 각도에서 유도 질문.
+"""
             for _ in range(3):
                 response = self.openai.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {"role": "system", "content": system_msg},
+                        {"role": "system", "content": interviewer["system_msg"]},
                         {"role": "user", "content": prompt},
                     ],
                     temperature=0.85,
@@ -265,42 +267,43 @@ class InterviewSession:
                 next_question = response.choices[0].message.content.strip()
                 if not self.is_too_similar_to_previous(next_question):
                     return next_question, interviewer_name, interviewer_role, voice_id
-            return next_question, interviewer_name, interviewer_role,voice_id  # fallback
+            return next_question, interviewer_name, interviewer_role, voice_id
 
-        # 직무 Pool 기반 질문 생성
-        example_job_q = (
-            self.get_random_common_question()
-            if self.job_role == "common"
-            else self.get_random_common_question()
-        )
-        similar_qas = self.search_similar_questions(last_answer, top_k=3)
-        retrieved_context = "\n".join([f"- {q}" for q, _ in similar_qas])
+        # -------- 그 외(각 면접관 역할별 프롬프트) --------
+        role_examples = {
+            "기술": ["최근 경험한 기술적 문제를 어떻게 해결하셨나요?",
+                   "코드 리뷰나 성능 개선을 주도한 경험이 있나요?",
+                   "새로운 언어나 프레임워크를 도입했던 사례가 있나요?",
+                   "운영 중 장애를 직접 해결한 경험을 구체적으로 설명해주세요",
+                  ],
+            "인성": ["팀워크가 중요했던 경험에 대해 말씀해 주세요.",
+                    "스트레스를 관리하는 본인만의 방법이 있나요?",
+                    "동료와의 협업에서 기억에 남는 일이 있었나요?",
+                    "실패를 극복했던 경험을 말씀해주세요."],
+            "창의": ["새로운 방식이나 아이디어로 일의 방식을 개선한 사례가 있나요?",
+                    "정답이 없는 문제를 해결할 때 본인만의 접근법은 무엇인가요?",
+                    "회사에 새로운 아이디어나 프로세스를 제안한 경험이 있나요?",
+                    "실패한 경험에서 얻은 교훈을 어떻게 적용해봤나요?"]
+        }
         prompt = f"""
-당신은 AI 면접관입니다. 아래 지침을 엄격하게 준수해 다음 질문을 생성하세요
+당신은 '{interviewer_name}' 면접관({interviewer_role})입니다.
+{system_msg}
 
-- 반드시 직무({self.job_role})에 맞는 실무적/현장감 있는 질문을 포함하세요.
-- 전체 질문의 비율은 개발 30%, 알고리즘 15%, 프로젝트 15%, 문제해결능력 10%, 인성 10%를 목표로 하며, 약 30%는 공통질문(예: 의사소통, 스트레스 관리, 동기, 성격, 협업, 갈등해결 등)으로 구성하세요.
-- 질문 출제 시 직무 질문과 공통 질문이 자연스럽게 섞이도록 하세요.
-- 사용자가 부담없이 이야기할 수 있도록 부드럽고 친근한 말투로 질문하세요.
-- **동일 주제는 3번 이상 묻지 말고, 직전 3개 이내의 질문과 비슷한 질문은 절대 하지 마세요.**
-- 사용자의 답변이 짧거나 모호하다면, 반드시 이전에 하지 않았던 새로운 각도에서 질문을 만드세요.
-- ** 데이터셋(질문 Pool)에 그대로 사용하지 말고, 지원자의 답변에서 파생되거나 새로운 각도에서 질문을 만드세요.**
-- 사용자가 “잘 모르겠습니다”, “없습니다”, “생각이 나지 않습니다” 등 소극적으로 답하면 같은/비슷한 질문을 반복하지 말고, {self.job_role} 직무와 연관된 쉽고 열린 주제로 자연스럽게 넘어가세요.
-- 경험이 없을 경우 앞으로 배우고 싶은 점, 관심 기술, 성향 등 자유롭게 이야기할 수 있도록 다양한 각도에서 질문하세요.
-- 경력이 부족해도 부정적으로 평가하지 말고, 지원자가 본인의 생각을 편하게 말하도록 도와주세요.
-- 각 질문은 **1~2문장 이내로 간결하고, 구체적으로 작성하세요.**
+[예시 질문] "{role_examples.get(interviewer_role, '')}"
 
-[이전 질문/답변]
+[이전 Q/A]
 {history_text}
+[지원자 마지막 답변] {answer_desc}
 
-[질문 Pool(참고용, 복붙 금지!)]
-{retrieved_context}
-
-[지원자 마지막 답변]
-{last_answer}
-
-→ 위 내용을 참고해, 다음 면접 질문을 하나만 생성하세요.
-""".strip()
+질문 생성 가이드:
+- '{interviewer_role}'의 시각으로 실무적/현장감 있는 심층질문을 1~2문장으로 만드세요.
+- 답변이 짧으면, 그 내용을 더 구체적으로 유도하거나 새로운 각도에서 질문하세요.
+- 사용자가 부담없이 이야기 할 수 있도록 부드럽고 친근한 말투로 질문하세요. 
+- 각 질문은 *1~2문장 이내로 간결하고, 구체적으로 작성하세요*
+- 질문 예시를 생성하지 마세요 
+- 반드시 직무 ({self.job_role})에 맞는 실무적/현장감 있는 질문을 포함하세요
+- 지원자의 {answer_desc}을 참고하여 꼬리질문을 생성하세요
+- """
         for _ in range(3):
             response = self.openai.chat.completions.create(
                 model="gpt-4o",
@@ -313,5 +316,5 @@ class InterviewSession:
             )
             next_question = response.choices[0].message.content.strip()
             if not self.is_too_similar_to_previous(next_question):
-                return next_question, interviewer_name, interviewer_role,voice_id
+                return next_question, interviewer_name, interviewer_role, voice_id
         return next_question, interviewer_name, interviewer_role, voice_id  # fallback
