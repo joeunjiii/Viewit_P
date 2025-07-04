@@ -3,7 +3,8 @@ import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview, endSession } from "./api/interview";  // ★ 종료 API 호출 import
 import { requestSpeechToText } from "./api/stt";
 import { useNavigate } from "react-router-dom";
-import InterviewHeader from "./asset/InterviewHeader";
+import UserAnswerDisplay from "./asset/UserAnswerDisplay";
+import QuestionStatusBar from "./asset//QuestionStatusBar";
 
 const PHASE = {
   TTS: "tts",           // TTS 재생 중
@@ -37,7 +38,6 @@ function InterviewSessionManager({
   const audioRef = useRef(null);       // TTS 오디오 관리용 ref
   const navigate = useNavigate();      // 페이지 이동용 훅
 
-
   // 초기 질문 세팅: initialQuestion이 바뀌면 질문과 단계 초기화
   useEffect(() => {
     setQuestion(initialQuestion);
@@ -58,8 +58,8 @@ function InterviewSessionManager({
 
     if (phase === PHASE.TTS && question?.audio_url) {
       const url = question.audio_url.startsWith("http")
-          ? question.audio_url
-          : "http://localhost:8000" + question.audio_url;
+        ? question.audio_url
+        : "http://localhost:8000" + question.audio_url;
 
       const audio = new Audio(url);
       audioRef.current = audio;
@@ -183,13 +183,15 @@ function InterviewSessionManager({
   ]);
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-      </div>
+    <div className="interview-session">
+
+      <UserAnswerDisplay status={phase} answer={sttResult} isVisible={true} />
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+    </div>
   );
 }
 
