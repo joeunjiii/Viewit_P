@@ -18,7 +18,7 @@ const UserAnswerDisplay = ({
       case "tts":
         return {
           icon: MessageCircle,
-          message: "면접관이 질문하고 있습니다...",
+          message: "면접관이 질문하고 있습니다",
           iconClass: "icon-blue",
           containerClass: "status-blue",
         };
@@ -32,14 +32,14 @@ const UserAnswerDisplay = ({
       case "recording":
         return {
           icon: Mic,
-          message: "음성을 인식하고 있습니다...",
+          message: "음성을 인식하고 있습니다",
           iconClass: "icon-red animate-pulse",
           containerClass: "status-red",
         };
       case "uploading":
         return {
           icon: Clock,
-          message: "답변을 처리하고 있습니다...",
+          message: "답변을 처리하고 있습니다",
           iconClass: "icon-amber animate-spin",
           containerClass: "status-amber",
         };

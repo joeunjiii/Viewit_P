@@ -21,13 +21,13 @@
 }
 
 .question-status-bar.wait {
-  border: 2px solid #36d6b6;
-  background: #e8f8f4;
+  border: 2px solid 	#e5e7eb ;
+  background: #f9fafb;
 }
 
 .question-status-bar.recording {
-  border: 2px solid #ffc357;
-  background: #fff9ec;
+  border: 2px solid #fecaca;
+  background: #fef2f2 ;
   animation: recording-blink 1.1s infinite alternate;
 }
 

@@ -142,6 +142,8 @@ class InterviewSession:
                 "topic": topic,
                 "interviewer_name": interviewer_name,
                 "interviewer_role": interviewer_role,
+                "question_type": question_type,  
+                "audio_url": audio_url,          
             }
         )
         if topic == self.state.get("current_topic"):

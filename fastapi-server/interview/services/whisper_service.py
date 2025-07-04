@@ -5,7 +5,6 @@ import subprocess
 from dotenv import load_dotenv
 import io
 import torch
-import torch
 # .env 파일 읽기
 load_dotenv()
 FFMPEG_BIN_PATH = os.getenv("FFMPEG_BIN_PATH")
@@ -66,3 +65,135 @@ def stt_from_webm(webm_path: str):
                 os.remove(wav_path)
             except Exception:
                 pass
+
+#API 활용
+# import os
+# import subprocess
+# import requests
+# import uuid
+# import wave
+# from dotenv import load_dotenv
+# MAX_SIZE = 20 * 1024 * 1024
+# # .env 파일 읽기
+# load_dotenv()
+# FFMPEG_BIN_PATH = os.getenv("FFMPEG_BIN_PATH")
+# WHISPER_API_URL = os.getenv("WHISPER_API_URL")
+# WHISPER_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# # if not FFMPEG_BIN_PATH:
+# #     raise RuntimeError("FFMPEG_BIN_PATH 환경변수가 설정되지 않았습니다.")
+# if not WHISPER_API_URL or not WHISPER_API_KEY:
+#     raise RuntimeError("Whisper API 환경변수가 설정되지 않았습니다.")
+# # 포맷 검증 함수
+# def is_valid_wav(wav_path):
+#     try:
+#         with wave.open(wav_path, 'rb') as wf:
+#             # Whisper 권장값: 16kHz, 1채널, 샘플폭 2byte(16bit PCM)
+#             return wf.getframerate() == 16000 and wf.getnchannels() == 1 and wf.getsampwidth() == 2
+#     except Exception:
+#         return False
+
+
+# # ffmpeg 변환 함수
+# def convert_to_wav(src_path, dst_path):
+#     cmd = [
+#         FFMPEG_BIN_PATH,
+#         "-y",
+#         "-i", src_path,
+#         "-acodec", "pcm_s16le",
+#         "-ar", "16000",
+#         "-ac", "1",
+#         dst_path,2
+#     ]
+#     try:
+#         subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
+#         if not os.path.exists(dst_path) or os.path.getsize(dst_path) == 0:
+#             raise RuntimeError("wav 파일 변환 실패(파일 없음 또는 크기 0)")
+#     except subprocess.CalledProcessError as e:
+#         raise RuntimeError(f"ffmpeg 변환 실패: {e.stderr.decode()}")
+#     except subprocess.TimeoutExpired:
+#         raise RuntimeError("ffmpeg 변환 timeout")
+
+
+# def stt_from_audio(webm_path: str):
+#     print(f"[LOG] Whisper API 요청 준비")
+#     print(f"[LOG] API URL: {WHISPER_API_URL}")
+#     wav_path = webm_path.rsplit(".", 1)[0] + ".wav"
+#     print(f"[LOG] WAV 파일 경로: {wav_path}")
+#     print(f"[LOG] 사용 모델: whisper-1")
+#     print(f"[LOG] 언어: ko")
+
+#     try:
+#         convert_to_wav(webm_path, wav_path)
+#     except Exception as e:
+#         print(f"[ERROR] 웹엠 → wav 변환 에러: {e}")
+#         raise RuntimeError(f"webm → wav 변환 실패: {e}")
+
+#     try:
+#         # Whisper API로 요청
+#         with open(wav_path, "rb") as f:
+#             files = {"file": (os.path.basename(wav_path), f, "audio/wav")}
+#             data = {"model": "whisper-1", "language": "ko"}  # openai whisper-api일 경우
+#             headers = {"Authorization": f"Bearer {WHISPER_API_KEY}"}
+
+#             print(f"[LOG] 요청 headers: {headers}")
+#             print(f"[LOG] 요청 data: {data}")
+#             print(f"[LOG] 파일명: {files['file'][0]}, 파일타입: {files['file'][2]}")
+
+#             response = requests.post(
+#                 WHISPER_API_URL, headers=headers, data=data, files=files, timeout=60
+#             )
+
+#             print(f"[LOG] 응답 status code: {response.status_code}")
+#             response.raise_for_status()
+#             result = response.json()
+#             # openai whisper-api는 result["text"]에 결과 반환
+#             text = result.get("text", "")
+#             print(f"[LOG] Whisper 변환 결과: {text}")
+#             return text
+#     except Exception as e:
+#         print(f"[ERROR] Whisper API 변환 에러: {e}")
+#         raise RuntimeError(f"Whisper API 변환 실패: {e}")
+#     finally:
+#         if os.path.exists(wav_path):
+#             try:
+#                 os.remove(wav_path)
+#             except Exception:
+#                 pass
+
+
+
+
+
+
+
+# def stt_from_audio(audio_path: str):
+#     print(f"[LOG] Whisper API 요청 준비")
+#     print(f"[LOG] API URL: {WHISPER_API_URL}")
+#     print(f"[LOG] 파일 경로: {audio_path}")
+#     print(f"[LOG] 사용 모델: whisper-1")
+#     print(f"[LOG] 언어: ko")
+
+#     try:
+#         with open(audio_path, "rb") as f:
+#             files = {"file": (os.path.basename(audio_path), f, "audio/wav")}
+#             data = {"model": "whisper-1", "language": "ko"}  # openai whisper-api일 경우
+#             headers = {"Authorization": f"Bearer {WHISPER_API_KEY}"}
+
+#             print(f"[LOG] 요청 headers: {headers}")
+#             print(f"[LOG] 요청 data: {data}")
+#             print(f"[LOG] 파일명: {files['file'][0]}, 파일타입: {files['file'][2]}")
+
+#             response = requests.post(
+#                 WHISPER_API_URL, headers=headers, data=data, files=files, timeout=60
+#             )
+
+#             print(f"[LOG] 응답 status code: {response.status_code}")
+#             response.raise_for_status()
+#             result = response.json()
+#             text = result.get("text", "")
+#             print(f"[LOG] Whisper 변환 결과: {text}")
+#             return text
+#     except Exception as e:
+#         print(f"[ERROR] Whisper API 변환 에러: {e}")
+#         raise RuntimeError(f"Whisper API 변환 실패: {e}")

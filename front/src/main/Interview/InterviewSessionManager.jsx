@@ -3,7 +3,7 @@ import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview, endSession } from "./api/interview";  // ★ 종료 API 호출 import
 import { requestSpeechToText } from "./api/stt";
 import { useNavigate } from "react-router-dom";
-
+import UserAnswerDisplay from "./asset/UserAnswerDisplay";
 const PHASE = {
   TTS: "tts",           // TTS 재생 중
   WAITING: "wait",      // 녹음 전 대기 중
@@ -27,16 +27,20 @@ function InterviewSessionManager({
   onUserAnswer, // 사용자 답변 전달 콜백
 }) {
   const [phase, setPhase] = useState(PHASE.TTS);
+  const [answer, setAnswer] = useState("");
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
   const [sttResult, setSttResult] = useState(null);
 
+ 
+
+  // 초기 질문 세팅: initialQuestion이 바뀌면 질문과 단계 초기화
   const timerRef = useRef(null);       // 타이머 관리용 ref
   const recorderRef = useRef(null);    // 녹음기 관리용 ref
   const audioRef = useRef(null);       // TTS 오디오 관리용 ref
   const navigate = useNavigate();      // 페이지 이동용 훅
-
-  // 초기 질문 세팅: initialQuestion이 바뀌면 질문과 단계 초기화
+  const sttInProgressRef = useRef(false);
+  // 초기 질문 세팅
   useEffect(() => {
     setQuestion(initialQuestion);
     setPhase(PHASE.TTS);
@@ -109,6 +113,13 @@ function InterviewSessionManager({
 
   // 녹음 완료 시 호출: STT API 호출 및 결과 처리
   const handleRecordingComplete = async (blob) => {
+    if (sttInProgressRef.current) {
+      console.warn("STT 중복 호출 차단!");
+      return;
+    }
+    sttInProgressRef.current = true; // 첫 진입에만 true
+
+    console.log("🎤 handleRecordingComplete 호출됨!", blob);
     setPhase(PHASE.UPLOADING);
     try {
       const data = await requestSpeechToText(blob);
@@ -122,9 +133,20 @@ function InterviewSessionManager({
     }
   };
 
+  // phase가 RECORDING이 될 때마다 flag를 초기화
+  useEffect(() => {
+    if (phase === PHASE.RECORDING) {
+      sttInProgressRef.current = false;
+    }
+  }, [phase]);
+
+  
+  // 답변 저장 & 다음 질문 또는 자동 총평
+
   // 답변 저장 & 다음 질문 요청 또는 면접 종료 처리
   useEffect(() => {
     if (phase === PHASE.COMPLETE && sttResult) {
+      console.log("🔥 nextQuestion API 요청 시작:", { phase, sttResult });
       (async () => {
         try {
           // 1. 답변 저장 API 호출
@@ -135,6 +157,7 @@ function InterviewSessionManager({
             filterWord: "",
             answerFeedback: "",
           });
+          console.log("✅ 답변 저장 성공!");
         } catch (e) {
           alert("저장 실패: " + e.message);
           return;
@@ -143,6 +166,7 @@ function InterviewSessionManager({
         try {
           // 2. 다음 질문 또는 종료 여부 판단 API 호출
           const res = await nextQuestion(sessionId, sttResult, jdText, pdfText);
+          console.log("✅ nextQuestion API 응답:", res);
           const data = res.data;
 
           // 3. done === true 이면 면접 종료 처리 (종료 API 호출 및 피드백 페이지 이동)
@@ -181,13 +205,25 @@ function InterviewSessionManager({
   ]);
 
   return (
-      <div className="interview-session">
-        <MicRecorder
-            ref={recorderRef}
-            isRecording={phase === PHASE.RECORDING}
-            onStop={handleRecordingComplete}
-        />
-      </div>
+    <div className="interview-session">
+      <UserAnswerDisplay
+        status={phase}
+        answer={answer}
+        isVisible={true}
+        title="내 답변"
+        placeholder="답변을 기다리는 중..."
+      />
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
+    </div>
   );
 }
 

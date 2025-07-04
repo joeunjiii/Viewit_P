@@ -56,13 +56,16 @@ async def init_session(data: InitRequest, request: Request):
         pdfText=data.pdfText,
     )
     # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
-    first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
-    session.state["interviewerVoice"] = data.interviewerVoice 
+    first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question(
+        "intro"
+    )
+    session.state["interviewerVoice"] = data.interviewerVoice
     session.store_answer(
-        first_q, "",
+        first_q,
+        "",
         interviewer_name=interviewer_name,
         interviewer_role=interviewer_role,
-        interviewer_voice_id=voice_id
+        interviewer_voice_id=voice_id,
     )
     session_store[data.session_id] = session
 
@@ -77,12 +80,11 @@ async def init_session(data: InitRequest, request: Request):
     }
 
 
-
 # ── 다음 질문 & 피드백 ──
 @router.post("/next_question")
 @timing_logger("다음 질문")
 async def next_question(
-        data: AnswerRequest, request: Request, authorization: str = Header(None)
+    data: AnswerRequest, request: Request, authorization: str = Header(None)
 ):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
@@ -95,7 +97,14 @@ async def next_question(
     role = prev.get("interviewer_role") or "기술"
 
     print(f"[DEBUG] interviewer_name={name}, interviewer_role={role}")
-    session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
+    # 이미 답변이 저장된 상태인지 체크 (예시)
+    if "answer" in prev and prev["answer"]:
+        # 이미 답변이 저장되어 있으면 새로 저장 안 함
+        pass
+    else:
+        session.store_answer(
+            last_q, data.answer, interviewer_name=name, interviewer_role=role
+        )
 
     # 1분 40초(100초) 경과 후 마지막 질문 던지기
     if time.time() - session.start_time >= 100 and not session.state.get("final_question_given"):
