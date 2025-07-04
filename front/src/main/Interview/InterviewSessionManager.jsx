@@ -171,7 +171,7 @@ function InterviewSessionManager({
 
           // 3. done === true 이면 면접 종료 처리 (종료 API 호출 및 피드백 페이지 이동)
           if (data.done === true) {
-            alert("면접이 종료되었습니다.\n" + (data.message || ""));c
+            alert("면접이 종료되었습니다.\n" + (data.message || ""));
             await endSession(sessionId);  // 종료 API 호출
             navigate(`/feedback/${sessionId}`); // 피드백 결과 페이지로 이동
             onAnswerComplete?.(sttResult);
