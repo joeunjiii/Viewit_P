@@ -3,7 +3,7 @@ import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview } from "./api/interview";
 import { requestSpeechToText } from "./api/stt";
 import { useNavigate } from "react-router-dom";
-
+import UserAnswerDisplay from "./asset/UserAnswerDisplay";
 const PHASE = {
   TTS: "tts",
   WAITING: "wait",
@@ -27,6 +27,7 @@ function InterviewSessionManager({
   onUserAnswer, // 사용자 답변 전달 콜백
 }) {
   const [phase, setPhase] = useState(PHASE.TTS);
+  const [answer, setAnswer] = useState("");
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
   const [sttResult, setSttResult] = useState(null);
@@ -204,6 +205,18 @@ function InterviewSessionManager({
 
   return (
     <div className="interview-session">
+      <UserAnswerDisplay
+        status={phase}
+        answer={answer}
+        isVisible={true}
+        title="내 답변"
+        placeholder="답변을 기다리는 중..."
+      />
+      <MicRecorder
+        ref={recorderRef}
+        isRecording={phase === PHASE.RECORDING}
+        onStop={handleRecordingComplete}
+      />
       <MicRecorder
         ref={recorderRef}
         isRecording={phase === PHASE.RECORDING}
