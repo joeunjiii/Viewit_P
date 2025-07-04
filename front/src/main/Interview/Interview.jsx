@@ -270,14 +270,6 @@ function Interview() {
               />
             )}
 
-            <UserAnswerDisplay
-              answer={currentUserAnswer}
-              isVisible={status === "recording" || currentUserAnswer !== ""}
-              title="내 답변"
-              isRecording={status === "recording"}
-              status={status} 
-              isDev={true} // 개발 모드에서는 true, 실제 서비스에서는 false
-            />
           </div>
         </div>
       )}

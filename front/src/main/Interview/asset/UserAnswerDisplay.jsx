@@ -10,7 +10,6 @@ const UserAnswerDisplay = ({
   status = "idle",
 }) => {
 
-
   if (!isVisible) return null;
 
   const getStatusConfig = () => {
@@ -60,9 +59,7 @@ const UserAnswerDisplay = ({
     }
   };
 
-  const hasAnswer =
-    status === "complete" || (answer && answer.trim().length > 0);
-
+  const hasAnswer = status === "complete";
   const config = getStatusConfig();
   const IconComponent = config.icon;
 
