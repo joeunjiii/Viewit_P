@@ -115,6 +115,19 @@ async def next_question(
     print(f"[DEBUG] interviewer_name={name}, interviewer_role={role}")
     session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
 
+    # ⭐️[Spring DB 저장] 답변 저장!
+    import requests
+    payload = {
+        "session_id": data.session_id,
+        "question_text": last_q,
+        "answer_text": data.answer,
+        "answer_feedback": None,
+        "interviewer_name": name,
+        "interviewer_role": role
+    }
+    requests.post(f"{SPRING_URL}/api/interview", json=payload)
+    # ⭐️[Spring DB 저장] 끝
+
     # 1) **로그**: 질문 생성 시작
     t1 = datetime.datetime.now()
     insert_log(data.session_id, "next_question", "질문 생성 시작", t1)
@@ -124,7 +137,19 @@ async def next_question(
         fq, nn, nr, voice_id = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.state["final_answer_received"] = False  # 새로운 플래그 추가
-        session.store_answer(fq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+        session.store_answer(fq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id) \
+        # ⭐️[Spring DB 저장] 마지막 질문도 빈 답변으로 저장!
+        payload = {
+            "session_id": data.session_id,
+            "question_text": fq,
+            "answer_text": "",
+            "answer_feedback": None,
+            "interviewer_name": nn,
+            "interviewer_role": nr
+        }
+        requests.post(f"{SPRING_URL}/api/interview", json=payload)
+        # ⭐️[Spring DB 저장] 끝
+
         t2 = datetime.datetime.now()
         insert_log(data.session_id, "next_question", "질문 생성 완료", t1, t2)
         # 3) **로그**: TTS 생성 시작
@@ -179,6 +204,18 @@ async def next_question(
     t4 = datetime.datetime.now()
     insert_log(data.session_id, "next_question", "TTS 생성 완료", t3, t4)
     session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+
+    # ⭐️[Spring DB 저장] 일반 질문(빈 답변) 저장
+    payload = {
+        "session_id": data.session_id,
+        "question_text": nq,
+        "answer_text": "",
+        "answer_feedback": None,
+        "interviewer_name": nn,
+        "interviewer_role": nr
+    }
+    requests.post(f"{SPRING_URL}/api/interview", json=payload)
+    # ⭐️[Spring DB 저장] 끝
 
     return {
         "question": nq,

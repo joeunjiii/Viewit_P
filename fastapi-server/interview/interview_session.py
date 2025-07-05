@@ -46,7 +46,6 @@ class InterviewSession:
                                "- 질문은 반드시 1~2문장 이내, 한 문장만 생성하는 것을 최우선으로 하세요.\n"
                                "- 질문 예시: '최근에 해결한 기술적 문제를 말씀해 주세요.' (O) / '최근 경험한 기술적 문제와 해결방법을 구체적으로 설명해 주세요.' (X, 두 가지 요구)\n"
                                "- 반드시 실무/기술/문제해결에만 집중하세요. 인성, 협업 등은 금지.\n"
-
             },
             {
                 "name": "박AI",
@@ -77,7 +76,57 @@ class InterviewSession:
             },
         ]
         self.interviewer_index = 0  # 면접관 순차 교대
+        self.last_interviewer_name = None  # 연속 배정 방지용
 
+    # ----------------------------------------------------------
+    # [추가] 질문 카테고리 분류 (아주 단순 키워드 기반, 필요시 확장)
+    # ----------------------------------------------------------
+    def classify_question_type(self, question: str) -> str:
+        tech_keywords = ["성능", "시스템", "백엔드", "알고리즘", "코드", "기술"]
+        personality_keywords = ["자기소개", "동기", "협업", "의사소통", "인성", "갈등"]
+        creative_keywords = ["혁신", "창의", "새로운", "아이디어", "개선", "시도"]
+        if any(word in question for word in tech_keywords):
+            return "기술"
+        elif any(word in question for word in personality_keywords):
+            return "인성"
+        elif any(word in question for word in creative_keywords):
+            return "창의"
+        else:
+            return "인성"  # 기본 fallback
+
+    # ----------------------------------------------------------
+    # [추가] 역할별 면접관 가져오기
+    # ----------------------------------------------------------
+    def get_interviewer_by_role(self, role: str):
+        return next((p for p in self.interviewer_profiles if p["role"] == role), self.interviewer_profiles[1])
+
+    # ----------------------------------------------------------
+    # [추가] 주면접관 외 다른 면접관 랜덤 배정
+    # ----------------------------------------------------------
+    def get_random_other_interviewer(self, exclude_role: str):
+        roles = ["기술", "인성", "창의"]
+        roles.remove(exclude_role)
+        candidates = [p for p in self.interviewer_profiles if p["role"] in roles]
+        return random.choice(candidates)
+
+    # ----------------------------------------------------------
+    # [추가] 논리(주면접관) + 다양성(랜덤) 혼합 배정
+    # ----------------------------------------------------------
+    def decide_next_interviewer(self, question_type: str, main_ratio: float = 0.75) -> dict:
+        if random.random() < main_ratio:
+            interviewer = self.get_interviewer_by_role(question_type)
+        else:
+            interviewer = self.get_random_other_interviewer(question_type)
+        # 연속 면접관 방지
+        if self.last_interviewer_name == interviewer["name"]:
+            alt = self.get_random_other_interviewer(interviewer["role"])
+            interviewer = alt
+        self.last_interviewer_name = interviewer["name"]
+        return interviewer
+
+    # ----------------------------------------------------------
+    # [기존] 랜덤 면접관 (이제는 사용하지 않아도 됨, 혹시 모르니 남겨둠)
+    # ----------------------------------------------------------
     def get_next_interviewer(self):
         interviewer = random.choice(self.interviewer_profiles)
         print(
@@ -175,8 +224,22 @@ class InterviewSession:
         sim = util.cos_sim(new_vec, prev_vecs)
         return torch.max(sim).item() > threshold
 
+    # ----------------------------------------------------------
+    # [변경/핵심] decide_next_question - 논리+랜덤 면접관 배정 (main_ratio=0.75)
+    # ----------------------------------------------------------
     def decide_next_question(self, last_answer: str) -> tuple[str, str, str, str]:
-        interviewer = self.get_next_interviewer()
+        """
+        - 최근 질문 있으면 해당 질문에서 카테고리 추출(최초는 인성)
+        - 75%는 논리적으로, 25%는 랜덤하게 다른 관점의 면접관 배정
+        - 모든 결과는 interviewer_name/role까지 함께 반환 → DB 저장과 완벽 연동
+        """
+        if self.state["history"]:
+            last_question = self.state["history"][-1]["question"]
+            question_type = self.classify_question_type(last_question)
+        else:
+            question_type = "인성"
+
+        interviewer = self.decide_next_interviewer(question_type, main_ratio=0.75)
         interviewer_name = interviewer["name"]
         interviewer_role = interviewer["role"]
         system_msg = interviewer["system_msg"]
@@ -304,15 +367,15 @@ class InterviewSession:
                    "코드 리뷰나 성능 개선을 주도한 경험이 있나요?",
                    "새로운 언어나 프레임워크를 도입했던 사례가 있나요?",
                    "운영 중 장애를 직접 해결한 경험을 구체적으로 설명해주세요",
-                  ],
+                   ],
             "인성": ["팀워크가 중요했던 경험에 대해 말씀해 주세요.",
-                    "스트레스를 관리하는 본인만의 방법이 있나요?",
-                    "동료와의 협업에서 기억에 남는 일이 있었나요?",
-                    "실패를 극복했던 경험을 말씀해주세요."],
+                   "스트레스를 관리하는 본인만의 방법이 있나요?",
+                   "동료와의 협업에서 기억에 남는 일이 있었나요?",
+                   "실패를 극복했던 경험을 말씀해주세요."],
             "창의": ["새로운 방식이나 아이디어로 일의 방식을 개선한 사례가 있나요?",
-                    "정답이 없는 문제를 해결할 때 본인만의 접근법은 무엇인가요?",
-                    "회사에 새로운 아이디어나 프로세스를 제안한 경험이 있나요?",
-                    "실패한 경험에서 얻은 교훈을 어떻게 적용해봤나요?"]
+                   "정답이 없는 문제를 해결할 때 본인만의 접근법은 무엇인가요?",
+                   "회사에 새로운 아이디어나 프로세스를 제안한 경험이 있나요?",
+                   "실패한 경험에서 얻은 교훈을 어떻게 적용해봤나요?"]
         }
         prompt = f"""
 당신은 '{interviewer_name}' 면접관({interviewer_role})입니다.
