@@ -6,7 +6,8 @@ import random
 from interview.interview_session import InterviewSession
 from interview.services.tts_service import generate_tts_audio
 from interview.services import feedback_service
-from interview.utils.logger_utils import timing_logger
+from interview.utils.logging_utils import insert_log
+import datetime
 
 router = APIRouter()
 
@@ -35,14 +36,21 @@ class EndRequest(BaseModel):
 
 # ── 세션 초기화 ──
 @router.post("/init_session")
-@timing_logger("세션 초기화 전체")
 async def init_session(data: InitRequest, request: Request):
-    # 리소스 로드
+
+    # 1) 세션 초기화 시작
+    t0 = datetime.datetime.now()
+    insert_log(data.session_id, "init_session", "세션 초기화 시작", t0)
+
+
     st_model = request.app.state.st_model
     qdrant_client = request.app.state.qdrant_client
     openai_client = request.app.state.openai_client
     session_store = request.app.state.session_store
 
+    # 2) 첫 질문 생성
+    t1 = datetime.datetime.now()
+    insert_log(data.session_id, "init_session", "질문 생성", t1)
     # 세션 생성
     session = InterviewSession(
         session_id=data.session_id,
@@ -57,6 +65,17 @@ async def init_session(data: InitRequest, request: Request):
     )
     # 첫 질문 + 면접관 정보 + voice_id 한 번에 받기
     first_q, interviewer_name, interviewer_role, voice_id = session.ask_fixed_question("intro")
+
+    # 3) TTS 생성
+    t2 = datetime.datetime.now()
+    insert_log(data.session_id, "init_session", "TTS 생성 시작", t2)
+    audio_url = generate_tts_audio(first_q, voice_id)
+    t3 = datetime.datetime.now()
+    insert_log(data.session_id, "init_session", "TTS 생성 완료", t2, t3)
+    audio_url = generate_tts_audio(first_q, voice_id)
+
+
+    # 4) 최초 상태 저장
     session.state["interviewerVoice"] = data.interviewerVoice
     session.store_answer(
         first_q, "",
@@ -66,7 +85,7 @@ async def init_session(data: InitRequest, request: Request):
     )
     session_store[data.session_id] = session
 
-    audio_url = generate_tts_audio(first_q, voice_id)
+
     return {
         "question": first_q,
         "audio_url": audio_url,
@@ -80,7 +99,6 @@ async def init_session(data: InitRequest, request: Request):
 
 # ── 다음 질문 & 피드백 ──
 @router.post("/next_question")
-@timing_logger("다음 질문")
 async def next_question(
         data: AnswerRequest, request: Request, authorization: str = Header(None)
 ):
@@ -97,20 +115,32 @@ async def next_question(
     print(f"[DEBUG] interviewer_name={name}, interviewer_role={role}")
     session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
 
+    # 1) **로그**: 질문 생성 시작
+    t1 = datetime.datetime.now()
+    insert_log(data.session_id, "next_question", "질문 생성 시작", t1)
+
     # 1분 40초(100초) 경과 후 마지막 질문 던지기
     if time.time() - session.start_time >= 300 and not session.state.get("final_question_given"):
         fq, nn, nr, voice_id = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.state["final_answer_received"] = False  # 새로운 플래그 추가
         session.store_answer(fq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+        t2 = datetime.datetime.now()
+        insert_log(data.session_id, "next_question", "질문 생성 완료", t1, t2)
+        # 3) **로그**: TTS 생성 시작
+        t3 = datetime.datetime.now()
+        insert_log(data.session_id, "next_question", "TTS 생성 시작", t3)
         audio_url = generate_tts_audio(fq, voice_id)
+        # 4) **로그**: TTS 생성 완료
+        t4 = datetime.datetime.now()
+        insert_log(data.session_id, "next_question", "TTS 생성 완료", t3, t4)
         return {"question": fq, "audio_url": audio_url, "done": False}
 
     # 마지막 질문에 대한 답변이 도착했으면 final_answer_received를 True로 변경
     if session.state.get("final_question_given") and not session.state.get("final_answer_received"):
-        # 여기서 last_q가 마지막 질문 텍스트인지 체크하는 게 안전함
+        # 여기서 last_q가 마지막 질문 텍스트인지 체크
         final_question_text = session.state["history"][-2]["question"]  # 마지막 질문 직전 질문
-        # 또는 session.ask_fixed_question("final") 반환값 중 질문 텍스트를 저장해두고 비교 가능
+        # 또는 session.ask_fixed_question("final") 반환값 중 질문 텍스트를 저장해두고 비교
         # 간단히 last_q가 마지막 질문과 같다고 가정
         if last_q == session.state["history"][-2]["question"]:
             session.state["final_answer_received"] = True
@@ -129,13 +159,6 @@ async def next_question(
             for a in answers
         ]
         summary, strengths, weaknesses = feedback_service.generate_final_feedback(request.app.state.openai_client, fixed)
-        # try:
-        #     feedback_service.send_final_feedback_to_spring(
-        #         data.session_id, summary, strengths, weaknesses, SPRING_URL, token=authorization
-        #     )
-        # except Exception as e:
-        #     print(f"[ERROR] 최종 피드백 저장 실패: {e}")
-        #     raise HTTPException(500, "Spring에 총평 저장 실패")
 
         return {
             "message": "면접 종료 및 총평 미리보기",
@@ -145,8 +168,18 @@ async def next_question(
 
     # 일반 질문
     nq, nn, nr, voice_id = session.decide_next_question(data.answer)
-    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+    # 1) **로그**: 질문 생성 완료
+    t2 = datetime.datetime.now()
+    insert_log(data.session_id, "next_question", "질문 생성 완료", t1, t2)
+    # 2) **로그**: TTS 생성 시작
+    t3 = datetime.datetime.now()
+    insert_log(data.session_id, "next_question", "TTS 생성 시작", t3)
     audio_url = generate_tts_audio(nq, voice_id)
+    # 3) **로그**: TTS 생성 완료
+    t4 = datetime.datetime.now()
+    insert_log(data.session_id, "next_question", "TTS 생성 완료", t3, t4)
+    session.store_answer(nq, "", interviewer_name=nn, interviewer_role=nr, interviewer_voice_id=voice_id)
+
     return {
         "question": nq,
         "audio_url": audio_url,
@@ -158,7 +191,6 @@ async def next_question(
 
 # ── 마지막 답변 수집 ──
 @router.post("/final_answer")
-@timing_logger("마지막")
 async def final_answer(data: AnswerRequest, request: Request):
     session_store = request.app.state.session_store
     session = session_store.get(data.session_id)
@@ -168,7 +200,6 @@ async def final_answer(data: AnswerRequest, request: Request):
     return {"message": "면접 종료", "history": session.state["history"]}
 
 @router.post("/end_session")
-@timing_logger("면접 종료 및 피드백 생성")
 async def end_session(data: EndRequest, request: Request, authorization: str = Header(None)):
     session_id = data.session_id
     session_store = request.app.state.session_store
