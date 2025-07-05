@@ -97,7 +97,12 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck, mode }) {
               onChange={(e) => setJob(e.target.value)}
             >
               <MenuItem value="backend">Back-end 개발자 (Java)</MenuItem>
+              <MenuItem value="backend-node">Back-end 개발자 (Node.js)</MenuItem>
+              <MenuItem value="backend-java">Back-end 개발자 (Python/Django)</MenuItem>
               <MenuItem value="frontend">Front-end 개발자 (React)</MenuItem>
+              <MenuItem value="frontend-vue">Front-end 개발자 (Vue)</MenuItem>
+              <MenuItem value="fullstack">풀스택 개발자</MenuItem>
+              <MenuItem value="designer-uiux">UI/UX 디자이너</MenuItem>
               <MenuItem value="ai">AI 엔지니어</MenuItem>
             </Select>
           </FormControl>
@@ -109,27 +114,12 @@ function InterviewSettingsModal({ onClose, onStart, onOpenMicCheck, mode }) {
           <label className="switch">
             <input
               type="checkbox"
-              // checked={autoQuestion}
-              // onChange={() => setAutoQuestion(!autoQuestion)}
               checked={captionEnabled}
               onChange={() => setCaptionEnabled(!captionEnabled)}
             />
             <span className="slider" />
           </label>
         </div>
-
-        {/* 다시 답변하기 허용 */}
-        {/* <div className="section">
-          <p>다시 답변하기 허용</p>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={allowRetry}
-              onChange={() => setAllowRetry(!allowRetry)}
-            />
-            <span className="slider" />
-          </label>
-        </div> */}
 
         {/* 액션 버튼 */}
         <div className="modal-actions">

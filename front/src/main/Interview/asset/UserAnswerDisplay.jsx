@@ -1,5 +1,5 @@
 import React from "react";
-import { Mic, UploadCloud,CheckCircle, MessageCircle,Volume2,Hourglass } from "lucide-react";
+import { Mic, UploadCloud, CheckCircle, MessageCircle, Volume2, Hourglass } from "lucide-react";
 import "./css/UserAnswerDisplay.css";
 
 const UserAnswerDisplay = ({
@@ -8,6 +8,7 @@ const UserAnswerDisplay = ({
   title = "내 답변",
   placeholder = "답변을 기다리는 중...",
   status = "idle",
+  stopRecording,
 }) => {
 
   if (!isVisible) return null;
@@ -90,11 +91,19 @@ const UserAnswerDisplay = ({
               {config.message}
             </span>
             {status === "recording" && (
-              <div className="user-answer-recording-dots">
-                <div className="dot" style={{ animationDelay: "0ms" }}></div>
-                <div className="dot" style={{ animationDelay: "150ms" }}></div>
-                <div className="dot" style={{ animationDelay: "300ms" }}></div>
-              </div>
+              <>
+                <div className="user-answer-recording-dots">
+                  <div className="dot" style={{ animationDelay: "0ms" }}></div>
+                  <div className="dot" style={{ animationDelay: "150ms" }}></div>
+                  <div className="dot" style={{ animationDelay: "300ms" }}></div>
+                </div>
+                <button
+                  className="stop-recording-btn"
+                  onClick={stopRecording}
+                >
+                  ⏹ 녹음 종료
+                </button>
+              </>
             )}
             {status === "uploading" && (
               <div className="user-answer-uploading-dots">

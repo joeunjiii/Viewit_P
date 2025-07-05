@@ -28,6 +28,7 @@ function InterviewSessionManager({
   pdfText,
   onUserAnswer, // 사용자 답변 전달 콜백
 }) {
+  const micRef = useRef(null);
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -86,7 +87,6 @@ function InterviewSessionManager({
     if (phase === PHASE.WAITING) {
       setRemainingTime(waitTime);
       onTimeUpdate?.(waitTime);
-
       // 1초 간격으로 카운트다운, 0 되면 녹음 시작
       timerRef.current = setInterval(() => {
         setRemainingTime((prev) => {
@@ -192,7 +192,8 @@ function InterviewSessionManager({
   return (
     <div className="interview-session">
 
-      <UserAnswerDisplay status={phase} answer={sttResult} isVisible={true} />
+      <UserAnswerDisplay status={phase} answer={sttResult} isVisible={true} stopRecording={() => {console.log("녹음종료"); recorderRef.current?.stop()}} />
+
       <MicRecorder
         ref={recorderRef}
         isRecording={phase === PHASE.RECORDING}
