@@ -147,3 +147,22 @@
 .scale-up-down     { animation: scale-up-down 1.3s infinite; }
 .blinking          { animation: blink 1.1s infinite; }
 
+
+/* 녹음 종료 버튼 스타일 */
+.stop-recording-btn {
+  margin-left: 18px;
+  background: #fa5252;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 6px 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(250,82,82,0.06);
+  transition: background 0.2s, transform 0.15s;
+}
+.stop-recording-btn:hover, .stop-recording-btn:focus {
+  background: #e03131;
+  transform: scale(1.04);
+}
