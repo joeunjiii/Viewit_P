@@ -45,6 +45,14 @@
 }
 
 
+.interview-wrapper {
+  width: 100vw; /* 필요에 따라 */
+  min-height: 100vh; /* 화면 꽉 채우고, 자식이 길어지면 늘어남 */
+  display: flex;
+  flex-direction: column;
+  background: #fff; /* 필요시 */
+  box-sizing: border-box;
+}
 
 
 

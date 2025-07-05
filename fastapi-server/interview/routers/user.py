@@ -14,13 +14,6 @@ from interview.uploads.database import get_db  # DB 세션 의존성
 from interview.routers.auth import get_current_user  # 인증 유저 추출 함수
 
 router = APIRouter()
-# 🔊 목소리 라벨 매핑
-# VOICE_LABELS = {
-#     "ErXwobaYiN019PkySvjV": "기본 목소리",
-#     "21m00Tcm4TlvDq8ikWAM": "차분한 여성",
-#     "TxGEqnHWrfWFTfGW9XjX": "명확한 남성",
-# }
-
 
 # 메인화면 5개 받아오는 api
 @router.get("/api/user/sessions/latest")

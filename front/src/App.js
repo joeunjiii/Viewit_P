@@ -18,8 +18,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/*  공개 라우트: 인증 없이 접근 가능  */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* 루트로 오면 무조건 로그인으로 이동 */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
 
         <Route path="/" element={<Layout />}>
