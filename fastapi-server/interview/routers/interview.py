@@ -98,7 +98,7 @@ async def next_question(
     session.store_answer(last_q, data.answer, interviewer_name=name, interviewer_role=role)
 
     # 1분 40초(100초) 경과 후 마지막 질문 던지기
-    if time.time() - session.start_time >= 600 and not session.state.get("final_question_given"):
+    if time.time() - session.start_time >= 300 and not session.state.get("final_question_given"):
         fq, nn, nr, voice_id = session.ask_fixed_question("final")
         session.state["final_question_given"] = True
         session.state["final_answer_received"] = False  # 새로운 플래그 추가
@@ -171,26 +171,30 @@ async def final_answer(data: AnswerRequest, request: Request):
 @timing_logger("면접 종료 및 피드백 생성")
 async def end_session(data: EndRequest, request: Request, authorization: str = Header(None)):
     session_id = data.session_id
+    session_store = request.app.state.session_store
+    session = session_store.get(session_id)
+    if not session:
+        raise HTTPException(404, "Session not found")
 
-    # 1. 전체 답변 가져오기 (Spring에서)
     answers = feedback_service.fetch_all_interview_answers_from_spring(session_id, SPRING_URL)
 
-    # 2. 개별 피드백 생성 및 저장
-    for item in answers:
+    for i, item in enumerate(answers):
+        interviewer_name = session.state["history"][i].get("interviewer_name", "AI면접관")
+        interviewer_role = session.state["history"][i].get("interviewer_role", "기술")
         fb = feedback_service.generate_answer_feedback(
             request.app.state.openai_client,
             item.get('questionText') or item.get('question_text'),
             item.get('answerText') or item.get('answer_text'),
-            interviewer_name=item.get('interviewerName'),
-            interviewer_role=item.get('interviewerRole')
-        )
+            interviewer_name=interviewer_name,
+            interviewer_role=interviewer_role,
+            )
         feedback_service.save_answer_feedback_to_spring(
             session_id,
             item.get('questionText') or item.get('question_text'),
             fb,
             SPRING_URL,
-            interviewer_name=item.get('interviewerName'),
-            interviewer_role=item.get('interviewerRole'),
+            interviewer_name=interviewer_name,
+            interviewer_role=interviewer_role,
             token=authorization,
             )
 
