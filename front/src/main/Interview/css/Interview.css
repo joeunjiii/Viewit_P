@@ -234,6 +234,39 @@
   background-color: #ffe5e5;
 }
 
+.interview-end-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 모달 카드 스타일 */
+.interview-end-modal-card {
+  background: white;
+  padding: 32px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 300px;
+  max-width: 400px;
+  position: relative;
+}
+
+.interview-end-modal-card .loading-message {
+  color: #333;
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .reset-btn {
   display: flex;
   background: #5e9b87;

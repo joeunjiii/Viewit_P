@@ -1,8 +1,8 @@
 // Interview.jsx
-import React, {useState, useCallback, useEffect} from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import {createInterviewSession, endSession, initSession} from "./api/interview";
+import { createInterviewSession, endSession, initSession } from "./api/interview";
 import "./css/Interview.css";
 import InterviewSettingModal from "./InterviewSettingModal";
 import AssessmentIntro from "./AssessmentIntro";
@@ -11,7 +11,6 @@ import ScreenSizeGuard from "./asset/ScreenSizeGuard";
 import MicCheckModal from "./asset/Mic/MicCheckModal";
 import InterviewHeader from "./asset/InterviewHeader";
 import QuestionTabs from "./asset/QuestionTabs";
-import QuestionStatusBar from "./asset/QuestionStatusBar";
 import InterviewSessionManager from "./InterviewSessionManager";
 import CaptionBox from "./asset/CaptionBox";
 import LoadingModal from "./asset/LoadingModal";
@@ -21,7 +20,9 @@ import Timer from "./asset/Timer";
 import defaultImg from "./img/default.png";
 import ttsImg from "./img/tts.png";
 import waitImg from "./img/waiting.png";
-import UserAnswerDisplay from "./asset/UserAnswerDisplay";
+import LoadingSpinner from "../maincomponent/asset/LoadingSpinner";
+import EndConfirmModal from "./asset/EndConfirmModal";
+
 
 
 function Interview() {
@@ -49,8 +50,9 @@ function Interview() {
   const [remainingTime, setRemainingTime] = useState(0);
   const [initialQuestion, setInitialQuestion] = useState(null);
   const [captionEnabled, setCaptionEnabled] = useState(true);
-
+  const [isEnding, setIsEnding] = useState(false);
   const [currentUserAnswer, setCurrentUserAnswer] = useState(""); //답변전달 스테이트
+  const sessionManagerRef = useRef(null); // InterviewSessionManager ref 추가
 
   const openMicCheck = () => setMicCheckOpen(true);
   const closeMicCheck = () => setMicCheckOpen(false);
@@ -60,6 +62,7 @@ function Interview() {
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showEndConfirmModal, setShowEndConfirmModal] = useState(false);
 
   const statusImages = {
     tts: ttsImg,
@@ -76,14 +79,23 @@ function Interview() {
   };
 
   //종료하기 핸들러
-  const handleManualEnd = async () => {
-    if (!window.confirm("정말 면접을 종료하시겠습니까?")) return;
-    try {
-      await endSession(sessionId); //종료 API 호출
-      navigate(`/feedback/${sessionId}`);
-    }catch (err) {
-      alert("면접 종료에 실패했습니다 :" + err.message);
+  const handleManualEnd = () => {
+    setShowEndConfirmModal(true);
+  }
+
+  // 종료 확인 핸들러
+  const handleEndConfirm = async () => {
+    setShowEndConfirmModal(false);
+    
+    // InterviewSessionManager의 수동 종료 함수 호출
+    if (sessionManagerRef.current) {
+      await sessionManagerRef.current.handleManualEnd();
     }
+  }
+
+  // 종료 취소 핸들러
+  const handleEndCancel = () => {
+    setShowEndConfirmModal(false);
   }
 
 
@@ -198,6 +210,11 @@ function Interview() {
         message={errorMsg}
         onClose={() => setShowErrorModal(false)}
       />
+      <EndConfirmModal
+        isOpen={showEndConfirmModal}
+        onConfirm={handleEndConfirm}
+        onCancel={handleEndCancel}
+      />
       {step === "settings" && (
         <InterviewSettingModal
           onStart={handleStartSettings}
@@ -231,7 +248,7 @@ function Interview() {
       {step === "interview" && (
         <div className="interview-wrapper">
           <InterviewHeader totalDuration={600}
-           onEndInterview={handleManualEnd}/>
+            onEndInterview={handleManualEnd} />
           <div className="interview-section-body">
             <QuestionTabs
               questionNumber={questionNumber}
@@ -266,8 +283,11 @@ function Interview() {
 
             {initialQuestion && (
               <InterviewSessionManager
+                ref={sessionManagerRef} // ref 추가
                 sessionId={sessionId}
                 jobRole={jobRole}
+                isEnding={isEnding}
+                setIsEnding={setIsEnding}
                 waitTime={waitTime}
                 allowRetry={allowRetry}
                 initialQuestion={initialQuestion}
@@ -276,11 +296,21 @@ function Interview() {
                 onNewQuestion={handleNewQuestion}
                 onCaptionUpdate={handleCaptionUpdate}
                 onUserAnswer={handleUserAnswer} // 사용자 답변 전달 콜백
-                // onAnswerComplete={handleAnswerComplete}
+              // onAnswerComplete={handleAnswerComplete}
               />
             )}
-
           </div>
+          {/* 종료 중일 때 전체 화면을 덮는 오버레이 */}
+          {isEnding && (
+            <div className="interview-end-overlay">
+              <div className="interview-end-modal-card">
+                <LoadingSpinner />
+                <div className="loading-message">
+                  면접 종료 중입니다. 잠시만 기다려주세요...
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
