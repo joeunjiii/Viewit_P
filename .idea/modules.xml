@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Viewit_P.iml" filepath="$PROJECT_DIR$/Viewit_P.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fastapi-server/fastapi-server.iml" filepath="$PROJECT_DIR$/fastapi-server/fastapi-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/viewit-front/viewit-front.iml" filepath="$PROJECT_DIR$/viewit-front/viewit-front.iml" />
+    </modules>
+  </component>
+</project>
