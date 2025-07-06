@@ -21,6 +21,9 @@ import Timer from "./asset/Timer";
 import defaultImg from "./img/default.png";
 import ttsImg from "./img/tts.png";
 import waitImg from "./img/waiting.png";
+import LoadingSpinner from "../maincomponent/asset/LoadingSpinner";
+import EndConfirmModal from "./asset/EndConfirmModal";
+import UploadingLoading from "../maincomponent/asset/UploadingLoading";
 import UserAnswerDisplay from "./asset/UserAnswerDisplay";
 
 
@@ -44,6 +47,9 @@ function Interview() {
   const [waitTime, setWaitTime] = useState(5);
   const [micCheckOpen, setMicCheckOpen] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(1);
+  const [totalQuestions, setTotalQuestions] = useState(1);
+  const [questions, setQuestions] = useState([]);
+  const [hasReceivedQuestion, setHasReceivedQuestion] = useState(false);
   const [captionText, setCaptionText] = useState("");
   const [status, setStatus] = useState("idle");
   const [remainingTime, setRemainingTime] = useState(0);
@@ -76,14 +82,23 @@ function Interview() {
   };
 
   //종료하기 핸들러
-  const handleManualEnd = async () => {
-    if (!window.confirm("정말 면접을 종료하시겠습니까?")) return;
-    try {
-      await endSession(sessionId); //종료 API 호출
-      navigate(`/feedback/${sessionId}`);
-    }catch (err) {
-      alert("면접 종료에 실패했습니다 :" + err.message);
+  const handleManualEnd = () => {
+    setShowEndConfirmModal(true);
+  }
+
+  // 종료 확인 핸들러
+  const handleEndConfirm = async () => {
+    setShowEndConfirmModal(false);
+
+    // InterviewSessionManager의 수동 종료 함수 호출
+    if (sessionManagerRef.current) {
+      await sessionManagerRef.current.handleManualEnd();
     }
+  }
+
+  // 종료 취소 핸들러
+  const handleEndCancel = () => {
+    setShowEndConfirmModal(false);
   }
 
 
@@ -156,6 +171,9 @@ function Interview() {
         audio_url: res.data.audio_url,
       });
       setQuestionNumber(1);
+      setTotalQuestions(1);
+      setQuestions([res.data.question]);
+      setHasReceivedQuestion(true);
       setCaptionText(`면접관: ${res.data.question}`);
       setShowLoadingModal(false);
     } catch (err) {
@@ -177,6 +195,9 @@ function Interview() {
   // 질문 번호 +1만 유지 (캡션 제어는 아래 콜백에서)
   const handleNewQuestion = useCallback((q) => {
     setQuestionNumber((n) => n + 1);
+    setTotalQuestions((t) => t + 1);
+    setQuestions((prev) => [...prev, q]);
+    setHasReceivedQuestion(true);
     setCurrentUserAnswer(""); //다음질문 시작되면 사용자 답변나오는곳은 초기화
   }, []);
 
@@ -233,11 +254,14 @@ function Interview() {
           <InterviewHeader totalDuration={600}
            onEndInterview={handleManualEnd}/>
           <div className="interview-section-body">
-            <QuestionTabs
-              questionNumber={questionNumber}
-              status={status}
-              remainingTime={remainingTime}
-            />
+            {hasReceivedQuestion && (
+              <QuestionTabs
+                current={questionNumber}
+                total={1}
+                status={status}
+                remainingTime={remainingTime}
+              />
+            )}
             <CaptionBox text={captionText} enabled={captionEnabled} />
             <div className="interview-body">
               <div className="center-row-fixed">
@@ -276,11 +300,19 @@ function Interview() {
                 onNewQuestion={handleNewQuestion}
                 onCaptionUpdate={handleCaptionUpdate}
                 onUserAnswer={handleUserAnswer} // 사용자 답변 전달 콜백
-                // onAnswerComplete={handleAnswerComplete}
+              // onAnswerComplete={handleAnswerComplete}
               />
             )}
 
           </div>
+          {/* 종료 중일 때 전체 화면을 덮는 오버레이 */}
+          {isEnding && (
+            <div className="interview-end-overlay">
+              <div className="interview-end-modal-card">
+                <UploadingLoading />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
