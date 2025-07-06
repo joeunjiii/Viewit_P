@@ -121,7 +121,7 @@ const InterviewSessionManager = forwardRef(({
     isSttProcessing.current = true;
     setPhase(PHASE.UPLOADING);
     try {
-      const data = await requestSpeechToText(blob);
+      const data = await requestSpeechToText(blob, sessionId);
       setSttResult(data.text);
       onUserAnswer?.(data.text);
       setPhase(PHASE.COMPLETE);

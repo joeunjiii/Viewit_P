@@ -22,7 +22,7 @@
 
 /* 로딩 스피너: 포인트 컬러 강화 */
 .loader {
-  border: 4px solid #e0e4e8;
+  border: 4px solid #ffffff;
   border-top: 4px solid #639f86; /* 서비스 메인 그린 */
   border-radius: 50%;
   width: 44px;
@@ -41,7 +41,7 @@
 }
 
 .loading-modal-box {
-  background: #fff;
+  background: #ffffff;
   padding: 40px 28px 24px 28px;
   border-radius: 18px;
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
@@ -124,18 +124,21 @@
 }
 /* modal.css */
 .interview-loading {
-  border: 2.5px solid #36b37e;
-  background: #f8fff6;
-  width: 300px; /* ← 기본보다 크게! */
-  min-height: 200px; /* ← 높이도 더 */
-  padding: 56px 36px 44px 36px; /* ← padding 넉넉하게 */
-  border-radius: 24px; /* ← 좀 더 부드러운 라운드 */
-  box-shadow: 0 8px 40px rgba(80, 200, 120, 0.15),
-    0 2px 8px rgba(60, 180, 110, 0.07);
+  background: #fafdff;
+  border: 2.2px solid #c5e5d5;
+  width: 350px;                  /* 조금 더 넓게 */
+  min-height: 210px;             /* 살짝 높게 */
+  padding: 48px 36px 36px 36px;  /* 상단 패딩 넉넉, 하단 살짝 줄임 */
+  border-radius: 28px;           /* 라운드 더 크게 */
+  box-shadow:
+    0 8px 32px rgba(70,170,130,0.15),
+    0 1.5px 8px rgba(50,160,110,0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
+  animation: modalSlideIn 0.22s cubic-bezier(.53,1.6,.41,1.13);
 }
 .interview-spinner {
   width: 54px; /* ← 크기 키움 */
@@ -153,8 +156,8 @@
 }
 .interview-loading .modal-message,
 .interview-loading div {
-  font-size: 1.18rem;
-  color: #21885e;
+  font-size: 1.2rem;
+  color: #000000;
   text-align: center;
   margin-top: 22px;
   font-weight: 600;

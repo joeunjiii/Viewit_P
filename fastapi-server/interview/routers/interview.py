@@ -137,7 +137,7 @@ async def next_question(
         return {"question": fq, "audio_url": audio_url, "done": False}
 
     # 마지막 질문에 대한 답변이 도착했으면 final_answer_received를 True로 변경
-    if session.state.get("final_question_given") and not session.state.get("final_answer_received"):
+    if session.state.get("final_quest3tion_given") and not session.state.get("final_answer_received"):
         # 여기서 last_q가 마지막 질문 텍스트인지 체크
         final_question_text = session.state["history"][-2]["question"]  # 마지막 질문 직전 질문
         # 또는 session.ask_fixed_question("final") 반환값 중 질문 텍스트를 저장해두고 비교
