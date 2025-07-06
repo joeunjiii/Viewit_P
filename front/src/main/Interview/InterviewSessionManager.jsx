@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import MicRecorder from "./asset/Mic/MicRecorder";
 import { nextQuestion, saveInterview, endSession } from "./api/interview";  // ★ 종료 API 호출 import
 import { requestSpeechToText } from "./api/stt";
@@ -14,10 +14,12 @@ const PHASE = {
   COMPLETE: "complete",  // STT 완료 및 응답 대기 상태
 };
 
-function InterviewSessionManager({
+const InterviewSessionManager = forwardRef(({
   sessionId,
   waitTime = 3,
   // allowRetry = true,
+  isEnding,
+  setIsEnding,
   initialQuestion,
   onStatusChange,
   onTimeUpdate,
@@ -27,7 +29,7 @@ function InterviewSessionManager({
   jdText,
   pdfText,
   onUserAnswer, // 사용자 답변 전달 콜백
-}) {
+}, ref) => {
   const micRef = useRef(null);
   const [phase, setPhase] = useState(PHASE.TTS);
   const [question, setQuestion] = useState(initialQuestion);
@@ -155,12 +157,16 @@ function InterviewSessionManager({
           const data = res.data;
 
           // 3. done === true 이면 면접 종료 처리 (종료 API 호출 및 피드백 페이지 이동)
+          // 종료 처리 부분만 props로 변경
           if (data.done === true) {
-            alert("면접이 종료되었습니다.\n" + (data.message || ""));
-            await endSession(sessionId);  // 종료 API 호출
-            navigate(`/feedback/${sessionId}`); // 피드백 결과 페이지로 이동
-            onAnswerComplete?.(sttResult);
-            return; // 이후 로직 중단
+            setIsEnding(true);
+            try {
+              await endSession(sessionId);
+              navigate(`/feedback/${sessionId}`);
+            } finally {
+              setIsEnding(false);
+            }
+            return;
           }
 
           // 4. done이 false면 다음 질문 세팅 및 TTS 재생 단계로 전환
@@ -189,10 +195,48 @@ function InterviewSessionManager({
     pdfText,
   ]);
 
+  // 수동 종료 처리 함수
+  const handleManualEnd = async () => {
+    if (isEnding) return; // 이미 종료 중이면 중복 실행 방지
+    
+    setIsEnding(true);
+    try {
+      // 현재 진행 중인 오디오 재생 중지
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      // 현재 진행 중인 녹음 중지
+      if (recorderRef.current && phase === PHASE.RECORDING) {
+        recorderRef.current.stop();
+      }
+      
+      // 타이머 정리
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      
+      // 종료 API 호출
+      await endSession(sessionId);
+      navigate(`/feedback/${sessionId}`);
+    } catch (err) {
+      console.error("수동 종료 중 오류:", err);
+      alert("면접 종료에 실패했습니다: " + err.message);
+    } finally {
+      setIsEnding(false);
+    }
+  };
+
+  // 부모 컴포넌트에서 호출할 수 있도록 ref 노출
+  useImperativeHandle(ref, () => ({
+    handleManualEnd
+  }));
+
   return (
     <div className="interview-session">
 
-      <UserAnswerDisplay status={phase} answer={sttResult} isVisible={true} stopRecording={() => {console.log("녹음종료"); recorderRef.current?.stop()}} />
+      <UserAnswerDisplay status={phase} answer={sttResult} isVisible={true} stopRecording={() => { console.log("녹음종료"); recorderRef.current?.stop() }} />
 
       <MicRecorder
         ref={recorderRef}
@@ -201,6 +245,6 @@ function InterviewSessionManager({
       />
     </div>
   );
-}
+});
 
 export default InterviewSessionManager;
