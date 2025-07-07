@@ -14,6 +14,8 @@ spring:
             client-id: ZKaZpBQ88jGwN0zuYf87
             client-secret: HgWGF91z4C
             redirect-uri: http://localhost:8083/login/oauth2/code/naver
+            #redirect-uri: https://view-it.co.kr/login/oauth2/code/naver
+
             authorization-grant-type: authorization_code
             scope:
               - name

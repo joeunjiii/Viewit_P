@@ -22,7 +22,7 @@ export function nextQuestion(sessionId, answer, jdText, pdfText) {
 }
 
 export function endSession(sessionId) {
-    return api.post("/api/interview/end_session", { session_id:sessionId});
+    return api.post("/api/interview/session/end", { session_id:sessionId});
 }
 
 export function saveInterview(payload) {

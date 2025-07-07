@@ -85,7 +85,7 @@ public class InterviewController {
 
         // FastAPI 호출
 
-        Map<String, Object> resp = rt.postForObject(fastapiUrl + "/init_session", body, Map.class);
+        Map<String, Object> resp = rt.postForObject(fastapiUrl + "/api/interview/init_session", body, Map.class);
         return resp;
     }
 

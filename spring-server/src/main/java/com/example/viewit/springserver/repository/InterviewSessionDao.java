@@ -23,7 +23,7 @@ public class InterviewSessionDao {
     );
 
     public void insertSession(InterviewSession session) {
-        String sql = "INSERT INTO INTERVIEW_SESSION (session_id, user_id, job_role, started_at, wait_time, interviewer_voice) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT IGNORE INTO INTERVIEW_SESSION (session_id, user_id, job_role, started_at, wait_time, interviewer_voice) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, session.getSessionId(), session.getUserId(), session.getJobRole(), session.getStartedAt(), session.getWaitTime(), session.getInterviewerVoice());
     }
 

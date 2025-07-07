@@ -75,9 +75,9 @@ public class InterviewSessionController {
 
     @PostMapping("/api/interview/session/end")
     public ResponseEntity<?> endSession(@RequestBody Map<String, String> body) {
-        String sessionId = body.get("sessionId");
+        String sessionId = body.get("session_id");
         if (sessionId == null) {
-            log.warn("[endSession] sessionId가 없습니다.");
+            log.warn("[endSession] session_id가 없습니다.");
             return ResponseEntity.badRequest().body(Map.of("error", "sessionId가 없습니다."));
         }
 //        interviewSessionDao.updateEndedAt(sessionId, new Timestamp(System.currentTimeMillis()));
