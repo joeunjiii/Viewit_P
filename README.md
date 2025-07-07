@@ -67,11 +67,11 @@ npm start
 # 2. 백엔드(Spring Boot, BE)
 cd ../spring-server/
 
-# (Linux/Mac)
+(Linux/Mac)
 ./mvnw clean install
 ./mvnw spring-boot:run
 
-# (Windows)
+(Windows)
 mvnw clean install
 mvnw spring-boot:run
 
