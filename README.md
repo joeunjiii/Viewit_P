@@ -32,15 +32,15 @@ IT 직군 취업 준비생이 실제 면접과 유사한 환경에서
 
 | 구분          | 기술 스택                                                                 |
 |---------------|--------------------------------------------------------------------------|
-| 사용 언어      | TypeScript, Python                                                      |
-| 프론트엔드     | React, Vite, TailwindCSS, Recorder.js                                   |
-| 백엔드        | Spring Boot (회원/세션), FastAPI (AI/TTS/STT/피드백)                     |
+| 사용 언어      | JAVA,js, Python                                                      |
+| 프론트엔드     | React,CSS, Recorder.js                                   |
+| 백엔드        |  Spring Boot (회원/세션), FastAPI (AI/TTS/STT/피드백)                     |
 | 음성 합성(TTS) | ElevenLabs API                                                          |
-| 음성 인식(STT) | OpenAI Whisper API                                                      |
-| 포트폴리오 분석 | OCR, PyPDF2, 임베딩 기반 문서 검색                                      |
+| 음성 인식(STT) | OpenAI Whisper                                                     |
+| 포트폴리오,JD 분석 | OCR, PyPDF2, 임베딩 기반 문서 검색                                      |
 | 인증/보안      | JWT                                                                     |
 | 데이터베이스    | MySQL                                                                   |
-| 협업 도구      | GitHub, Notion, Figma, Hancom                                           |
+| 협업 도구      | GitHub, Notion, Figma                                       |
 | 배포/인프라     | Docker, Naver Cloud, Linux                                              |
 
 ---
@@ -48,18 +48,24 @@ IT 직군 취업 준비생이 실제 면접과 유사한 환경에서
 ## 실행 방법
 
 ### 1. 사전 준비
-- `.env` 파일에 API 키, DB 정보 등 등록
+- `.env` 파일에 DB 정보, ELEVENlabs api, open ai api 준비
 - Docker Desktop 설치
 
 ### 2. 로컬 실행
 ```bash
-cd frontend/
+cd front/
 npm install
 
 cd ../spring-server/
-./gradlew bootRun
+리눅스/Mac:
+    ./mvnw clean install
+    ./mvnw spring-boot:run
+Windows:
 
-cd ../fastapi-server/
+    mvnw clean install
+    mvnw spring-boot:run
+
+cd ./fastapi-server/
 python -m venv .venv
 source .venv/bin/activate      # (Windows: .venv\Scripts\activate)
 pip install -r requirements.txt
