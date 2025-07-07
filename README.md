@@ -52,11 +52,11 @@ IT 직군 취업 준비생이 실제 면접과 유사한 환경에서
 - Docker Desktop 설치
 
 ### 2. 로컬 실행
-프론트엔드(FE)
+
 cd front/
 npm install
 
-백엔드(BE)
+
 cd ../spring-server/
 리눅스/Mac:
     ./mvnw clean install
@@ -65,7 +65,7 @@ Windows:
     mvnw clean install
     mvnw spring-boot:run
 
-AI 백엔드(AI BE)
+
 cd ./fastapi-server/
 python -m venv .venv
 source .venv/bin/activate      # (Windows: .venv\Scripts\activate)
