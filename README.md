@@ -64,17 +64,25 @@ npm install
 npm start
 
 - BE
-cd ../spring-server/
-리눅스/Mac:
-    ./mvnw clean install
-    ./mvnw spring-boot:run
-Windows:
-    mvnw clean install
-    mvnw spring-boot:run
+cd spring-server/
+
+# Linux/Mac
+./mvnw clean install
+./mvnw spring-boot:run
+
+# Windows
+mvnw clean install
+mvnw spring-boot:run
 
 - AI BE 
-cd ./fastapi-server/
+cd fastapi-server/
 python -m venv .venv
-source .venv/bin/activate      # (Windows: .venv\Scripts\activate)
+
+# Linux/Mac
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
 pip install -r requirements.txt
 uvicorn main:app --reload
