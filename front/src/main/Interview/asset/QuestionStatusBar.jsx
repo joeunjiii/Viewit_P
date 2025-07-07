@@ -12,7 +12,7 @@ function QuestionStatusBar({ status, remainingTime, small }) {
       message = "면접관 질문 재생 중";
       break;
     case "wait":
-      icon = <Hourglass className="qs-icon icon-amber spin" size={20} />;
+      icon = <Hourglass className="qs-icon icon-gray spin" size={20} />;
       message = "대기중입니다";
       break;
     case "recording":
@@ -20,7 +20,7 @@ function QuestionStatusBar({ status, remainingTime, small }) {
       message = "답변 녹음 중입니다";
       break;
     case "uploading":
-      icon = <UploadCloud className="qs-icon icon-gray bounce" size={20} />;
+      icon = <UploadCloud className="qs-icon icon-amber bounce" size={20} />;
       message = "답변 제출 및 질문 생성 중입니다";
       break;
     case "complete":

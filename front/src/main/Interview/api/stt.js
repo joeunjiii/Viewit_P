@@ -1,9 +1,10 @@
 // src/api/stt.js
 
 // FastAPI 서버로 STT 파일 보내기
-export async function requestSpeechToText(blob) {
+export async function requestSpeechToText(blob, sessionId) {
     const formData = new FormData();
     formData.append("audio", blob, "answer.webm");
+    formData.append("session_id", sessionId);
 
     // "http://localhost:8000/interview/stt" 대신!
     const res = await fetch("/api/stt/", {

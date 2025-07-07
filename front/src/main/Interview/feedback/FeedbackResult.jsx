@@ -44,7 +44,7 @@ function FeedbackResult() {
   }, [sessionId]);
 
   if (loading) {
-    return <LoadingModal message="AI 피드백 결과를 불러오고 있습니다..." />;
+    return <LoadingModal message="AI 피드백 결과를 불러오고 있습니다" />;
   }
   if (!feedback) {
     return <div className="feedback-layout">피드백 데이터가 없습니다.</div>;

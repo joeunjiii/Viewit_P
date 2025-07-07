@@ -18,7 +18,7 @@ export default function LoadingModal({
     <div className="modal-bg">
       <div className={modalClass}>
         {spinner && <div className={spinnerClass} />}
-        <div style={{ marginTop: 22 }}>{message}</div>
+        <div style={{ marginTop: 22, fontWeight: 'bold' }}>{message}</div>
       </div>
     </div>
   );
