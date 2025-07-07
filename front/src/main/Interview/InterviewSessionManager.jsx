@@ -61,9 +61,8 @@ const InterviewSessionManager = forwardRef(({
     }
 
     if (phase === PHASE.TTS && question?.audio_url) {
-      const url = question.audio_url.startsWith("http")
-        ? question.audio_url
-        : "http://localhost:8000" + question.audio_url;
+      console.log("[오디오 URL]", question.audio_url);
+      const url = question.audio_url;
 
       const audio = new Audio(url);
       audioRef.current = audio;
@@ -198,7 +197,7 @@ const InterviewSessionManager = forwardRef(({
   // 수동 종료 처리 함수
   const handleManualEnd = async () => {
     if (isEnding) return; // 이미 종료 중이면 중복 실행 방지
-    
+
     setIsEnding(true);
     try {
       // 현재 진행 중인 오디오 재생 중지
@@ -206,17 +205,17 @@ const InterviewSessionManager = forwardRef(({
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
-      
+
       // 현재 진행 중인 녹음 중지
       if (recorderRef.current && phase === PHASE.RECORDING) {
         recorderRef.current.stop();
       }
-      
+
       // 타이머 정리
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      
+
       // 종료 API 호출
       await endSession(sessionId);
       navigate(`/feedback/${sessionId}`);
@@ -243,6 +242,7 @@ const InterviewSessionManager = forwardRef(({
         isRecording={phase === PHASE.RECORDING}
         onStop={handleRecordingComplete}
       />
+    
     </div>
   );
 });

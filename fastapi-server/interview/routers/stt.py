@@ -51,6 +51,7 @@ async def speech_to_text(
         try:
             abs_webm_path = os.path.abspath(webm_path)
             text = stt_from_webm(abs_webm_path)
+            print("STT 결과:", text)
             if not text or not text.strip():
                 text = "소리없음"
                 

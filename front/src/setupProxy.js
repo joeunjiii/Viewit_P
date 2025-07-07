@@ -49,6 +49,11 @@ module.exports = function(app) {
         })
     );
     app.use(
+        "/static/audio",
+        createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
+    );
+    
+    app.use(
         "/api/finalfeedback",
         createProxyMiddleware({ target: "http://localhost:8000", changeOrigin: true })
     );
