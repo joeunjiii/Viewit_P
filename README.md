@@ -58,31 +58,37 @@ IT 직군 취업 준비생이 실제 면접과 유사한 환경에서
 
 
 ### 2. 로컬 실행
-- FE
+# ==========================
+# 1. 프론트엔드(FE)
+# ==========================
 cd front/
 npm install
 npm start
 
-- BE
-cd spring-server/
+# ==========================
+# 2. 백엔드(Spring Boot, BE)
+# ==========================
+cd ../spring-server/
 
-# Linux/Mac
+# (Linux/Mac)
 ./mvnw clean install
 ./mvnw spring-boot:run
 
-# Windows
-mvnw clean install
-mvnw spring-boot:run
+# (Windows)
+# mvnw clean install
+# mvnw spring-boot:run
 
-- AI BE 
-cd fastapi-server/
+# ==========================
+# 3. AI 백엔드(FastAPI, AI BE)
+# ==========================
+cd ../fastapi-server/
 python -m venv .venv
 
-# Linux/Mac
+# (Linux/Mac)
 source .venv/bin/activate
 
-# Windows
-.venv\Scripts\activate
+# (Windows)
+# .venv\Scripts\activate
 
 pip install -r requirements.txt
 uvicorn main:app --reload
