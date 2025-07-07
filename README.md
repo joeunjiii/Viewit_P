@@ -48,15 +48,22 @@ IT 직군 취업 준비생이 실제 면접과 유사한 환경에서
 ## 실행 방법
 
 ### 1. 사전 준비
-- `.env` 파일에 DB 정보, ELEVENLABs api, OpenAI api 준비,FFmpeg 경로 설정,qdrant api, url 설정
+- `.env` 파일에 다음 정보 등록  
+  - DB 정보  
+  - ELEVENLABS API 키  
+  - OpenAI API 키  
+  - FFmpeg 경로  
+  - Qdrant API, URL 등
 - Docker Desktop 설치
 
-### 2. 로컬 실행
 
+### 2. 로컬 실행
+- FE
 cd front/
 npm install
+npm start
 
-
+- BE
 cd ../spring-server/
 리눅스/Mac:
     ./mvnw clean install
@@ -65,7 +72,7 @@ Windows:
     mvnw clean install
     mvnw spring-boot:run
 
-
+- AI BE 
 cd ./fastapi-server/
 python -m venv .venv
 source .venv/bin/activate      # (Windows: .venv\Scripts\activate)
