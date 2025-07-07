@@ -1,15 +1,15 @@
 # AI 면접 리허설 서비스
 
-실전과 같은 AI 기반 모의 면접으로  
+실전과 같은 AI 기반 모의 면접으로
 IT 취업 준비생의 실전 감각 향상과 맞춤 피드백까지 한 번에!
 
 ---
 
 ## 프로젝트 개요
 
-본 프로젝트는 최신 LLM 및 음성 인식·합성 기술을 활용하여  
+본 프로젝트는 LLM 및 음성 인식을 활용하여  
 IT 직군 취업 준비생이 실제 면접과 유사한 환경에서  
-연습할 수 있도록 지원하는 AI 면접 리허설 웹 서비스입니다.
+연습할 수 있도록 지원하는 AI 면접 모의면접 웹 서비스입니다.
 
 ---
 
@@ -71,5 +71,3 @@ python -m venv .venv
 source .venv/bin/activate      # (Windows: .venv\Scripts\activate)
 pip install -r requirements.txt
 uvicorn main:app --reload
-
-# 혹은 docker-compose up -d --build 로 전체 실행
